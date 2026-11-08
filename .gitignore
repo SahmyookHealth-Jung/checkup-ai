@@ -14,6 +14,10 @@ hs_err_pid*
 .idea/
 *.iml
 .vscode/
+.metadata/
+.project
+.classpath
+.settings/
 out/
 bin/
 .DS_Store
@@ -35,6 +39,8 @@ frontend/dist/
 
 # --- Data: 원문 문서는 다운로드 스크립트로 받는다 (재배포 조건이 문서마다 다름) ---
 data/guidelines/raw/
+# 합성 결과지 PDF: macOS 폰트가 임베드되므로 커밋하지 않고 같은 시드로 다시 만든다 (eval/README.md)
+data/synthetic/**/*.pdf
 
 # --- Logs ---
 *.log

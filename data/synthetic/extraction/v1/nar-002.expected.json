@@ -1,0 +1,192 @@
+{
+  "examDate": "2026-09-13",
+  "examType": "GENERAL",
+  "sex": "FEMALE",
+  "age": null,
+  "items": [
+    {
+      "code": "HEIGHT",
+      "rawName": "키",
+      "value": "155.4",
+      "unit": "cm",
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "WEIGHT",
+      "rawName": "몸무게",
+      "value": "52.4",
+      "unit": "kg",
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "BMI",
+      "rawName": "체질량지수",
+      "value": "21.7",
+      "unit": "kg/m²",
+      "referenceRaw": null,
+      "centerJudgment": "정상A"
+    },
+    {
+      "code": "WAIST_CIRCUMFERENCE",
+      "rawName": "허리둘레",
+      "value": "70",
+      "unit": "cm",
+      "referenceRaw": null,
+      "centerJudgment": "정상A"
+    },
+    {
+      "code": "SYSTOLIC_BP",
+      "rawName": "혈압 수축기",
+      "value": "172",
+      "unit": "mmHg",
+      "referenceRaw": null,
+      "centerJudgment": "질환의심"
+    },
+    {
+      "code": "DIASTOLIC_BP",
+      "rawName": "이완기",
+      "value": "98",
+      "unit": "mmHg",
+      "referenceRaw": null,
+      "centerJudgment": "질환의심"
+    },
+    {
+      "code": "VISION_LEFT",
+      "rawName": "시력 좌",
+      "value": "0.5",
+      "unit": null,
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "VISION_RIGHT",
+      "rawName": "시력 우",
+      "value": "0.9",
+      "unit": null,
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "HEARING_LEFT",
+      "rawName": "청력 좌",
+      "value": "정상",
+      "unit": null,
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "HEARING_RIGHT",
+      "rawName": "청력 우",
+      "value": "정상",
+      "unit": null,
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "URINE_PROTEIN",
+      "rawName": "요단백",
+      "value": "양성(2+)",
+      "unit": null,
+      "referenceRaw": null,
+      "centerJudgment": "질환의심"
+    },
+    {
+      "code": "HEMOGLOBIN",
+      "rawName": "혈색소",
+      "value": "12.4",
+      "unit": "g/dL",
+      "referenceRaw": "12.0~15.5",
+      "centerJudgment": "정상A"
+    },
+    {
+      "code": "FASTING_GLUCOSE",
+      "rawName": "공복 혈당",
+      "value": "122",
+      "unit": "mg/dL",
+      "referenceRaw": "100 미만",
+      "centerJudgment": "정상B"
+    },
+    {
+      "code": "TOTAL_CHOLESTEROL",
+      "rawName": "총콜레스테롤",
+      "value": "230",
+      "unit": "mg/dL",
+      "referenceRaw": "200 미만",
+      "centerJudgment": "정상B"
+    },
+    {
+      "code": "HDL_CHOLESTEROL",
+      "rawName": "좋은 콜레스테롤(HDL)",
+      "value": "29",
+      "unit": "mg/dL",
+      "referenceRaw": "60 이상",
+      "centerJudgment": "질환의심"
+    },
+    {
+      "code": "TRIGLYCERIDES",
+      "rawName": "중성지방",
+      "value": "74",
+      "unit": "mg/dL",
+      "referenceRaw": "150 미만",
+      "centerJudgment": "정상A"
+    },
+    {
+      "code": "LDL_CHOLESTEROL",
+      "rawName": "나쁜 콜레스테롤(LDL)",
+      "value": "71",
+      "unit": "mg/dL",
+      "referenceRaw": "130 미만",
+      "centerJudgment": "정상A"
+    },
+    {
+      "code": "SERUM_CREATININE",
+      "rawName": "크레아티닌",
+      "value": "2.66",
+      "unit": "mg/dL",
+      "referenceRaw": "1.5 이하",
+      "centerJudgment": "질환의심"
+    },
+    {
+      "code": "EGFR",
+      "rawName": "신장 기능(eGFR)",
+      "value": "45",
+      "unit": "mL/min/1.73m²",
+      "referenceRaw": "60 이상",
+      "centerJudgment": "질환의심"
+    },
+    {
+      "code": "AST",
+      "rawName": "간수치 AST",
+      "value": "75",
+      "unit": "U/L",
+      "referenceRaw": "40 이하",
+      "centerJudgment": "질환의심"
+    },
+    {
+      "code": "ALT",
+      "rawName": "간수치 ALT",
+      "value": "32",
+      "unit": "U/L",
+      "referenceRaw": "35 이하",
+      "centerJudgment": "정상A"
+    },
+    {
+      "code": "GAMMA_GTP",
+      "rawName": "감마지티피",
+      "value": "41",
+      "unit": "U/L",
+      "referenceRaw": "8~35",
+      "centerJudgment": "정상B"
+    },
+    {
+      "code": "CHEST_XRAY",
+      "rawName": "흉부 X선",
+      "value": "정상",
+      "unit": null,
+      "referenceRaw": null,
+      "centerJudgment": "정상A"
+    }
+  ]
+}

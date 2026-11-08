@@ -1,0 +1,152 @@
+# 합성 결과지 항목 정의 (ADR 0003)
+#
+# 주의: 아래 구간(normal/borderline/abnormal)과 참고치는 "합성 문서에 찍을 값을 고르기 위한 임시값"이다.
+#   - 추출 평가용 문서를 만드는 데만 쓴다. 해설(RAG)의 의학적 근거로 쓰지 않는다.
+#   - 출처: 임시값 (보건복지부 고시 「건강검진 실시기준」 판정기준 확인 후 교체 예정)
+#
+# names: [표준 한국어명, 영문 약어(요약표형에서 사용), 일상어(서술형에서 사용)]
+# bands: 값 구간. 성별 차이가 있으면 male/female로 나눈다.
+# decimals: 소수 자릿수
+
+judgment_labels:
+  normal: 정상A
+  borderline: 정상B(경계)
+  abnormal: 질환의심
+
+items:
+  HEIGHT:
+    names: [신장, Height, 키]
+    unit: cm
+    decimals: 1
+    bands: {male: {normal: [160, 186]}, female: {normal: [149, 172]}}
+  WEIGHT:
+    names: [체중, Weight, 몸무게]
+    unit: kg
+    decimals: 1
+    derived: true            # 신장과 BMI에서 계산
+  WAIST_CIRCUMFERENCE:
+    names: [허리둘레, Waist, 허리둘레]
+    unit: cm
+    decimals: 0
+    reference: {male: "90 미만", female: "85 미만"}
+    bands:
+      male: {normal: [72, 89], abnormal: [90, 108]}
+      female: {normal: [62, 84], abnormal: [85, 102]}
+  BMI:
+    names: [체질량지수, BMI, 체질량지수]
+    unit: kg/m²
+    decimals: 1
+    reference: "18.5~24.9"
+    bands: {normal: [18.5, 24.9], borderline: [25.0, 29.9], abnormal: [30.0, 35.0]}
+  SYSTOLIC_BP:
+    names: [수축기 혈압, SBP, 수축기]
+    unit: mmHg
+    decimals: 0
+    reference: "120 미만"
+    bands: {normal: [98, 119], borderline: [120, 139], abnormal: [140, 172]}
+  DIASTOLIC_BP:
+    names: [이완기 혈압, DBP, 이완기]
+    unit: mmHg
+    decimals: 0
+    reference: "80 미만"
+    bands: {normal: [62, 79], borderline: [80, 89], abnormal: [90, 108]}
+  VISION_LEFT:
+    names: [시력(좌), "Vision(L)", 시력 좌]
+    choices: ["0.3", "0.5", "0.7", "0.8", "0.9", "1.0", "1.2", "1.5"]
+  VISION_RIGHT:
+    names: [시력(우), "Vision(R)", 시력 우]
+    choices: ["0.3", "0.5", "0.7", "0.8", "0.9", "1.0", "1.2", "1.5"]
+  HEARING_LEFT:
+    names: [청력(좌), "Hearing(L)", 청력 좌]
+    text_bands: {normal: [정상], abnormal: [비정상]}
+  HEARING_RIGHT:
+    names: [청력(우), "Hearing(R)", 청력 우]
+    text_bands: {normal: [정상], abnormal: [비정상]}
+  URINE_PROTEIN:
+    names: [요단백, U-Protein, 요단백]
+    reference: 음성
+    text_bands: {normal: [음성], borderline: ["약양성(±)"], abnormal: ["양성(1+)", "양성(2+)"]}
+  HEMOGLOBIN:
+    names: [혈색소, Hb, 혈색소]
+    unit: g/dL
+    decimals: 1
+    reference: {male: "13.0~16.5", female: "12.0~15.5"}
+    bands:
+      male: {normal: [13.0, 16.5], borderline: [12.0, 12.9], abnormal: [9.5, 11.9]}
+      female: {normal: [12.0, 15.5], borderline: [10.0, 11.9], abnormal: [8.5, 9.9]}
+  FASTING_GLUCOSE:
+    names: [공복혈당, FBS, 공복 혈당]
+    unit: mg/dL
+    decimals: 0
+    reference: "100 미만"
+    bands: {normal: [72, 99], borderline: [100, 125], abnormal: [126, 210]}
+  TOTAL_CHOLESTEROL:
+    names: [총콜레스테롤, T-Chol, 총콜레스테롤]
+    unit: mg/dL
+    decimals: 0
+    reference: "200 미만"
+    bands: {normal: [135, 199], borderline: [200, 239], abnormal: [240, 310]}
+  HDL_CHOLESTEROL:
+    names: [HDL 콜레스테롤, HDL-C, 좋은 콜레스테롤(HDL)]
+    unit: mg/dL
+    decimals: 0
+    reference: "60 이상"
+    bands: {normal: [60, 88], borderline: [40, 59], abnormal: [26, 39]}
+  TRIGLYCERIDES:
+    names: [중성지방, TG, 중성지방]
+    unit: mg/dL
+    decimals: 0
+    reference: "150 미만"
+    bands: {normal: [55, 149], borderline: [150, 199], abnormal: [200, 480]}
+  LDL_CHOLESTEROL:
+    names: [LDL 콜레스테롤, LDL-C, 나쁜 콜레스테롤(LDL)]
+    unit: mg/dL
+    decimals: 0
+    reference: "130 미만"
+    bands: {normal: [62, 129], borderline: [130, 159], abnormal: [160, 215]}
+  SERUM_CREATININE:
+    names: [혈청 크레아티닌, Cr, 크레아티닌]
+    unit: mg/dL
+    decimals: 2
+    reference: "1.5 이하"
+    bands: {normal: [0.55, 1.20], borderline: [1.21, 1.50], abnormal: [1.51, 2.80]}
+  EGFR:
+    names: [신사구체여과율, eGFR, 신장 기능(eGFR)]
+    unit: mL/min/1.73m²
+    decimals: 0
+    reference: "60 이상"
+    linked_to: SERUM_CREATININE   # 크레아티닌 구간을 따라간다
+    bands: {normal: [76, 118], borderline: [60, 75], abnormal: [28, 59]}
+  AST:
+    names: [AST, SGOT(AST), 간수치 AST]
+    unit: U/L
+    decimals: 0
+    reference: "40 이하"
+    bands: {normal: [13, 40], borderline: [41, 50], abnormal: [51, 140]}
+  ALT:
+    names: [ALT, SGPT(ALT), 간수치 ALT]
+    unit: U/L
+    decimals: 0
+    reference: "35 이하"
+    bands: {normal: [8, 35], borderline: [36, 45], abnormal: [46, 170]}
+  GAMMA_GTP:
+    names: [감마지티피, r-GTP, 감마지티피]
+    unit: U/L
+    decimals: 0
+    reference: {male: "11~63", female: "8~35"}
+    bands:
+      male: {normal: [11, 63], borderline: [64, 77], abnormal: [78, 280]}
+      female: {normal: [8, 35], borderline: [36, 45], abnormal: [46, 190]}
+  CHEST_XRAY:
+    names: [흉부방사선, Chest PA, 흉부 X선]
+    text_bands: {normal: [정상], borderline: [비활동성 폐결핵], abnormal: ["기타 질환 의심(소견서 참조)"]}
+
+# 종합검진(요약표형)에만 붙는 추가 검사 → 정답 코드는 OTHER
+other_items:
+  - {name: 요산, abbr: Uric acid, unit: mg/dL, range: [3.0, 8.9], decimals: 1, reference: "3.5~7.2"}
+  - {name: 당화혈색소, abbr: HbA1c, unit: "%", range: [4.8, 7.4], decimals: 1, reference: "5.7 미만"}
+  - {name: 갑상선자극호르몬, abbr: TSH, unit: μIU/mL, range: [0.4, 6.2], decimals: 2, reference: "0.4~4.5"}
+  - {name: 알부민, abbr: Albumin, unit: g/dL, range: [3.8, 5.1], decimals: 1, reference: "3.5~5.2"}
+  - {name: 총빌리루빈, abbr: T-Bil, unit: mg/dL, range: [0.3, 1.6], decimals: 1, reference: "0.2~1.2"}
+  - {name: 암태아성항원, abbr: CEA, unit: ng/mL, range: [0.5, 6.0], decimals: 1, reference: "5.0 이하"}
+  - {name: 고감도 C반응단백, abbr: hs-CRP, unit: mg/L, range: [0.1, 5.8], decimals: 1, reference: "1.0 미만"}

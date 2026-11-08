@@ -1,0 +1,184 @@
+{
+  "examDate": "2026-09-30",
+  "examType": "COMPREHENSIVE",
+  "sex": "MALE",
+  "age": 31,
+  "items": [
+    {
+      "code": "HEIGHT",
+      "rawName": "Height",
+      "value": "160.6",
+      "unit": "cm",
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "WEIGHT",
+      "rawName": "Weight",
+      "value": "82.3",
+      "unit": "kg",
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "WAIST_CIRCUMFERENCE",
+      "rawName": "Waist",
+      "value": "91",
+      "unit": "cm",
+      "referenceRaw": "<90",
+      "centerJudgment": null
+    },
+    {
+      "code": "BMI",
+      "rawName": "BMI",
+      "value": "31.9",
+      "unit": "kg/m²",
+      "referenceRaw": "18.5-24.9",
+      "centerJudgment": null
+    },
+    {
+      "code": "SYSTOLIC_BP",
+      "rawName": "SBP",
+      "value": "170",
+      "unit": "mmHg",
+      "referenceRaw": "<120",
+      "centerJudgment": null
+    },
+    {
+      "code": "DIASTOLIC_BP",
+      "rawName": "DBP",
+      "value": "94",
+      "unit": "mmHg",
+      "referenceRaw": "<80",
+      "centerJudgment": null
+    },
+    {
+      "code": "URINE_PROTEIN",
+      "rawName": "U-Protein",
+      "value": "음성",
+      "unit": null,
+      "referenceRaw": "음성",
+      "centerJudgment": null
+    },
+    {
+      "code": "HEMOGLOBIN",
+      "rawName": "Hb",
+      "value": "14.9",
+      "unit": "g/dL",
+      "referenceRaw": "13.0-16.5",
+      "centerJudgment": null
+    },
+    {
+      "code": "FASTING_GLUCOSE",
+      "rawName": "FBS",
+      "value": "87",
+      "unit": "mg/dL",
+      "referenceRaw": "<100",
+      "centerJudgment": null
+    },
+    {
+      "code": "TOTAL_CHOLESTEROL",
+      "rawName": "T-Chol",
+      "value": "163",
+      "unit": "mg/dL",
+      "referenceRaw": "<200",
+      "centerJudgment": null
+    },
+    {
+      "code": "HDL_CHOLESTEROL",
+      "rawName": "HDL-C",
+      "value": "81",
+      "unit": "mg/dL",
+      "referenceRaw": "≥60",
+      "centerJudgment": null
+    },
+    {
+      "code": "TRIGLYCERIDES",
+      "rawName": "TG",
+      "value": "101",
+      "unit": "mg/dL",
+      "referenceRaw": "<150",
+      "centerJudgment": null
+    },
+    {
+      "code": "LDL_CHOLESTEROL",
+      "rawName": "LDL-C",
+      "value": "159",
+      "unit": "mg/dL",
+      "referenceRaw": "<130",
+      "centerJudgment": null
+    },
+    {
+      "code": "SERUM_CREATININE",
+      "rawName": "Cr",
+      "value": "1.12",
+      "unit": "mg/dL",
+      "referenceRaw": "≤1.5",
+      "centerJudgment": null
+    },
+    {
+      "code": "EGFR",
+      "rawName": "eGFR",
+      "value": "115",
+      "unit": "mL/min/1.73m²",
+      "referenceRaw": "≥60",
+      "centerJudgment": null
+    },
+    {
+      "code": "AST",
+      "rawName": "SGOT(AST)",
+      "value": "20",
+      "unit": "U/L",
+      "referenceRaw": "≤40",
+      "centerJudgment": null
+    },
+    {
+      "code": "ALT",
+      "rawName": "SGPT(ALT)",
+      "value": "35",
+      "unit": "U/L",
+      "referenceRaw": "≤35",
+      "centerJudgment": null
+    },
+    {
+      "code": "GAMMA_GTP",
+      "rawName": "r-GTP",
+      "value": "71",
+      "unit": "U/L",
+      "referenceRaw": "11-63",
+      "centerJudgment": null
+    },
+    {
+      "code": "CHEST_XRAY",
+      "rawName": "Chest PA",
+      "value": "기타 질환 의심(소견서 참조)",
+      "unit": null,
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "OTHER",
+      "rawName": "TSH",
+      "value": "3.88",
+      "unit": "μIU/mL",
+      "referenceRaw": "0.4-4.5",
+      "centerJudgment": null
+    },
+    {
+      "code": "OTHER",
+      "rawName": "Uric acid",
+      "value": "8.1",
+      "unit": "mg/dL",
+      "referenceRaw": "3.5-7.2",
+      "centerJudgment": null
+    },
+    {
+      "code": "OTHER",
+      "rawName": "HbA1c",
+      "value": "6.8",
+      "unit": "%",
+      "referenceRaw": "<5.7",
+      "centerJudgment": null
+    }
+  ]
+}

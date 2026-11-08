@@ -1,0 +1,216 @@
+"""레이아웃 템플릿 3종. 각 템플릿은 (문서 블록, 정답 JSON, 메타)를 돌려준다.
+
+정답 JSON의 문자열 값은 문서에 "찍힌 그대로"다. 그래서 정답은 렌더링과 항상 일치한다.
+"""
+from __future__ import annotations
+
+import random
+from dataclasses import dataclass
+
+from .sampling import Measured, Subject
+
+SYNTHETIC_NOTICE = "※ 이 문서는 테스트용 합성 데이터입니다. 실제 개인 정보나 검진 결과가 아닙니다."
+FAKE_CENTER = "가상건강검진센터"
+
+
+# ---- 문서 블록 (텍스트·PDF 렌더러가 공통으로 쓴다) ----
+
+@dataclass
+class Heading:
+    text: str
+
+
+@dataclass
+class Para:
+    text: str
+
+
+@dataclass
+class Table:
+    header: list[str]
+    rows: list[list[str]]
+
+
+Block = Heading | Para | Table
+
+
+def _expected_item(m: Measured, raw_name: str, *, value: str | None = None, unit: str | None = None,
+                   reference: str | None = None, judgment: str | None = None) -> dict:
+    return {
+        "code": m.code,
+        "rawName": raw_name,
+        "value": value if value is not None else m.value,
+        "unit": unit,
+        "referenceRaw": reference,
+        "centerJudgment": judgment,
+    }
+
+
+def _expected(subject: Subject, exam_type: str, items: list[dict], *, age_printed: bool) -> dict:
+    return {
+        "examDate": subject.exam_date.isoformat(),
+        "examType": exam_type,
+        "sex": subject.sex,
+        "age": subject.age if age_printed else None,
+        "items": items,
+    }
+
+
+def _by_code(items: list[Measured]) -> dict[str, Measured]:
+    return {m.code: m for m in items if m.code != "OTHER"}
+
+
+# ---- 템플릿 1: 공단 표준 서식형 ----
+
+GROUPS = {
+    "HEIGHT": "계측검사", "WEIGHT": "계측검사", "WAIST_CIRCUMFERENCE": "계측검사", "BMI": "계측검사",
+    "SYSTOLIC_BP": "계측검사", "VISION_LEFT": "계측검사", "VISION_RIGHT": "계측검사",
+    "HEARING_LEFT": "계측검사", "HEARING_RIGHT": "계측검사", "URINE_PROTEIN": "요검사",
+    "CHEST_XRAY": "영상검사",
+}
+
+
+def standard(rng: random.Random, subject: Subject, items: list[Measured], labels: dict) -> tuple:
+    rows, expected = [], []
+    codes = _by_code(items)
+    for m in items:
+        if m.code == "DIASTOLIC_BP":
+            continue  # 수축기 행에서 함께 찍는다
+        group = GROUPS.get(m.code, "혈액검사")
+        judgment = labels[m.band] if m.band else None
+        if m.code == "SYSTOLIC_BP":
+            dia = codes["DIASTOLIC_BP"]
+            name, reference = "혈압(수축기/이완기)", "120/80 미만"
+            rows.append([group, name, f"{m.value}/{dia.value}", "mmHg", reference, judgment or "-"])
+            expected.append(_expected_item(m, name, unit="mmHg", reference=reference, judgment=judgment))
+            expected.append(_expected_item(dia, name, unit="mmHg", reference=reference, judgment=judgment))
+            continue
+        name = m.names[0]
+        rows.append([group, name, m.value, m.unit or "-", m.reference or "-", judgment or "-"])
+        expected.append(_expected_item(m, name, unit=m.unit, reference=m.reference, judgment=judgment))
+
+    flagged = [m.names[0] for m in items if m.band in ("borderline", "abnormal")]
+    sex_ko = "남" if subject.sex == "MALE" else "여"
+    blocks: list[Block] = [
+        Heading("일반건강검진 결과통보서"),
+        Para(SYNTHETIC_NOTICE),
+        Heading("수검자 정보"),
+        Table(["성명", "생년월일", "성별", "나이", "검진일", "검진기관"],
+              [[subject.masked_name, f"{subject.birth_year}-**-**", sex_ko, f"만 {subject.age}세",
+                subject.exam_date.isoformat(), FAKE_CENTER]]),
+        Heading("검사 결과"),
+        Table(["구분", "검사항목", "결과", "단위", "참고치", "판정"], rows),
+        Heading("종합 소견"),
+        Para("추적 관찰이 필요한 항목: " + (", ".join(flagged) if flagged else "없음")
+             + ". 자세한 내용은 담당 의사와 상담하시기 바랍니다."),
+    ]
+    meta = {"distractors": [], "age_printed": True}
+    return blocks, _expected(subject, "GENERAL", expected, age_printed=True), meta
+
+
+# ---- 템플릿 2: 기관 요약표형 (종합검진, 영문 약어, 전회 결과 칸) ----
+
+def _short_reference(reference: str | None) -> str:
+    if not reference:
+        return ""
+    for word, symbol in (("미만", "<"), ("이하", "≤"), ("이상", "≥")):
+        if reference.endswith(word):
+            return symbol + reference.removesuffix(word).strip()
+    return reference.replace("~", "-")
+
+
+def clinic_summary(rng: random.Random, subject: Subject, items: list[Measured], labels: dict) -> tuple:
+    rows, expected = [], []
+    for m in items:
+        name = m.names[1]
+        reference = _short_reference(m.reference) or None
+        rows.append([name, m.value, m.previous, m.unit or "", reference or ""])
+        expected.append(_expected_item(m, name, unit=m.unit, reference=reference))
+
+    sex_code = "M" if subject.sex == "MALE" else "F"
+    blocks: list[Block] = [
+        Heading("가상의원 종합건강검진 결과 요약"),
+        Para(SYNTHETIC_NOTICE),
+        Para(f"수검번호: SYN-2026-{rng.randint(1000, 9999)}    이름: {subject.masked_name} "
+             f"({sex_code}/{subject.age})    검사일: {subject.exam_date.strftime('%Y.%m.%d')}"),
+        Table(["검사명", "금회", "전회", "단위", "참고치"], rows),
+        Para("※ 전회 결과는 직전 검진 기록입니다. 이상 소견은 담당 의사와 상담하시기 바랍니다."),
+    ]
+    meta = {"distractors": ["previous_column"], "age_printed": True}
+    return blocks, _expected(subject, "COMPREHENSIVE", expected, age_printed=True), meta
+
+
+# ---- 템플릿 3: 목록 + 의사 소견형 (나이 없음, 소견 속 전회 수치) ----
+
+def _short_label(label: str) -> str:
+    return label.split("(")[0]
+
+
+def narrative(rng: random.Random, subject: Subject, items: list[Measured], labels: dict) -> tuple:
+    codes = _by_code(items)
+    expected: list[dict] = []
+
+    def judged(m: Measured) -> str | None:
+        return _short_label(labels[m.band]) if m.band else None
+
+    def inline(m: Measured, *, space: bool) -> str:
+        """'172.4cm (정상A)' 형태로 찍고 정답을 기록한다."""
+        judgment = judged(m)
+        expected.append(_expected_item(m, m.names[2], unit=m.unit, judgment=judgment))
+        unit = (" " if space else "") + m.unit if m.unit else ""
+        return f"{m.names[2]} {m.value}{unit}" + (f" ({judgment})" if judgment else "")
+
+    lines = ["■ 신체 계측"]
+    lines.append("· " + ", ".join(inline(codes[c], space=False)
+                                  for c in ("HEIGHT", "WEIGHT", "BMI", "WAIST_CIRCUMFERENCE")))
+    sbp, dbp = codes["SYSTOLIC_BP"], codes["DIASTOLIC_BP"]
+    bp_judgment = judged(sbp)
+    expected.append(_expected_item(sbp, "혈압 수축기", unit="mmHg", judgment=bp_judgment))
+    expected.append(_expected_item(dbp, "이완기", unit="mmHg", judgment=bp_judgment))
+    lines.append(f"· 혈압 수축기 {sbp.value}mmHg / 이완기 {dbp.value}mmHg ({bp_judgment})")
+    if "VISION_LEFT" in codes:
+        for c in ("VISION_LEFT", "VISION_RIGHT", "HEARING_LEFT", "HEARING_RIGHT"):
+            expected.append(_expected_item(codes[c], codes[c].names[2]))
+        lines.append("· " + ", ".join(f"{codes[c].names[2]} {codes[c].value}"
+                                      for c in ("VISION_LEFT", "VISION_RIGHT", "HEARING_LEFT", "HEARING_RIGHT")))
+
+    lines.append("■ 소변 검사")
+    lines.append("· " + inline(codes["URINE_PROTEIN"], space=True))
+
+    lines.append("■ 혈액 검사")
+    blood = [m for m in items if m.code not in GROUPS and m.code not in ("DIASTOLIC_BP", "OTHER")]
+    for m in blood:
+        judgment = judged(m)
+        expected.append(_expected_item(m, m.names[2], unit=m.unit, reference=m.reference, judgment=judgment))
+        reference = f" (참고 {m.reference})" if m.reference else ""
+        lines.append(f"· {m.names[2]} {m.value} {m.unit}{reference}" + (f" → {judgment}" if judgment else ""))
+
+    lines.append("■ 흉부 X선")
+    lines.append("· " + inline(codes["CHEST_XRAY"], space=True))
+
+    # 의사 소견: 경계/이상 항목 하나를 골라 '전회 수치'를 문장에 넣는다 (방해 요소)
+    numeric_flagged = [m for m in blood if m.band in ("borderline", "abnormal")]
+    target = rng.choice(numeric_flagged) if numeric_flagged else rng.choice(blood)
+    comment = (f"{target.names[2]} 수치는 지난 검진 때 {target.previous} {target.unit}에서 이번에 "
+               f"{target.value} {target.unit}로 변했습니다. 생활습관을 점검하시고 정기적으로 추적 검사를 받으세요. "
+               "이 안내문은 진단서가 아니며, 정확한 판단은 담당 의사와 상담하시기 바랍니다.")
+
+    sex_ko = "남성" if subject.sex == "MALE" else "여성"
+    blocks: list[Block] = [
+        Heading("[가상내과의원] 건강검진 결과 안내"),
+        Para(SYNTHETIC_NOTICE),
+        Para(f"{subject.masked_name} 님 ({sex_ko}, {subject.birth_year}-**-** 생)"),
+        Para(f"검진일자: {subject.exam_date.year}년 {subject.exam_date.month}월 {subject.exam_date.day}일"),
+        *[Heading(line[2:]) if line.startswith("■") else Para(line) for line in lines],
+        Heading("의사 소견"),
+        Para(comment),
+    ]
+    meta = {"distractors": ["comment_previous_value"], "age_printed": False}
+    return blocks, _expected(subject, "GENERAL", expected, age_printed=False), meta
+
+
+TEMPLATES = {
+    "std": standard,        # 공단 표준 서식형
+    "sum": clinic_summary,  # 기관 요약표형
+    "nar": narrative,       # 목록 + 의사 소견형
+}

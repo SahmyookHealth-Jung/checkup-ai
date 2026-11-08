@@ -1,0 +1,192 @@
+{
+  "examDate": "2026-03-03",
+  "examType": "COMPREHENSIVE",
+  "sex": "FEMALE",
+  "age": 45,
+  "items": [
+    {
+      "code": "HEIGHT",
+      "rawName": "Height",
+      "value": "150.2",
+      "unit": "cm",
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "WEIGHT",
+      "rawName": "Weight",
+      "value": "75.1",
+      "unit": "kg",
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "WAIST_CIRCUMFERENCE",
+      "rawName": "Waist",
+      "value": "65",
+      "unit": "cm",
+      "referenceRaw": "<85",
+      "centerJudgment": null
+    },
+    {
+      "code": "BMI",
+      "rawName": "BMI",
+      "value": "33.3",
+      "unit": "kg/m²",
+      "referenceRaw": "18.5-24.9",
+      "centerJudgment": null
+    },
+    {
+      "code": "SYSTOLIC_BP",
+      "rawName": "SBP",
+      "value": "134",
+      "unit": "mmHg",
+      "referenceRaw": "<120",
+      "centerJudgment": null
+    },
+    {
+      "code": "DIASTOLIC_BP",
+      "rawName": "DBP",
+      "value": "87",
+      "unit": "mmHg",
+      "referenceRaw": "<80",
+      "centerJudgment": null
+    },
+    {
+      "code": "URINE_PROTEIN",
+      "rawName": "U-Protein",
+      "value": "약양성(±)",
+      "unit": null,
+      "referenceRaw": "음성",
+      "centerJudgment": null
+    },
+    {
+      "code": "HEMOGLOBIN",
+      "rawName": "Hb",
+      "value": "13.6",
+      "unit": "g/dL",
+      "referenceRaw": "12.0-15.5",
+      "centerJudgment": null
+    },
+    {
+      "code": "FASTING_GLUCOSE",
+      "rawName": "FBS",
+      "value": "107",
+      "unit": "mg/dL",
+      "referenceRaw": "<100",
+      "centerJudgment": null
+    },
+    {
+      "code": "TOTAL_CHOLESTEROL",
+      "rawName": "T-Chol",
+      "value": "173",
+      "unit": "mg/dL",
+      "referenceRaw": "<200",
+      "centerJudgment": null
+    },
+    {
+      "code": "HDL_CHOLESTEROL",
+      "rawName": "HDL-C",
+      "value": "80",
+      "unit": "mg/dL",
+      "referenceRaw": "≥60",
+      "centerJudgment": null
+    },
+    {
+      "code": "TRIGLYCERIDES",
+      "rawName": "TG",
+      "value": "100",
+      "unit": "mg/dL",
+      "referenceRaw": "<150",
+      "centerJudgment": null
+    },
+    {
+      "code": "LDL_CHOLESTEROL",
+      "rawName": "LDL-C",
+      "value": "134",
+      "unit": "mg/dL",
+      "referenceRaw": "<130",
+      "centerJudgment": null
+    },
+    {
+      "code": "SERUM_CREATININE",
+      "rawName": "Cr",
+      "value": "1.11",
+      "unit": "mg/dL",
+      "referenceRaw": "≤1.5",
+      "centerJudgment": null
+    },
+    {
+      "code": "EGFR",
+      "rawName": "eGFR",
+      "value": "93",
+      "unit": "mL/min/1.73m²",
+      "referenceRaw": "≥60",
+      "centerJudgment": null
+    },
+    {
+      "code": "AST",
+      "rawName": "SGOT(AST)",
+      "value": "17",
+      "unit": "U/L",
+      "referenceRaw": "≤40",
+      "centerJudgment": null
+    },
+    {
+      "code": "ALT",
+      "rawName": "SGPT(ALT)",
+      "value": "127",
+      "unit": "U/L",
+      "referenceRaw": "≤35",
+      "centerJudgment": null
+    },
+    {
+      "code": "GAMMA_GTP",
+      "rawName": "r-GTP",
+      "value": "40",
+      "unit": "U/L",
+      "referenceRaw": "8-35",
+      "centerJudgment": null
+    },
+    {
+      "code": "CHEST_XRAY",
+      "rawName": "Chest PA",
+      "value": "비활동성 폐결핵",
+      "unit": null,
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "OTHER",
+      "rawName": "CEA",
+      "value": "2.6",
+      "unit": "ng/mL",
+      "referenceRaw": "≤5.0",
+      "centerJudgment": null
+    },
+    {
+      "code": "OTHER",
+      "rawName": "HbA1c",
+      "value": "5.9",
+      "unit": "%",
+      "referenceRaw": "<5.7",
+      "centerJudgment": null
+    },
+    {
+      "code": "OTHER",
+      "rawName": "Uric acid",
+      "value": "4.7",
+      "unit": "mg/dL",
+      "referenceRaw": "3.5-7.2",
+      "centerJudgment": null
+    },
+    {
+      "code": "OTHER",
+      "rawName": "hs-CRP",
+      "value": "2.6",
+      "unit": "mg/L",
+      "referenceRaw": "<1.0",
+      "centerJudgment": null
+    }
+  ]
+}
