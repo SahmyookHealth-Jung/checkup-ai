@@ -1,0 +1,31 @@
+# 버전은 이 파일에서만 관리한다. 개별 라이브러리 버전은 Spring Boot / Spring AI BOM이 정한다.
+[versions]
+spring-boot = "4.1.2"
+spring-ai = "2.0.1"
+
+[libraries]
+# BOM (buildSrc 컨벤션 플러그인에서 platform으로 적용)
+spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
+spring-ai-bom = { module = "org.springframework.ai:spring-ai-bom", version.ref = "spring-ai" }
+
+# Spring Boot
+spring-boot-starter-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
+spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+spring-boot-starter-flyway = { module = "org.springframework.boot:spring-boot-starter-flyway" }
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+flyway-database-postgresql = { module = "org.flywaydb:flyway-database-postgresql" }
+postgresql = { module = "org.postgresql:postgresql" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+
+# Spring AI - 기능 모듈은 추상화(인터페이스)에만 의존한다
+spring-ai-client-chat = { module = "org.springframework.ai:spring-ai-client-chat" }
+spring-ai-model = { module = "org.springframework.ai:spring-ai-model" }
+
+# Spring AI - 구현체(스타터)는 app 모듈만 가진다. 설정으로 공급자를 고른다
+spring-ai-starter-model-ollama = { module = "org.springframework.ai:spring-ai-starter-model-ollama" }
+spring-ai-starter-model-anthropic = { module = "org.springframework.ai:spring-ai-starter-model-anthropic" }
+spring-ai-starter-vector-store-pgvector = { module = "org.springframework.ai:spring-ai-starter-vector-store-pgvector" }
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }

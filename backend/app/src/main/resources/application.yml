@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: checkup-ai
+
+  # 값은 저장소 루트 .env에서 주입된다 (.env.example 참고)
+  datasource:
+    url: jdbc:postgresql://localhost:${POSTGRES_PORT:5433}/${POSTGRES_DB:checkup}
+    username: ${POSTGRES_USER:checkup}
+    password: ${POSTGRES_PASSWORD}
+
+  ai:
+    # 모델 공급자 선택. 코드는 ChatModel/EmbeddingModel 인터페이스만 쓰므로 여기만 바꾸면 교체된다.
+    model:
+      chat: ${AI_CHAT_PROVIDER:ollama}     # ollama | anthropic
+      embedding: ollama                    # 임베딩은 로컬 bge-m3 고정 (벡터 차원이 바뀌면 재적재 필요)
+
+    ollama:
+      base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+      embedding:
+        model: bge-m3                      # Spring AI 2.0 키. 1.x의 embedding.options.model은 deprecated
+      # 로컬 채팅 모델은 결과지 추출 작업 때 정한다 (ADR 예정). 정하면 chat.model에 지정한다.
+
+    anthropic:
+      api-key: ${ANTHROPIC_API_KEY:}
+      chat:
+        model: ${ANTHROPIC_CHAT_MODEL:claude-haiku-5-5}
+
+    vectorstore:
+      pgvector:
+        # 벡터 테이블(메타데이터, 키워드 검색 컬럼, 인덱스)은 2주차에 설계해 Flyway로 만든다.
+        initialize-schema: false
+        dimensions: 1024                   # bge-m3 출력 차원
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics

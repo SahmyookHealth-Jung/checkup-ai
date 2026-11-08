@@ -1,0 +1,40 @@
+# --- 비밀값: 절대 커밋하지 않는다 ---
+.env
+.env.*
+!.env.example
+
+# --- Gradle / Java ---
+.gradle/
+build/
+!**/src/**/build/
+*.class
+hs_err_pid*
+
+# --- IDE / OS ---
+.idea/
+*.iml
+.vscode/
+out/
+bin/
+.DS_Store
+
+# --- Claude Code 개인 설정 ---
+.claude/settings.local.json
+
+# --- Python (eval) ---
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+# LLM 응답 캐시 (중복 과금 방지용, 재생성 가능)
+eval/.cache/
+
+# --- Frontend ---
+node_modules/
+frontend/dist/
+
+# --- Data: 원문 문서는 다운로드 스크립트로 받는다 (재배포 조건이 문서마다 다름) ---
+data/guidelines/raw/
+
+# --- Logs ---
+*.log
