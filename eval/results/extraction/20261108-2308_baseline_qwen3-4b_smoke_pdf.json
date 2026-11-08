@@ -1,0 +1,253 @@
+{
+  "summary": {
+    "runAt": "2026-11-08T23:08:16",
+    "model": "qwen3:4b",
+    "promptVersion": "extraction-v1",
+    "pipeline": "baseline",
+    "subset": "smoke",
+    "format": "pdf",
+    "documents": 6,
+    "failed": 0,
+    "itemF1": {
+      "tp": 123,
+      "fp": 5,
+      "fn": 9,
+      "precision": 0.9609,
+      "recall": 0.9318,
+      "f1": 0.9462
+    },
+    "byTemplate": {
+      "nar": {
+        "tp": 40,
+        "fp": 0,
+        "fn": 2,
+        "precision": 1.0,
+        "recall": 0.9524,
+        "f1": 0.9756
+      },
+      "std": {
+        "tp": 44,
+        "fp": 0,
+        "fn": 2,
+        "precision": 1.0,
+        "recall": 0.9565,
+        "f1": 0.9778
+      },
+      "sum": {
+        "tp": 39,
+        "fp": 5,
+        "fn": 5,
+        "precision": 0.8864,
+        "recall": 0.8864,
+        "f1": 0.8864
+      }
+    },
+    "avgLatencyMs": 301493,
+    "avgPromptTokens": 1589,
+    "avgCompletionTokens": 1445
+  },
+  "documents": [
+    {
+      "id": "std-001",
+      "cached": false,
+      "tp": 23,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "latencyMs": 449121,
+        "promptTokens": 1737,
+        "completionTokens": 1554,
+        "attempts": 1
+      },
+      "error": null,
+      "errors": []
+    },
+    {
+      "id": "std-002",
+      "cached": false,
+      "tp": 21,
+      "fp": 0,
+      "fn": 2,
+      "precision": 1.0,
+      "recall": 0.913,
+      "f1": 0.9545,
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "latencyMs": 327944,
+        "promptTokens": 1706,
+        "completionTokens": 1447,
+        "attempts": 1
+      },
+      "error": null,
+      "errors": [
+        {
+          "type": "missing",
+          "code": "VISION_LEFT",
+          "expected": "0.3",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "VISION_RIGHT",
+          "expected": "0.3",
+          "predicted": null
+        }
+      ]
+    },
+    {
+      "id": "sum-001",
+      "cached": false,
+      "tp": 20,
+      "fp": 3,
+      "fn": 2,
+      "precision": 0.8696,
+      "recall": 0.9091,
+      "f1": 0.8889,
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "latencyMs": 288027,
+        "promptTokens": 1458,
+        "completionTokens": 1555,
+        "attempts": 1
+      },
+      "error": null,
+      "errors": [
+        {
+          "type": "duplicate",
+          "code": "HEMOGLOBIN",
+          "expected": null,
+          "predicted": "10.4"
+        },
+        {
+          "type": "duplicate",
+          "code": "FASTING_GLUCOSE",
+          "expected": null,
+          "predicted": "183"
+        },
+        {
+          "type": "wrong_value",
+          "code": "CHEST_XRAY",
+          "expected": "비활동성 폐결핵",
+          "predicted": "비활동성"
+        },
+        {
+          "type": "missing",
+          "code": "OTHER",
+          "expected": "HbA1c=5.1",
+          "predicted": null
+        }
+      ]
+    },
+    {
+      "id": "sum-002",
+      "cached": false,
+      "tp": 19,
+      "fp": 2,
+      "fn": 3,
+      "precision": 0.9048,
+      "recall": 0.8636,
+      "f1": 0.8837,
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "latencyMs": 257616,
+        "promptTokens": 1471,
+        "completionTokens": 1426,
+        "attempts": 1
+      },
+      "error": null,
+      "errors": [
+        {
+          "type": "duplicate",
+          "code": "TOTAL_CHOLESTEROL",
+          "expected": null,
+          "predicted": "163"
+        },
+        {
+          "type": "duplicate",
+          "code": "TOTAL_CHOLESTEROL",
+          "expected": null,
+          "predicted": "163"
+        },
+        {
+          "type": "missing",
+          "code": "OTHER",
+          "expected": "TSH=3.88",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "OTHER",
+          "expected": "Uric acid=8.1",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "OTHER",
+          "expected": "HbA1c=6.8",
+          "predicted": null
+        }
+      ]
+    },
+    {
+      "id": "nar-001",
+      "cached": false,
+      "tp": 17,
+      "fp": 0,
+      "fn": 2,
+      "precision": 1.0,
+      "recall": 0.8947,
+      "f1": 0.9444,
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "latencyMs": 196146,
+        "promptTokens": 1503,
+        "completionTokens": 1146,
+        "attempts": 1
+      },
+      "error": null,
+      "errors": [
+        {
+          "type": "missing",
+          "code": "VISION_LEFT",
+          "expected": "0.7",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "VISION_RIGHT",
+          "expected": "0.8",
+          "predicted": null
+        }
+      ]
+    },
+    {
+      "id": "nar-002",
+      "cached": false,
+      "tp": 23,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "latencyMs": 290103,
+        "promptTokens": 1658,
+        "completionTokens": 1542,
+        "attempts": 1
+      },
+      "error": null,
+      "errors": []
+    }
+  ]
+}
