@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,12 @@ public class ReportExtractionController {
     public ReportExtractionController(ReportTextReader textReader, ReportExtractor extractor) {
         this.textReader = textReader;
         this.extractor = extractor;
+    }
+
+    /** 현재 모델·프롬프트·파이프라인 버전. 평가 스크립트의 캐시 키로 쓴다. */
+    @GetMapping("/extract/info")
+    public ExtractionInfo info() {
+        return extractor.info();
     }
 
     @PostMapping(path = "/extract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

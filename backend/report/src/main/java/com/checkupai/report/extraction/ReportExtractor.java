@@ -7,6 +7,7 @@ import org.springframework.ai.chat.client.AdvisorParams;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.ResponseEntity;
 import org.springframework.ai.chat.metadata.Usage;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 public class ReportExtractor {
 
     static final String PROMPT_VERSION = "extraction-v1";
+    static final String PIPELINE = "baseline";
 
     private static final String USER_TEMPLATE = """
             다음 검진 결과지에서 검사 결과를 추출하라.
@@ -31,11 +33,17 @@ public class ReportExtractor {
             """;
 
     private final ChatClient chatClient;
+    private final String defaultModel;
     private final String systemPrompt;
 
-    public ReportExtractor(ChatClient.Builder chatClientBuilder) {
+    public ReportExtractor(ChatClient.Builder chatClientBuilder, ChatModel chatModel) {
         this.chatClient = chatClientBuilder.build();
+        this.defaultModel = chatModel.getOptions().getModel();
         this.systemPrompt = loadPrompt("prompts/report-extraction-v1.st");
+    }
+
+    public ExtractionInfo info() {
+        return new ExtractionInfo(defaultModel, PROMPT_VERSION, PIPELINE);
     }
 
     public ExtractionResult extract(String reportText) {
