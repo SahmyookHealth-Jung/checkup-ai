@@ -18,7 +18,11 @@ spring:
       base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
       embedding:
         model: bge-m3                      # Spring AI 2.0 키. 1.x의 embedding.options.model은 deprecated
-      # 로컬 채팅 모델은 결과지 추출 작업 때 정한다 (ADR 예정). 정하면 chat.model에 지정한다.
+      chat:
+        model: ${OLLAMA_CHAT_MODEL:qwen3:4b}   # 임시 선택. 실측 후 ADR 0004에서 확정
+        temperature: 0                     # 추출은 재현성이 중요하다
+        think: false                       # 사고 과정 출력 끔 (CPU에서 토큰 낭비)
+        num-ctx: 8192                      # 결과지 + 출력 JSON이 기본 4096을 넘을 수 있다
 
     anthropic:
       api-key: ${ANTHROPIC_API_KEY:}

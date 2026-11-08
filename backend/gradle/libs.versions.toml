@@ -21,6 +21,8 @@ junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher
 # Spring AI - 기능 모듈은 추상화(인터페이스)에만 의존한다
 spring-ai-client-chat = { module = "org.springframework.ai:spring-ai-client-chat" }
 spring-ai-model = { module = "org.springframework.ai:spring-ai-model" }
+spring-ai-pdf-document-reader = { module = "org.springframework.ai:spring-ai-pdf-document-reader" }
+spring-web = { module = "org.springframework:spring-web" }
 
 # Spring AI - 구현체(스타터)는 app 모듈만 가진다. 설정으로 공급자를 고른다
 spring-ai-starter-model-ollama = { module = "org.springframework.ai:spring-ai-starter-model-ollama" }
