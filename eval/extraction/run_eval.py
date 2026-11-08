@@ -109,6 +109,10 @@ def _save(args, info: dict, ids: list[str], total: Score, per_template: dict, do
         "avgLatencyMs": avg("latencyMs"),
         "avgPromptTokens": avg("promptTokens"),
         "avgCompletionTokens": avg("completionTokens"),
+        # validated 파이프라인: LLM 호출 수, 재요청한 줄 수, 검증에서 찾은 문제 유형별 건수
+        "totalAttempts": sum(c.get("attempts") or 1 for c in calls),
+        "totalRetriedLines": sum(c.get("retriedLines") or 0 for c in calls),
+        "issueCounts": _sum_counts(c.get("issues") or {} for c in calls),
     }
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -133,6 +137,14 @@ def _save(args, info: dict, ids: list[str], total: Score, per_template: dict, do
 
     print(json.dumps(summary, ensure_ascii=False, indent=2))
     print(f"저장: {out.relative_to(EVAL_DIR)}")
+
+
+def _sum_counts(counts) -> dict:
+    total: dict[str, int] = {}
+    for count in counts:
+        for key, value in count.items():
+            total[key] = total.get(key, 0) + value
+    return dict(sorted(total.items()))
 
 
 def _all_ids(data: Path) -> list[str]:

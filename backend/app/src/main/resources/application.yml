@@ -35,6 +35,10 @@ spring:
         initialize-schema: false
         dimensions: 1024                   # bge-m3 출력 차원
 
+checkupai:
+  extraction:
+    pipeline: ${EXTRACTION_PIPELINE:validated}   # baseline | validated (ADR 0003)
+
 management:
   endpoints:
     web:
