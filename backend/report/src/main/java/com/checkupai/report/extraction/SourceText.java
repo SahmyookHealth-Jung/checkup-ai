@@ -1,5 +1,6 @@
 package com.checkupai.report.extraction;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -45,6 +46,29 @@ final class SourceText {
         }
         String squashedText = squash(text);
         return Arrays.stream(WHITESPACE.split(trimmed)).allMatch(token -> squashedText.contains(token));
+    }
+
+    /**
+     * 값이 들어 있는 원문 범위. 값이 한 줄 안에 있으면 그 줄이고, 두 줄에 걸쳐 있으면 두 줄을 이은 것이다.
+     * PDF 표 칸에서 긴 값은 줄바꿈된다. 2026-11-09 전체 평가에서 "기타 질환 의심(소견서 참조)"가
+     * "... 의심(소" / "견서 참조) - - 질환의심"으로 나뉘어, 같은 칸의 판정을 지우고 둘째 줄을 누락 조각으로 재요청했다.
+     */
+    static List<String> valueWindows(List<String> lines, String value) {
+        List<String> windows = new ArrayList<>();
+        for (int i = 0; i < lines.size(); i++) {
+            if (containsValue(lines.get(i), value)) {
+                windows.add(lines.get(i));
+            } else if (i + 1 < lines.size() && spansLines(lines.get(i), lines.get(i + 1), value)) {
+                windows.add(lines.get(i) + " " + lines.get(i + 1));
+            }
+        }
+        return windows;
+    }
+
+    /** 값이 두 줄 중 어느 한 줄에도 온전히 없고, 두 줄을 이으면 있다 (줄바꿈으로 나뉜 값). 숫자는 나뉘지 않는다. */
+    static boolean spansLines(String first, String second, String value) {
+        return !containsValue(first, value) && !containsValue(second, value)
+                && containsValue(first + " " + second, value);
     }
 
     static boolean containsIgnoringSpaces(String text, String fragment) {

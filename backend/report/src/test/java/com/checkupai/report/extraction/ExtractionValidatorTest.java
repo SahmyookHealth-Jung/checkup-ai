@@ -179,6 +179,76 @@ class ExtractionValidatorTest {
         assertThat(types(merged)).containsExactly(IssueType.DUPLICATE);
     }
 
+    @Test
+    @DisplayName("PDF 표 칸에서 두 줄로 줄바꿈된 값: 둘째 줄을 누락으로 보지 않는다. 판정은 다른 열과 구분할 수 없어 지운다 (std-004 실측)")
+    void treatsValueWrappedOverTwoLinesAsOneCell() {
+        String wrapped = """
+                             혈액검사                 감마지티피                 76                  U/L                  11~63               정상B(경계)
+                             영상검사                 흉부방사선                 기타  질환   의심(소
+                                                                        견서  참조)             -                    -                   질환의심
+                """;
+        CheckupReport report = new CheckupReport(null, CheckupReport.ExamType.GENERAL, CheckupReport.Sex.MALE, 45,
+                List.of(new ReportItem(ItemCode.GAMMA_GTP, "감마지티피", "76", "U/L", "11~63", "정상B(경계)"),
+                        new ReportItem(ItemCode.CHEST_XRAY, "흉부방사선", "기타 질환 의심(소견서 참조)", null, null, "질환의심")));
+
+        ValidationResult result = validator.validate(report, wrapped);
+
+        assertThat(result.report().items()).extracting(ReportItem::code)
+                .containsExactly(ItemCode.GAMMA_GTP, ItemCode.CHEST_XRAY);
+        assertThat(result.report().items().get(1).centerJudgment()).as("틀린 판정보다 빈 판정이 덜 위험하다").isNull();
+        assertThat(types(result)).containsExactly(IssueType.UNGROUNDED_FIELD);
+        assertThat(result.uncoveredSegments()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("줄바꿈된 값의 둘째 줄에 다른 열의 결과어가 있어도 누락 조각으로 재요청하지 않는다 (sum 템플릿의 '참조) 정상')")
+    void doesNotRetryContinuationLineOfWrappedValue() {
+        String wrapped = """
+                 Chest PA                 기타 질환 의심(소견서
+                                          참조)                    정상
+                """;
+        CheckupReport report = new CheckupReport(null, CheckupReport.ExamType.COMPREHENSIVE, CheckupReport.Sex.FEMALE,
+                42, List.of(item(ItemCode.CHEST_XRAY, "Chest PA", "기타 질환 의심(소견서 참조)")));
+
+        assertThat(validator.validate(report, wrapped).uncoveredSegments()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("OTHER 항목도 같은 항목명에 값이 여럿이면 처음 값만 남긴다 (sum-003: 한 줄의 금회·전회·참고치를 각각 항목으로 뽑음)")
+    void keepsFirstValueOfSameOtherName() {
+        String source = "T-Bil      0.8      0.7      mg/dL      0.2-1.2";
+        CheckupReport empty = new CheckupReport(null, CheckupReport.ExamType.COMPREHENSIVE, CheckupReport.Sex.MALE, 50,
+                List.of());
+
+        ValidationResult merged = validator.validateAdditional(empty, List.of(
+                item(ItemCode.OTHER, "T-Bil", "0.8"),
+                item(ItemCode.OTHER, "T-Bil", "0.7"),
+                item(ItemCode.OTHER, "T-Bil", "0.2-1.2"),
+                item(ItemCode.OTHER, "T-Bil", "0.8")), source);
+
+        assertThat(merged.report().items()).extracting(ReportItem::value).containsExactly("0.8");
+        assertThat(types(merged)).containsExactly(IssueType.CONFLICT, IssueType.CONFLICT, IssueType.DUPLICATE);
+    }
+
+    @Test
+    @DisplayName("참고치 칸에 들어온 판정 등급(정상A 등)은 지운다. 요단백의 '음성' 같은 글자 참고치는 남긴다 (nar 실측)")
+    void clearsJudgmentGradeInReference() {
+        String narrative = """
+                · 키 173.0cm, 몸무게 68.5kg, 체질량지수 22.9kg/m² (정상A), 허리둘레 87cm (정상A)
+                · 요단백 음성 (참고 음성) → 정상A
+                """;
+        CheckupReport report = new CheckupReport(null, CheckupReport.ExamType.GENERAL, CheckupReport.Sex.MALE, null,
+                List.of(new ReportItem(ItemCode.BMI, "체질량지수", "22.9", "kg/m²", "정상A", "정상A"),
+                        new ReportItem(ItemCode.URINE_PROTEIN, "요단백", "음성", null, "음성", "정상A")));
+
+        ValidationResult result = validator.validate(report, narrative);
+
+        assertThat(result.report().items()).extracting(ReportItem::referenceRaw).containsExactly(null, "음성");
+        assertThat(result.report().items().getFirst().centerJudgment()).isEqualTo("정상A");
+        assertThat(result.issues()).extracting(Issue::type, Issue::detail)
+                .containsExactly(tuple(IssueType.MISPLACED_FIELD, "referenceRaw=정상A (판정 등급)"));
+    }
+
     private ValidationResult validate(ReportItem... items) {
         CheckupReport report = new CheckupReport(null, CheckupReport.ExamType.COMPREHENSIVE,
                 CheckupReport.Sex.FEMALE, 42, List.of(items));

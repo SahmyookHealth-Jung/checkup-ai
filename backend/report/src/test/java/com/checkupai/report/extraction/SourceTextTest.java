@@ -36,4 +36,19 @@ class SourceTextTest {
         assertThat(SourceText.containsValue("FBS 183 185", "18")).isFalse();
         assertThat(SourceText.containsValue("Chest PA 비활동성     폐결핵", "비활동성 폐결핵")).isTrue();
     }
+
+    @Test
+    @DisplayName("두 줄에 걸친 값은 두 줄을 이어 한 범위로 본다. 한 줄에 온전히 있으면 그 줄만 본다")
+    void findsValueWindowsAcrossWrappedLines() {
+        var lines = SourceText.lines("""
+                흉부방사선   기타  질환   의심(소
+                견서  참조)   -   -   질환의심
+                공복혈당   112   mg/dL
+                """);
+
+        assertThat(SourceText.valueWindows(lines, "기타 질환 의심(소견서 참조)"))
+                .containsExactly("흉부방사선 기타 질환 의심(소 견서 참조) - - 질환의심");
+        assertThat(SourceText.valueWindows(lines, "112")).containsExactly("공복혈당 112 mg/dL");
+        assertThat(SourceText.spansLines("값 12", "3 단위", "123")).as("숫자는 줄바꿈으로 나뉘지 않는다").isFalse();
+    }
 }

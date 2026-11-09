@@ -2,6 +2,7 @@ package com.checkupai.report.extraction;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -18,10 +19,13 @@ import org.springframework.stereotype.Component;
  *   <li>값 원문 대조: 원문에 없는 값은 버린다 (지어낸 값 차단)</li>
  *   <li>OTHER 항목: 항목명과 값이 같은 줄에 없으면 버린다 (다른 항목 값을 빌려 만든 가짜 항목 차단)</li>
  *   <li>숫자 항목 상식 검사: 숫자가 아니거나 생리적으로 불가능한 값은 버린다</li>
- *   <li>같은 코드에 다른 값이 여럿이면 처음 것만 남긴다</li>
+ *   <li>같은 코드(OTHER는 같은 항목명)에 다른 값이 여럿이면 처음 것만 남긴다</li>
+ *   <li>참고치 칸에 들어온 판정 등급(정상A 등)은 지운다</li>
  *   <li>필드 원문 대조: 값이 있는 줄에 없는 단위·참고치·판정은 null로 바꾼다</li>
  *   <li>커버리지: 검사 결과처럼 보이지만 아무 값도 추출되지 않은 줄 조각을 모은다 (누락 의심)</li>
  * </ol>
+ * PDF 표 칸에서 줄바꿈되어 두 줄에 걸친 값은 누락 조각 검사와 OTHER 항목명 확인에서 두 줄을 함께 본다
+ * ({@link SourceText#valueWindows}). 필드 원문 대조에서는 보지 않는다(이유는 groundFields 주석).
  */
 @Component
 public class ExtractionValidator {
@@ -58,6 +62,13 @@ public class ExtractionValidator {
     private static final Pattern RESULT_WORD = Pattern.compile("음성|양성|정상|비정상");
     private static final Pattern EMPTY_MARK = Pattern.compile("[-–—]+|없음|N/?A", Pattern.CASE_INSENSITIVE);
 
+    /**
+     * 국가건강검진 판정 등급 (정상A, 정상B(경계), 질환의심, 유질환자). 판정 칸의 값이지 참고치가 될 수 없다.
+     * 2026-11-09 전체 평가: 서술형 "체질량지수 22.9kg/m² (정상A)"의 괄호 속 판정을 참고치로 읽은 경우가 149건이었다.
+     * 등급 체계는 공단 자료로 확인이 필요하다 (CLAUDE.md 용어집).
+     */
+    private static final Pattern JUDGMENT_GRADE = Pattern.compile("정상[AB](\\(경계\\))?|질환의심|유질환자?");
+
     public ValidationResult validate(CheckupReport report, String source) {
         return run(report, List.of(), report.items() == null ? List.of() : report.items(), source);
     }
@@ -74,10 +85,13 @@ public class ExtractionValidator {
         List<ReportItem> kept = new ArrayList<>(alreadyKept);
         Set<String> seen = new HashSet<>();
         Set<ItemCode> keptCodes = new HashSet<>();
+        Map<String, String> otherValues = new HashMap<>();  // OTHER 항목명 → 값
         for (ReportItem item : alreadyKept) {
             seen.add(item.code() + "|" + SourceText.squash(item.value()));
             if (item.code() != ItemCode.OTHER) {
                 keptCodes.add(item.code());
+            } else {
+                otherValues.put(otherName(item), SourceText.squash(item.value()));
             }
         }
 
@@ -110,6 +124,18 @@ public class ExtractionValidator {
                 issues.add(new Issue(IssueType.CONFLICT, item.code(), "같은 코드에 다른 값: " + item.value()));
                 continue;
             }
+            if (item.code() == ItemCode.OTHER) {
+                // OTHER는 코드로 구분되지 않으므로 항목명으로 같은 항목인지 본다.
+                // 2026-11-09 sum-003: 재요청이 "T-Bil 0.8 0.7 mg/dL 0.2-1.2" 한 줄에서 금회·전회·참고치를 각각 항목으로 뽑았다.
+                String previous = otherValues.putIfAbsent(otherName(item), SourceText.squash(item.value()));
+                if (previous != null) {
+                    issues.add(previous.equals(SourceText.squash(item.value()))
+                            ? new Issue(IssueType.DUPLICATE, item.code(), item.rawName() + "=" + item.value())
+                            : new Issue(IssueType.CONFLICT, item.code(),
+                                    "같은 항목명에 다른 값: " + item.rawName() + "=" + item.value()));
+                    continue;
+                }
+            }
             kept.add(groundFields(item, lines, issues));
         }
 
@@ -121,8 +147,12 @@ public class ExtractionValidator {
         if (item.rawName() == null || item.rawName().isBlank()) {
             return false;
         }
-        return lines.stream().anyMatch(line -> SourceText.containsValue(line, item.value())
-                && SourceText.containsIgnoringSpaces(line, item.rawName()));
+        return SourceText.valueWindows(lines, item.value()).stream()
+                .anyMatch(window -> SourceText.containsIgnoringSpaces(window, item.rawName()));
+    }
+
+    private static String otherName(ReportItem item) {
+        return SourceText.squash(item.rawName() == null ? "" : item.rawName());
     }
 
     private static String implausible(ReportItem item) {
@@ -142,14 +172,26 @@ public class ExtractionValidator {
 
     /** 값이 들어 있는 줄에서 단위·참고치·판정을 찾는다. 없으면 null로 바꾼다 (지어낸 필드 제거). */
     private static ReportItem groundFields(ReportItem item, List<String> lines, List<Issue> issues) {
+        // 줄바꿈된 값이어도 두 줄을 함께 보지 않는다. 둘째 줄에는 다른 열(예: 전회 결과 "정상")이 섞여 있어
+        // 지어낸 판정이 통과한다. 2026-11-09 재생 비교: 함께 보면 std 판정 3건을 살리지만 sum 필드 8건이 새로 틀렸다.
+        // 틀린 판정을 보여 주는 것이 비워 두는 것보다 위험하므로 보수적으로 둔다.
         List<String> valueLines = lines.stream().filter(line -> SourceText.containsValue(line, item.value())).toList();
         if (!SourceText.containsIgnoringSpaces(String.join("\n", lines), item.rawName() == null ? "" : item.rawName())) {
             issues.add(new Issue(IssueType.RAW_NAME_NOT_IN_SOURCE, item.code(), item.rawName()));
         }
         String unit = keepIfOnLine(item, "unit", item.unit(), valueLines, issues);
-        String reference = keepIfOnLine(item, "referenceRaw", item.referenceRaw(), valueLines, issues);
+        String reference = keepIfOnLine(item, "referenceRaw", notJudgmentGrade(item, issues), valueLines, issues);
         String judgment = keepIfOnLine(item, "centerJudgment", item.centerJudgment(), valueLines, issues);
         return new ReportItem(item.code(), item.rawName(), item.value().strip(), unit, reference, judgment);
+    }
+
+    private static String notJudgmentGrade(ReportItem item, List<Issue> issues) {
+        String reference = item.referenceRaw();
+        if (reference != null && JUDGMENT_GRADE.matcher(SourceText.squash(reference)).matches()) {
+            issues.add(new Issue(IssueType.MISPLACED_FIELD, item.code(), "referenceRaw=" + reference + " (판정 등급)"));
+            return null;
+        }
+        return reference;
     }
 
     private static String keepIfOnLine(ReportItem item, String field, String fieldValue, List<String> valueLines,
@@ -172,15 +214,23 @@ public class ExtractionValidator {
      */
     private static List<String> uncoveredSegments(List<String> lines, List<ReportItem> kept, Integer age) {
         List<String> uncovered = new ArrayList<>();
-        for (String line : lines) {
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
             if (META_LINE.matcher(line).find()) {
                 continue;
             }
-            for (String segment : SourceText.segments(line)) {
+            List<String> segments = SourceText.segments(line);
+            for (int j = 0; j < segments.size(); j++) {
+                String segment = segments.get(j);
                 if (!looksLikeResult(segment, age)) {
                     continue;
                 }
-                boolean covered = kept.stream().anyMatch(item -> SourceText.containsValue(segment, item.value()));
+                // 줄바꿈으로 나뉜 값: 윗줄에서 이어진 값은 첫 조각을, 아랫줄로 이어지는 값은 마지막 조각을 덮는다
+                String previous = j == 0 && i > 0 ? lines.get(i - 1) : null;
+                String next = j == segments.size() - 1 && i + 1 < lines.size() ? lines.get(i + 1) : null;
+                boolean covered = kept.stream().anyMatch(item -> SourceText.containsValue(segment, item.value())
+                        || previous != null && SourceText.spansLines(previous, line, item.value())
+                        || next != null && SourceText.spansLines(line, next, item.value()));
                 if (!covered) {
                     uncovered.add(segment);
                 }
@@ -205,7 +255,9 @@ public class ExtractionValidator {
 
     public enum IssueType {
         EMPTY, DUPLICATE, UNGROUNDED_VALUE, OTHER_NAME_VALUE_APART, IMPLAUSIBLE, CONFLICT, UNGROUNDED_FIELD,
-        RAW_NAME_NOT_IN_SOURCE
+        MISPLACED_FIELD, RAW_NAME_NOT_IN_SOURCE,
+        /** 출력이 상한에서 잘려 JSON이 깨졌고, 완성된 항목까지만 살렸다 ({@link ReportExtractor}가 기록) */
+        TRUNCATED_OUTPUT
     }
 
     public record Issue(IssueType type, ItemCode code, String detail) {
