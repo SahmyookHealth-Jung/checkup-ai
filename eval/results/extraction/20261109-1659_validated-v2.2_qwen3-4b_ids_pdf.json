@@ -1,0 +1,807 @@
+{
+  "summary": {
+    "runAt": "2026-11-09T16:59:40",
+    "model": "qwen3:4b",
+    "promptVersion": "extraction-v1",
+    "pipeline": "validated-v2.2",
+    "dataset": "v1",
+    "subset": "ids",
+    "format": "pdf",
+    "documents": 1,
+    "failed": 0,
+    "itemF1": {
+      "tp": 18,
+      "fp": 0,
+      "fn": 5,
+      "precision": 1.0,
+      "recall": 0.7826,
+      "f1": 0.878
+    },
+    "firstPassF1": {
+      "tp": 10,
+      "fp": 26,
+      "fn": 13,
+      "precision": 0.2778,
+      "recall": 0.4348,
+      "f1": 0.339
+    },
+    "byTemplate": {
+      "sum": {
+        "tp": 18,
+        "fp": 0,
+        "fn": 5,
+        "precision": 1.0,
+        "recall": 0.7826,
+        "f1": 0.878
+      }
+    },
+    "fieldAccuracy": {
+      "unit": {
+        "accuracy": 1.0,
+        "total": 18,
+        "correct": 18,
+        "invented": 0,
+        "dropped": 0,
+        "wrong": 0
+      },
+      "referenceRaw": {
+        "accuracy": 0.5,
+        "total": 18,
+        "correct": 9,
+        "invented": 3,
+        "dropped": 0,
+        "wrong": 6
+      },
+      "centerJudgment": {
+        "accuracy": 0.5,
+        "total": 18,
+        "correct": 9,
+        "invented": 9,
+        "dropped": 0,
+        "wrong": 0
+      }
+    },
+    "firstPassFieldAccuracy": {
+      "unit": {
+        "accuracy": 1.0,
+        "total": 10,
+        "correct": 10,
+        "invented": 0,
+        "dropped": 0,
+        "wrong": 0
+      },
+      "referenceRaw": {
+        "accuracy": 0.9,
+        "total": 10,
+        "correct": 9,
+        "invented": 1,
+        "dropped": 0,
+        "wrong": 0
+      },
+      "centerJudgment": {
+        "accuracy": 0.0,
+        "total": 10,
+        "correct": 0,
+        "invented": 10,
+        "dropped": 0,
+        "wrong": 0
+      }
+    },
+    "fieldAccuracyByTemplate": {
+      "sum": {
+        "unit": 1.0,
+        "referenceRaw": 0.5,
+        "centerJudgment": 0.5
+      }
+    },
+    "avgLatencyMs": 590137,
+    "avgPromptTokens": 2304,
+    "avgCompletionTokens": 3100,
+    "totalAttempts": 2,
+    "totalRetriedSegments": 11,
+    "issueCounts": {
+      "DUPLICATE": 26,
+      "IMPLAUSIBLE": 1,
+      "RAW_NAME_NOT_IN_SOURCE": 10,
+      "TRUNCATED_OUTPUT": 2,
+      "UNGROUNDED_FIELD": 10
+    }
+  },
+  "documents": [
+    {
+      "id": "sum-008",
+      "cached": false,
+      "tp": 18,
+      "fp": 0,
+      "fn": 5,
+      "precision": 1.0,
+      "recall": 0.7826,
+      "f1": 0.878,
+      "firstPass": {
+        "tp": 10,
+        "fp": 26,
+        "fn": 13,
+        "precision": 0.2778,
+        "recall": 0.4348,
+        "f1": 0.339
+      },
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "pipeline": "validated-v2.2",
+        "latencyMs": 590137,
+        "promptTokens": 2304,
+        "completionTokens": 3100,
+        "attempts": 2,
+        "retriedSegments": 11,
+        "issues": {
+          "DUPLICATE": 26,
+          "IMPLAUSIBLE": 1,
+          "RAW_NAME_NOT_IN_SOURCE": 10,
+          "TRUNCATED_OUTPUT": 2,
+          "UNGROUNDED_FIELD": 10
+        }
+      },
+      "error": null,
+      "errors": [
+        {
+          "type": "missing",
+          "code": "BMI",
+          "expected": "27.0",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "DIASTOLIC_BP",
+          "expected": "74",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "OTHER",
+          "expected": "TSH=3.98",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "OTHER",
+          "expected": "hs-CRP=1.4",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "OTHER",
+          "expected": "T-Bil=1.1",
+          "predicted": null
+        }
+      ],
+      "diagnostics": {
+        "firstPassItems": [
+          {
+            "code": "CHEST_XRAY",
+            "rawName": "흉부방사선",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "정상",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "TOTAL_CHOLESTEROL",
+            "rawName": "총콜레스테롤",
+            "value": "284",
+            "unit": "mg/dL",
+            "referenceRaw": "<200",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HDL_CHOLESTEROL",
+            "rawName": "HDL 콜레스테롤",
+            "value": "74",
+            "unit": "mg/dL",
+            "referenceRaw": "≥60",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "TRIGLYCERIDES",
+            "rawName": "중성지방(TG)",
+            "value": "448",
+            "unit": "mg/dL",
+            "referenceRaw": "<150",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "LDL_CHOLESTEROL",
+            "rawName": "LDL 콜레스테롤",
+            "value": "108",
+            "unit": "mg/dL",
+            "referenceRaw": "<130",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청 크레아티닌",
+            "value": "0.63",
+            "unit": "mg/dL",
+            "referenceRaw": "≤1.5",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율(eGFR)",
+            "value": "111",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "≥60",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "AST",
+            "rawName": "AST(SGOT)",
+            "value": "18",
+            "unit": "U/L",
+            "referenceRaw": "≤40",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "ALT",
+            "rawName": "ALT(SGPT)",
+            "value": "135",
+            "unit": "U/L",
+            "referenceRaw": "≤35",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피(γ-GTP)",
+            "value": "74",
+            "unit": "U/L",
+            "referenceRaw": "11-63",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "TOTAL_CHOLESTEROL",
+            "rawName": "총콜레스테롤",
+            "value": "284",
+            "unit": "mg/dL",
+            "referenceRaw": "<200",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HDL_CHOLESTEROL",
+            "rawName": "HDL 콜레스테롤",
+            "value": "74",
+            "unit": "mg/dL",
+            "referenceRaw": "≥60",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "TRIGLYCERIDES",
+            "rawName": "중성지방(TG)",
+            "value": "448",
+            "unit": "mg/dL",
+            "referenceRaw": "<150",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "LDL_CHOLESTEROL",
+            "rawName": "LDL 콜레스테롤",
+            "value": "108",
+            "unit": "mg/dL",
+            "referenceRaw": "<130",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청 크레아티닌",
+            "value": "0.63",
+            "unit": "mg/dL",
+            "referenceRaw": "≤1.5",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율(eGFR)",
+            "value": "111",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "≥60",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "AST",
+            "rawName": "AST(SGOT)",
+            "value": "18",
+            "unit": "U/L",
+            "referenceRaw": "≤40",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "ALT",
+            "rawName": "ALT(SGPT)",
+            "value": "135",
+            "unit": "U/L",
+            "referenceRaw": "≤35",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피(γ-GTP)",
+            "value": "74",
+            "unit": "U/L",
+            "referenceRaw": "11-63",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "TOTAL_CHOLESTEROL",
+            "rawName": "총콜레스테롤",
+            "value": "284",
+            "unit": "mg/dL",
+            "referenceRaw": "<200",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HDL_CHOLESTEROL",
+            "rawName": "HDL 콜레스테롤",
+            "value": "74",
+            "unit": "mg/dL",
+            "referenceRaw": "≥60",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "TRIGLYCERIDES",
+            "rawName": "중성지방(TG)",
+            "value": "448",
+            "unit": "mg/dL",
+            "referenceRaw": "<150",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "LDL_CHOLESTEROL",
+            "rawName": "LDL 콜레스테롤",
+            "value": "108",
+            "unit": "mg/dL",
+            "referenceRaw": "<130",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청 크레아티닌",
+            "value": "0.63",
+            "unit": "mg/dL",
+            "referenceRaw": "≤1.5",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율(eGFR)",
+            "value": "111",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "≥60",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "AST",
+            "rawName": "AST(SGOT)",
+            "value": "18",
+            "unit": "U/L",
+            "referenceRaw": "≤40",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "ALT",
+            "rawName": "ALT(SGPT)",
+            "value": "135",
+            "unit": "U/L",
+            "referenceRaw": "≤35",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피(γ-GTP)",
+            "value": "74",
+            "unit": "U/L",
+            "referenceRaw": "11-63",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "CHEST_XRAY",
+            "rawName": "흉부방사선",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "정상",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "TOTAL_CHOLESTEROL",
+            "rawName": "총콜레스테롤",
+            "value": "284",
+            "unit": "mg/dL",
+            "referenceRaw": "<200",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HDL_CHOLESTEROL",
+            "rawName": "HDL 콜레스테롤",
+            "value": "74",
+            "unit": "mg/dL",
+            "referenceRaw": "≥60",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "TRIGLYCERIDES",
+            "rawName": "중성지방(TG)",
+            "value": "448",
+            "unit": "mg/dL",
+            "referenceRaw": "<150",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "LDL_CHOLESTEROL",
+            "rawName": "LDL 콜레스테롤",
+            "value": "108",
+            "unit": "mg/dL",
+            "referenceRaw": "<130",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청 크레아티닌",
+            "value": "0.63",
+            "unit": "mg/dL",
+            "referenceRaw": "≤1.5",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율(eGFR)",
+            "value": "111",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "≥60",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "AST",
+            "rawName": "AST(SGOT)",
+            "value": "18",
+            "unit": "U/L",
+            "referenceRaw": "≤40",
+            "centerJudgment": "정상"
+          }
+        ],
+        "issues": [
+          {
+            "type": "TRUNCATED_OUTPUT",
+            "code": null,
+            "detail": "출력이 잘려 완성된 항목 36개를 살림 (CheckupReport)"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "CHEST_XRAY",
+            "detail": "흉부방사선"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "unit=null"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "TOTAL_CHOLESTEROL",
+            "detail": "총콜레스테롤"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "TOTAL_CHOLESTEROL",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "HDL_CHOLESTEROL",
+            "detail": "HDL 콜레스테롤"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HDL_CHOLESTEROL",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "TRIGLYCERIDES",
+            "detail": "중성지방(TG)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "TRIGLYCERIDES",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "LDL_CHOLESTEROL",
+            "detail": "LDL 콜레스테롤"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "LDL_CHOLESTEROL",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "SERUM_CREATININE",
+            "detail": "혈청 크레아티닌"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "SERUM_CREATININE",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "EGFR",
+            "detail": "신사구체여과율(eGFR)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "EGFR",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "AST",
+            "detail": "AST(SGOT)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "AST",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "ALT",
+            "detail": "ALT(SGPT)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "ALT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "GAMMA_GTP",
+            "detail": "감마지티피(γ-GTP)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "GAMMA_GTP",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "TOTAL_CHOLESTEROL",
+            "detail": "284"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "HDL_CHOLESTEROL",
+            "detail": "74"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "TRIGLYCERIDES",
+            "detail": "448"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "LDL_CHOLESTEROL",
+            "detail": "108"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "SERUM_CREATININE",
+            "detail": "0.63"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "EGFR",
+            "detail": "111"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "AST",
+            "detail": "18"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "ALT",
+            "detail": "135"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "GAMMA_GTP",
+            "detail": "74"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "TOTAL_CHOLESTEROL",
+            "detail": "284"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "HDL_CHOLESTEROL",
+            "detail": "74"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "TRIGLYCERIDES",
+            "detail": "448"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "LDL_CHOLESTEROL",
+            "detail": "108"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "SERUM_CREATININE",
+            "detail": "0.63"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "EGFR",
+            "detail": "111"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "AST",
+            "detail": "18"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "ALT",
+            "detail": "135"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "GAMMA_GTP",
+            "detail": "74"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "CHEST_XRAY",
+            "detail": "정상"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "TOTAL_CHOLESTEROL",
+            "detail": "284"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "HDL_CHOLESTEROL",
+            "detail": "74"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "TRIGLYCERIDES",
+            "detail": "448"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "LDL_CHOLESTEROL",
+            "detail": "108"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "SERUM_CREATININE",
+            "detail": "0.63"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "EGFR",
+            "detail": "111"
+          },
+          {
+            "type": "DUPLICATE",
+            "code": "AST",
+            "detail": "18"
+          },
+          {
+            "type": "TRUNCATED_OUTPUT",
+            "code": null,
+            "detail": "출력이 잘려 완성된 항목 9개를 살림 (ItemList)"
+          },
+          {
+            "type": "IMPLAUSIBLE",
+            "code": "TOTAL_CHOLESTEROL",
+            "detail": "가능 범위 밖: 3.98"
+          }
+        ],
+        "retryInput": [
+          "검사명 금회 전회 단위 참고치",
+          "Height 166.9 167.7 cm",
+          "Weight 75.2 69.8 kg",
+          "Waist 82 90 cm <90",
+          "SBP 114 126 mmHg <120",
+          "U-Protein 약양성(±) 양성(1+) 음성",
+          "Hb 12.1 11.5 g/dL 13.0-16.5",
+          "FBS 81 91 mg/dL <100",
+          "TSH 3.98 4.32 μIU/mL 0.4-4.5",
+          "Albumin 4.5 5.0 g/dL 3.5-5.2",
+          "hs-CRP 1.4 1.2 mg/L <1.0",
+          "T-Bil 1.1 1.0 mg/dL 0.2-1.2"
+        ],
+        "retryItems": [
+          {
+            "code": "HEIGHT",
+            "rawName": "Height",
+            "value": "166.9",
+            "unit": "cm",
+            "referenceRaw": "167.7",
+            "centerJudgment": "Height"
+          },
+          {
+            "code": "WEIGHT",
+            "rawName": "Weight",
+            "value": "75.2",
+            "unit": "kg",
+            "referenceRaw": "69.8",
+            "centerJudgment": "Weight"
+          },
+          {
+            "code": "WAIST_CIRCUMFERENCE",
+            "rawName": "Waist",
+            "value": "82",
+            "unit": "cm",
+            "referenceRaw": "90",
+            "centerJudgment": "Waist"
+          },
+          {
+            "code": "SYSTOLIC_BP",
+            "rawName": "SBP",
+            "value": "114",
+            "unit": "mmHg",
+            "referenceRaw": "126",
+            "centerJudgment": "SBP"
+          },
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "U-Protein",
+            "value": "약양성(±)",
+            "unit": "",
+            "referenceRaw": "양성(1+)",
+            "centerJudgment": "U-Protein"
+          },
+          {
+            "code": "HEMOGLOBIN",
+            "rawName": "Hb",
+            "value": "12.1",
+            "unit": "g/dL",
+            "referenceRaw": "11.5",
+            "centerJudgment": "Hb"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "FBS",
+            "value": "81",
+            "unit": "mg/dL",
+            "referenceRaw": "91",
+            "centerJudgment": "FBS"
+          },
+          {
+            "code": "TOTAL_CHOLESTEROL",
+            "rawName": "TSH",
+            "value": "3.98",
+            "unit": "μIU/mL",
+            "referenceRaw": "4.32",
+            "centerJudgment": "TSH"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "Albumin",
+            "value": "4.5",
+            "unit": "g/dL",
+            "referenceRaw": "5.0",
+            "centerJudgment": "Albumin"
+          }
+        ]
+      }
+    }
+  ]
+}
