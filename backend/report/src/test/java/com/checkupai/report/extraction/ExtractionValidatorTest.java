@@ -249,6 +249,86 @@ class ExtractionValidatorTest {
                 .containsExactly(tuple(IssueType.MISPLACED_FIELD, "referenceRaw=정상A (판정 등급)"));
     }
 
+    @Test
+    @DisplayName("검진일이 있는 줄, 전화번호, 영문 식별자는 결과로 보지 않는다 (heldout-v1: 등록번호·채혈일·문의 줄을 매번 재요청)")
+    void ignoresSubjectInfoAndNonResultNumbers() {
+        String lab = """
+                등록번호: SYN-50520    성별/나이: 여/35    채혈일: 2026/09/16
+                공복혈당(FBS) | 73 | 정상 | 100 미만 | mg/dL
+                고객 코드 AB-1234
+                문의: 진단검사의학과 000-0000-0000
+                """;
+        CheckupReport report = new CheckupReport(java.time.LocalDate.of(2026, 9, 16), CheckupReport.ExamType.UNKNOWN,
+                CheckupReport.Sex.FEMALE, 35, List.of(item(ItemCode.FASTING_GLUCOSE, "공복혈당(FBS)", "73")));
+
+        assertThat(validator.validate(report, lab).uncoveredSegments()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("다른 항목의 같은 값이 그 줄을 덮지 않는다: 항목명이 없는 조각은 차지하지 않는다 (heldout-v1·sum-008 실측)")
+    void sameValueOfAnotherItemDoesNotCoverLine() {
+        String source = """
+                청력(좌/우) | 정상/정상
+                흉부 X-ray | 정상 | 정상
+                HDL-C | 74 | mg/dL
+                DBP | 74 | mmHg
+                """;
+        CheckupReport report = new CheckupReport(null, CheckupReport.ExamType.UNKNOWN, CheckupReport.Sex.MALE, 50,
+                List.of(item(ItemCode.CHEST_XRAY, "흉부 X-ray", "정상"), item(ItemCode.HDL_CHOLESTEROL, "HDL-C", "74")));
+
+        assertThat(validator.validate(report, source).uncoveredSegments())
+                .containsExactly("청력(좌/우) | 정상/정상", "DBP | 74 | mmHg");
+    }
+
+    @Test
+    @DisplayName("같은 값을 다시 말하는 소견 문장은 항목명이 있으면 그 항목이 차지한다 (nar 의사 소견)")
+    void commentRepeatingValueIsCoveredByItsItem() {
+        String narrative = """
+                · 공복 혈당 206 mg/dL (참고 100 미만) → 질환의심
+                공복 혈당 수치는 지난 검진 때 230 mg/dL에서 이번에 206 mg/dL로 변했습니다. 생활습관을 점검하시고
+                """;
+        CheckupReport report = new CheckupReport(null, CheckupReport.ExamType.GENERAL, CheckupReport.Sex.MALE, null,
+                List.of(item(ItemCode.FASTING_GLUCOSE, "공복 혈당", "206")));
+
+        assertThat(validator.validate(report, narrative).uncoveredSegments()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("항목명이 원문에 없는 항목은 값이 있는 조각 중 아직 아무도 차지하지 않은 것을 차지한다")
+    void itemWithoutSourceNameClaimsUnclaimedSegment() {
+        String source = """
+                HDL-C | 74 | mg/dL
+                DBP | 74 | mmHg
+                """;
+        CheckupReport report = new CheckupReport(null, CheckupReport.ExamType.UNKNOWN, CheckupReport.Sex.MALE, 50,
+                List.of(item(ItemCode.DIASTOLIC_BP, "이완기 혈압", "74"), item(ItemCode.HDL_CHOLESTEROL, "HDL-C", "74")));
+
+        assertThat(validator.validate(report, source).uncoveredSegments()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("OTHER 항목명이 줄바꿈돼 윗줄에 이름만 있으면 이어서 본다. 결과어가 있는 윗줄은 잇지 않는다 (v2 가짜 항목은 계속 막음)")
+    void acceptsOtherNameWrappedOntoPreviousLine() {
+        String source = """
+                Chest PA                 기타 질환 의심(소견서
+                                         참조)                    정상
+                TSH      3.88     4.18     μIU/mL     0.4-4.5
+                고감도 C반응단백
+                (hs-CRP)     0.8     1.0 미만     mg/L
+                """;
+        CheckupReport report = new CheckupReport(null, CheckupReport.ExamType.COMPREHENSIVE, CheckupReport.Sex.MALE,
+                50, List.of(item(ItemCode.CHEST_XRAY, "Chest PA", "기타 질환 의심(소견서 참조)"),
+                        item(ItemCode.OTHER, "참조) 정상", "3.88"),
+                        item(ItemCode.OTHER, "고감도 C반응단백", "0.8")));
+
+        ValidationResult result = validator.validate(report, source);
+
+        assertThat(result.report().items()).extracting(ReportItem::rawName).containsExactly("Chest PA", "고감도 C반응단백");
+        assertThat(result.issues()).extracting(Issue::type, Issue::detail)
+                .containsExactly(tuple(IssueType.OTHER_NAME_VALUE_APART, "참조) 정상=3.88"));
+        assertThat(result.uncoveredSegments()).containsExactly("TSH 3.88 4.18 μIU/mL 0.4-4.5");
+    }
+
     private ValidationResult validate(ReportItem... items) {
         CheckupReport report = new CheckupReport(null, CheckupReport.ExamType.COMPREHENSIVE,
                 CheckupReport.Sex.FEMALE, 42, List.of(items));

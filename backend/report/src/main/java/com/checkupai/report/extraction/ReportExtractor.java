@@ -40,6 +40,8 @@ import org.springframework.stereotype.Service;
  *
  * <p>v2.2: 출력이 상한에서 잘려 JSON이 깨지면 완성된 항목까지 살린다(2026-11-09 sum-008이 이 때문에 실패).
  * 살린 항목은 검증을 거치고, 빠진 부분은 누락 조각 재요청이 채운다.
+ *
+ * <p>v2.3: 누락 조각이 많으면 몇 개씩 나눠 재요청한다. 한 묶음이 실패해도 나머지는 계속한다.
  */
 @Service
 public class ReportExtractor {
@@ -113,20 +115,28 @@ public class ReportExtractor {
         String retryError = null;
 
         if (!segments.isEmpty()) {
-            try {
-                ItemList retried = call(retryPrompt, RETRY_USER_TEMPLATE,
-                        Map.of("header", header.isEmpty() ? "(없음)" : String.join("\n", header),
-                                "segments", String.join("\n", segments)),
-                        properties.retryMaxTokens(), ItemList.class, responses, issues);
-                retryItems = retried == null ? List.of() : retried.items();
-                ValidationResult merged = validator.validateAdditional(report, retryItems, reportText);
-                issues.addAll(merged.issues());
-                report = merged.report();
-            } catch (RuntimeException e) {
-                // 재요청 실패(시간 초과, 살릴 항목 없이 잘린 출력 등)는 치명적이지 않다. 1차 결과를 그대로 쓴다
-                retryError = e.getClass().getSimpleName() + ": " + e.getMessage();
-                log.warn("누락 조각 재요청 실패, 1차 결과를 반환한다: {}", retryError);
+            String headerText = header.isEmpty() ? "(없음)" : String.join("\n", header);
+            List<String> errors = new ArrayList<>();
+            retryItems = new ArrayList<>();
+            int batchSize = Math.max(1, properties.retryBatchSize());
+            for (int from = 0; from < segments.size(); from += batchSize) {
+                List<String> batch = segments.subList(from, Math.min(from + batchSize, segments.size()));
+                try {
+                    ItemList retried = call(retryPrompt, RETRY_USER_TEMPLATE,
+                            Map.of("header", headerText, "segments", String.join("\n", batch)),
+                            properties.retryMaxTokens(), ItemList.class, responses, issues);
+                    List<ReportItem> items = retried == null || retried.items() == null ? List.of() : retried.items();
+                    retryItems.addAll(items);
+                    ValidationResult merged = validator.validateAdditional(report, items, reportText);
+                    issues.addAll(merged.issues());
+                    report = merged.report();
+                } catch (RuntimeException e) {
+                    // 재요청 실패(시간 초과, 살릴 항목 없이 잘린 출력 등)는 치명적이지 않다. 그 묶음만 건너뛴다
+                    errors.add(e.getClass().getSimpleName() + ": " + e.getMessage());
+                    log.warn("누락 조각 재요청 실패, 이 묶음은 건너뛴다: {}", errors.getLast());
+                }
             }
+            retryError = errors.isEmpty() ? null : String.join(" | ", errors);
         }
 
         var diagnostics = withDiagnostics

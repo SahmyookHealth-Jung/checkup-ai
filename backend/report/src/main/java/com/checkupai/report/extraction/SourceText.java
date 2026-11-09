@@ -56,13 +56,23 @@ final class SourceText {
     static List<String> valueWindows(List<String> lines, String value) {
         List<String> windows = new ArrayList<>();
         for (int i = 0; i < lines.size(); i++) {
-            if (containsValue(lines.get(i), value)) {
-                windows.add(lines.get(i));
-            } else if (i + 1 < lines.size() && spansLines(lines.get(i), lines.get(i + 1), value)) {
-                windows.add(lines.get(i) + " " + lines.get(i + 1));
+            String window = valueWindowAt(lines, i, value);
+            if (window != null) {
+                windows.add(window);
             }
         }
         return windows;
+    }
+
+    /** i번째 줄에서 시작하는 값 범위: 그 줄, 또는 다음 줄과 이은 것. 값이 없으면 null */
+    static String valueWindowAt(List<String> lines, int i, String value) {
+        if (containsValue(lines.get(i), value)) {
+            return lines.get(i);
+        }
+        if (i + 1 < lines.size() && spansLines(lines.get(i), lines.get(i + 1), value)) {
+            return lines.get(i) + " " + lines.get(i + 1);
+        }
+        return null;
     }
 
     /** 값이 두 줄 중 어느 한 줄에도 온전히 없고, 두 줄을 이으면 있다 (줄바꿈으로 나뉜 값). 숫자는 나뉘지 않는다. */
@@ -86,11 +96,13 @@ final class SourceText {
      * (2026-11-09: "※ 전회 결과는 직전 검진 기록입니다."가 '전회', '결과' 때문에 머리 줄로 잡혀 문장 제외 조건을 추가)
      */
     static List<String> headerLines(String source) {
-        return lines(source).stream()
-                .filter(line -> !line.matches(".*\\d.*"))
-                .filter(line -> !SENTENCE.matcher(line).matches())
-                .filter(line -> HEADER_WORD.matcher(line).results().count() >= 2)
-                .toList();
+        return lines(source).stream().filter(SourceText::isHeaderLine).toList();
+    }
+
+    static boolean isHeaderLine(String line) {
+        return !line.matches(".*\\d.*")
+                && !SENTENCE.matcher(line).matches()
+                && HEADER_WORD.matcher(line).results().count() >= 2;
     }
 
     /**

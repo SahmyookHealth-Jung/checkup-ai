@@ -55,6 +55,7 @@ checkupai:
     pipeline: ${EXTRACTION_PIPELINE:validated}   # baseline | validated (ADR 0003)
     first-pass-max-tokens: 2500                  # 정상 출력 1,400~1,800토큰. 반복 루프 폭주 방지
     retry-max-tokens: 600
+    retry-batch-size: 4                          # 누락 조각이 많으면 4개씩 나눠 재요청 (v2.3)
 
 management:
   endpoints:

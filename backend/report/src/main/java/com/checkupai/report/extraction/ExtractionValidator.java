@@ -1,5 +1,6 @@
 package com.checkupai.report.extraction;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -59,6 +60,12 @@ public class ExtractionValidator {
     private static final Pattern META_LINE = Pattern.compile("수검번호|성명|이름|생년월일|검진일|검사일|주민|연락처|주소|※");
     private static final Pattern NUMBER = Pattern.compile("(?<![\\d.])\\d+(\\.\\d+)?(?![\\d])");
     private static final Pattern DATE = Pattern.compile("\\d{4}\\s*[-./년]\\s*\\d{1,2}\\s*[-./월]\\s*\\d{1,2}");
+    /**
+     * 결과가 아닌 숫자: 전화번호(02-123-4567)와 영문 식별자(SYN-50520). 숫자 검사 전에 지운다.
+     * 2026-11-09 heldout-v1: "문의 000-0000-0000", "등록번호: SYN-50520" 줄을 결과로 보고 매번 재요청했다.
+     */
+    private static final Pattern PHONE = Pattern.compile("(?<!\\d)\\d{2,4}-\\d{3,4}-\\d{4}(?!\\d)");
+    private static final Pattern IDENTIFIER = Pattern.compile("(?<![A-Za-z])[A-Za-z]{2,}-\\d[\\d-]*");
     private static final Pattern RESULT_WORD = Pattern.compile("음성|양성|정상|비정상");
     private static final Pattern EMPTY_MARK = Pattern.compile("[-–—]+|없음|N/?A", Pattern.CASE_INSENSITIVE);
 
@@ -109,7 +116,7 @@ public class ExtractionValidator {
                 issues.add(new Issue(IssueType.UNGROUNDED_VALUE, item.code(), item.value()));
                 continue;
             }
-            if (item.code() == ItemCode.OTHER && !nameAndValueOnSameLine(item, lines)) {
+            if (item.code() == ItemCode.OTHER && !nameAndValueOnSameLine(item, lines, report.age())) {
                 // 표준 코드 표에 없는 항목은 모델이 항목명을 원문에서 그대로 옮겨야 한다.
                 // 2026-11-09 v2 평가: 줄바꿈 조각 "참조) 정상"에 다른 항목의 값(3.88)을 붙인 가짜 항목이 나왔다.
                 issues.add(new Issue(IssueType.OTHER_NAME_VALUE_APART, item.code(), item.rawName() + "=" + item.value()));
@@ -140,15 +147,44 @@ public class ExtractionValidator {
         }
 
         CheckupReport cleaned = new CheckupReport(report.examDate(), report.examType(), report.sex(), report.age(), kept);
-        return new ValidationResult(cleaned, issues, uncoveredSegments(lines, kept, report.age()));
+        return new ValidationResult(cleaned, issues, uncoveredSegments(lines, kept, report.age(), report.examDate()));
     }
 
-    private static boolean nameAndValueOnSameLine(ReportItem item, List<String> lines) {
+    /**
+     * 항목명과 값이 같은 줄(또는 줄바꿈으로 이어진 범위)에 있는가.
+     * 항목명이 PDF 표 칸에서 줄바꿈되면 이름 앞부분만 윗줄에 남는다(2026-11-09 heldout-v1: "고감도 C반응단백" /
+     * "(hs-CRP) 0.8 ..."). 그래서 윗줄이 결과 없는 이름 조각이면 이어서 본다. 결과어가 있는 윗줄("참조) 정상")은 잇지 않는다.
+     */
+    private static boolean nameAndValueOnSameLine(ReportItem item, List<String> lines, Integer age) {
         if (item.rawName() == null || item.rawName().isBlank()) {
             return false;
         }
-        return SourceText.valueWindows(lines, item.value()).stream()
-                .anyMatch(window -> SourceText.containsIgnoringSpaces(window, item.rawName()));
+        for (int i = 0; i < lines.size(); i++) {
+            String window = SourceText.valueWindowAt(lines, i, item.value());
+            if (window != null && nameNear(window, i, item.rawName(), lines, age)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** text(i번째 줄에서 시작)에 항목명이 있거나, 윗줄이 이름 조각이고 이어 보면 항목명이 있다 */
+    private static boolean nameNear(String text, int line, String rawName, List<String> lines, Integer age) {
+        if (rawName == null || rawName.isBlank()) {
+            return false;
+        }
+        if (SourceText.containsIgnoringSpaces(text, rawName)) {
+            return true;
+        }
+        if (line == 0) {
+            return false;
+        }
+        String previous = lines.get(line - 1);
+        return isNameFragment(previous, age) && SourceText.containsIgnoringSpaces(previous + " " + text, rawName);
+    }
+
+    private static boolean isNameFragment(String line, Integer age) {
+        return !looksLikeResult(line, age) && !SourceText.isHeaderLine(line);
     }
 
     private static String otherName(ReportItem item) {
@@ -208,39 +244,99 @@ public class ExtractionValidator {
     }
 
     /**
-     * 검사 결과처럼 보이는데 추출된 값이 하나도 없는 조각(쉼표로 나눈 줄 조각).
-     * 검사 결과처럼 보인다 = 날짜·연도·나이가 아닌 숫자가 있거나, 음성/양성/정상 같은 결과어가 있다.
-     * v1은 줄 단위로 봐서 "시력 좌 0.7, ..., 청력 좌 정상"에서 청력만 뽑혀도 시력 누락을 놓쳤다.
+     * 검사 결과처럼 보이는데 아무 항목도 차지하지 않은 조각(쉼표로 나눈 줄 조각). 재요청 대상이다.
+     *
+     * <ul>
+     *   <li>검사 결과처럼 보인다 = 날짜·연도·나이·전화번호·식별자가 아닌 숫자가 있거나, 음성/양성/정상 같은 결과어가 있다.</li>
+     *   <li>수검자 정보 줄(단어 목록 또는 이미 뽑은 검진일이 있는 줄)은 보지 않는다.</li>
+     *   <li>항목은 항목명과 값이 함께 있는 조각을 모두 차지한다. 항목명이 원문에 없으면 값이 있는 조각 중
+     *       아직 아무도 차지하지 않은 것 하나를 차지한다. 값만 같고 항목명이 없는 다른 조각은 덮지 않는다.</li>
+     * </ul>
+     * v2.2까지는 값만 같으면 모든 조각을 덮은 것으로 봤다. 2026-11-09 heldout-v1에서 흉부 X-ray의 "정상"이
+     * 청력 줄 "정상/정상"을, HDL 74가 "DBP 74" 줄을 덮어 누락을 다시 묻지 못했다(10건).
      */
-    private static List<String> uncoveredSegments(List<String> lines, List<ReportItem> kept, Integer age) {
-        List<String> uncovered = new ArrayList<>();
+    private static List<String> uncoveredSegments(List<String> lines, List<ReportItem> kept, Integer age,
+                                                  LocalDate examDate) {
+        List<Segment> segments = new ArrayList<>();
         for (int i = 0; i < lines.size(); i++) {
-            String line = lines.get(i);
-            if (META_LINE.matcher(line).find()) {
+            if (isMetaLine(lines.get(i), examDate)) {
                 continue;
             }
-            List<String> segments = SourceText.segments(line);
-            for (int j = 0; j < segments.size(); j++) {
-                String segment = segments.get(j);
-                if (!looksLikeResult(segment, age)) {
-                    continue;
-                }
-                // 줄바꿈으로 나뉜 값: 윗줄에서 이어진 값은 첫 조각을, 아랫줄로 이어지는 값은 마지막 조각을 덮는다
-                String previous = j == 0 && i > 0 ? lines.get(i - 1) : null;
-                String next = j == segments.size() - 1 && i + 1 < lines.size() ? lines.get(i + 1) : null;
-                boolean covered = kept.stream().anyMatch(item -> SourceText.containsValue(segment, item.value())
-                        || previous != null && SourceText.spansLines(previous, line, item.value())
-                        || next != null && SourceText.spansLines(line, next, item.value()));
-                if (!covered) {
-                    uncovered.add(segment);
-                }
+            List<String> parts = SourceText.segments(lines.get(i));
+            for (int j = 0; j < parts.size(); j++) {
+                segments.add(new Segment(i, j, j == 0, j == parts.size() - 1, parts.get(j)));
             }
         }
-        return uncovered;
+
+        Set<Segment> claimed = new HashSet<>();
+        List<ReportItem> unnamed = new ArrayList<>();
+        for (ReportItem item : kept) {
+            List<Segment> candidates = segments.stream().filter(s -> holdsValue(s, item.value(), lines)).toList();
+            List<Segment> named = candidates.stream()
+                    .filter(s -> nameNear(s.text(), s.line(), item.rawName(), lines, age)).toList();
+            if (!named.isEmpty()) {
+                // 항목명과 값이 함께 있는 조각은 모두 이 항목의 것이다 (예: 결과 줄과, 같은 값을 다시 말하는 소견 문장)
+                named.forEach(s -> claim(s, item.value(), segments, lines, claimed));
+            } else if (!candidates.isEmpty()) {
+                unnamed.add(item);
+            }
+        }
+        for (ReportItem item : unnamed) {
+            List<Segment> candidates = segments.stream().filter(s -> holdsValue(s, item.value(), lines)).toList();
+            Segment target = candidates.stream().filter(s -> !claimed.contains(s)).findFirst()
+                    .orElse(candidates.getFirst());
+            claim(target, item.value(), segments, lines, claimed);
+        }
+
+        return segments.stream()
+                .filter(s -> !claimed.contains(s) && looksLikeResult(s.text(), age))
+                .map(Segment::text)
+                .toList();
+    }
+
+    /** 조각을 차지한다. 값이 줄바꿈으로 이웃 줄에 걸쳐 있으면 이웃 조각도 함께 차지한다 */
+    private static void claim(Segment segment, String value, List<Segment> segments, List<String> lines,
+                              Set<Segment> claimed) {
+        claimed.add(segment);
+        if (SourceText.containsValue(segment.text(), value)) {
+            return;
+        }
+        int line = segment.line();
+        segments.stream()
+                .filter(s -> segment.first() && s.line() == line - 1 && s.last()
+                        && SourceText.spansLines(lines.get(line - 1), lines.get(line), value)
+                        || segment.last() && s.line() == line + 1 && s.first()
+                        && SourceText.spansLines(lines.get(line), lines.get(line + 1), value))
+                .forEach(claimed::add);
+    }
+
+    /** 조각에 값이 있다. 줄바꿈으로 나뉜 값은 윗줄 끝 조각·아랫줄 첫 조각과 이어서 본다 */
+    private static boolean holdsValue(Segment segment, String value, List<String> lines) {
+        int line = segment.line();
+        return SourceText.containsValue(segment.text(), value)
+                || segment.first() && line > 0 && SourceText.spansLines(lines.get(line - 1), lines.get(line), value)
+                || segment.last() && line + 1 < lines.size()
+                && SourceText.spansLines(lines.get(line), lines.get(line + 1), value);
+    }
+
+    /** 수검자 정보 줄: 정해 둔 단어가 있거나, 이미 뽑은 검진일이 들어 있다(형식은 2026-09-16, 2026/09/16, 2026. 9. 16. 등) */
+    private static boolean isMetaLine(String line, LocalDate examDate) {
+        if (META_LINE.matcher(line).find()) {
+            return true;
+        }
+        if (examDate == null) {
+            return false;
+        }
+        return Pattern.compile(examDate.getYear() + "\\s*[-./년]\\s*0?" + examDate.getMonthValue()
+                + "\\s*[-./월]\\s*0?" + examDate.getDayOfMonth() + "(?!\\d)").matcher(line).find();
+    }
+
+    private record Segment(int line, int index, boolean first, boolean last, String text) {
     }
 
     private static boolean looksLikeResult(String line, Integer age) {
-        String withoutDates = DATE.matcher(line).replaceAll(" ");
+        String withoutDates = IDENTIFIER.matcher(PHONE.matcher(DATE.matcher(line).replaceAll(" ")).replaceAll(" "))
+                .replaceAll(" ");
         var numbers = NUMBER.matcher(withoutDates);
         while (numbers.find()) {
             String number = numbers.group();

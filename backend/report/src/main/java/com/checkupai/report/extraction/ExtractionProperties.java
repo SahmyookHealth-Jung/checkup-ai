@@ -9,16 +9,19 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
  * @param pipeline baseline: 구조화 출력만 (기준선 재현용) / validated: 검증 + 누락 조각 재요청
  * @param firstPassMaxTokens 1차 추출 출력 상한. 정상 출력은 1,400~1,800토큰. 반복 루프가 문맥을 다 채우는 것을 막는다
  * @param retryMaxTokens 재요청 출력 상한. 누락 조각 몇 개만 다시 뽑으므로 작게 둔다
+ * @param retryBatchSize 재요청 한 번에 보내는 누락 조각 수. 조각이 많으면 나눠 보낸다.
+ *        2026-11-09 heldout-v1: 1차가 표 하나를 통째로 건너뛰면 조각이 10개 넘게 쌓여 재요청이 출력 상한에서 잘렸다
  */
 @ConfigurationProperties("checkupai.extraction")
 public record ExtractionProperties(
         @DefaultValue("validated") Pipeline pipeline,
         @DefaultValue("2500") int firstPassMaxTokens,
-        @DefaultValue("600") int retryMaxTokens) {
+        @DefaultValue("600") int retryMaxTokens,
+        @DefaultValue("4") int retryBatchSize) {
 
     public enum Pipeline {
         BASELINE("baseline"),
-        VALIDATED("validated-v2.2");  // 캐시 키에 들어가므로 검증 로직을 바꾸면 올린다
+        VALIDATED("validated-v2.3");  // 캐시 키에 들어가므로 검증 로직을 바꾸면 올린다
 
         private final String label;
 
