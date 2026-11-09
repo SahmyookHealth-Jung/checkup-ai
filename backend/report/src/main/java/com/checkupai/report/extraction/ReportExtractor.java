@@ -2,6 +2,7 @@ package com.checkupai.report.extraction;
 
 import com.checkupai.report.extraction.ExtractionProperties.Pipeline;
 import com.checkupai.report.extraction.ExtractionValidator.Issue;
+import com.checkupai.report.extraction.ExtractionValidator.IssueType;
 import com.checkupai.report.extraction.ExtractionValidator.ValidationResult;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -19,6 +20,8 @@ import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.converter.BeanOutputConverter;
+import org.springframework.ai.converter.StructuredOutputConverter;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
@@ -27,13 +30,16 @@ import org.springframework.stereotype.Service;
  *
  * <ul>
  *   <li>baseline: 구조화 출력(JSON 스키마 강제) 한 번. 기준선 재현용</li>
- *   <li>validated-v2: 기준선 + 원문 대조 검증 + 누락 의심 조각만 한 번 더 요청</li>
+ *   <li>validated: 기준선 + 원문 대조 검증 + 누락 의심 조각만 한 번 더 요청</li>
  * </ul>
  * 모델 공급자는 모른다. app 모듈 설정(spring.ai.model.chat)이 정한다.
  *
  * <p>v1 → v2 변경 (2026-11-08 평가에서 재요청이 35분 폭주한 문제 대응):
  * 재요청에는 결과지 전문 대신 표 머리 줄과 누락 조각만 보낸다. 호출마다 출력 토큰 상한을 둔다.
  * 재요청이 실패해도 1차 결과는 반환한다.
+ *
+ * <p>v2.2: 출력이 상한에서 잘려 JSON이 깨지면 완성된 항목까지 살린다(2026-11-09 sum-008이 이 때문에 실패).
+ * 살린 항목은 검증을 거치고, 빠진 부분은 누락 조각 재요청이 채운다.
  */
 @Service
 public class ReportExtractor {
@@ -88,9 +94,10 @@ public class ReportExtractor {
     public ExtractionResult extract(String reportText, boolean withDiagnostics) {
         long started = System.nanoTime();
         List<ChatResponse> responses = new ArrayList<>();
+        List<Issue> issues = new ArrayList<>();
 
         CheckupReport firstPass = call(systemPrompt, USER_TEMPLATE, Map.of("report", reportText),
-                properties.firstPassMaxTokens(), CheckupReport.class, responses);
+                properties.firstPassMaxTokens(), CheckupReport.class, responses, issues);
         if (properties.pipeline() == Pipeline.BASELINE) {
             var diagnostics = withDiagnostics
                     ? new ExtractionResult.Diagnostics(firstPass.items(), List.of(), null, null, null) : null;
@@ -98,7 +105,7 @@ public class ReportExtractor {
         }
 
         ValidationResult validation = validator.validate(firstPass, reportText);
-        List<Issue> issues = new ArrayList<>(validation.issues());
+        issues.addAll(validation.issues());
         CheckupReport report = validation.report();
         List<String> segments = validation.uncoveredSegments();
         List<String> header = SourceText.headerLines(reportText);
@@ -110,13 +117,13 @@ public class ReportExtractor {
                 ItemList retried = call(retryPrompt, RETRY_USER_TEMPLATE,
                         Map.of("header", header.isEmpty() ? "(없음)" : String.join("\n", header),
                                 "segments", String.join("\n", segments)),
-                        properties.retryMaxTokens(), ItemList.class, responses);
+                        properties.retryMaxTokens(), ItemList.class, responses, issues);
                 retryItems = retried == null ? List.of() : retried.items();
                 ValidationResult merged = validator.validateAdditional(report, retryItems, reportText);
                 issues.addAll(merged.issues());
                 report = merged.report();
             } catch (RuntimeException e) {
-                // 재요청 실패(출력 상한 초과로 JSON이 잘림, 시간 초과 등)는 치명적이지 않다. 1차 결과를 그대로 쓴다
+                // 재요청 실패(시간 초과, 살릴 항목 없이 잘린 출력 등)는 치명적이지 않다. 1차 결과를 그대로 쓴다
                 retryError = e.getClass().getSimpleName() + ": " + e.getMessage();
                 log.warn("누락 조각 재요청 실패, 1차 결과를 반환한다: {}", retryError);
             }
@@ -130,15 +137,23 @@ public class ReportExtractor {
     }
 
     private <T> T call(String system, String userTemplate, Map<String, Object> params, int maxTokens, Class<T> type,
-                       List<ChatResponse> responses) {
+                       List<ChatResponse> responses, List<Issue> issues) {
+        // 기준선은 재현용이므로 잘린 출력을 살리지 않는다
+        StructuredOutputConverter<T> converter = properties.pipeline() == Pipeline.BASELINE
+                ? new BeanOutputConverter<>(type) : new SalvagingOutputConverter<>(type);
         ResponseEntity<ChatResponse, T> response = chatClient.prompt()
                 .system(s -> s.text(system).param("codeTable", ItemCode.promptTable()))
                 .user(u -> u.text(userTemplate).params(params))
                 .options(ChatOptions.builder().maxTokens(maxTokens))
                 .advisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
                 .call()
-                .responseEntity(type);
+                .responseEntity(converter);
         responses.add(response.response());
+        if (converter instanceof SalvagingOutputConverter<T> salvaging && salvaging.salvagedItems() >= 0) {
+            String detail = "출력이 잘려 완성된 항목 " + salvaging.salvagedItems() + "개를 살림 (" + type.getSimpleName() + ")";
+            log.warn(detail);
+            issues.add(new Issue(IssueType.TRUNCATED_OUTPUT, null, detail));
+        }
         return response.entity();
     }
 
