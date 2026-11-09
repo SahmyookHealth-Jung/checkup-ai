@@ -42,3 +42,7 @@ eval/run_eval_resumable.sh full    # 30개, 로컬 CPU 약 3~4시간
   - 캐시 키는 (모델, 프롬프트 버전, 파이프라인 버전, 입력 형식, 파일 내용)입니다. 검증 로직을 바꾸면 파이프라인 버전(`ExtractionProperties`)을 올려야 새로 계산합니다.
 - DB·Ollama·앱이 꺼져 있으면 스크립트가 켭니다. 평가가 도는 동안만 `caffeinate`로 잠자기를 막습니다.
 - 진행 상황은 `tail -f eval/.cache/logs/full-latest.log`로 볼 수 있습니다.
+- 다른 평가셋이나 특정 보고서만 돌릴 때는 인자를 뒤에 붙입니다. 경로는 `eval/` 기준입니다.
+  - `LOG_NAME=heldout eval/run_eval_resumable.sh full --data ../data/synthetic/extraction/heldout-v1`
+  - `eval/run_eval_resumable.sh full --ids sum-008`
+- 보조 지표로 **필드 정확도**(값이 맞은 항목의 단위·참고치·판정)를 함께 기록합니다. 오류는 지어냄, 빠뜨림, 다름으로 나눕니다.

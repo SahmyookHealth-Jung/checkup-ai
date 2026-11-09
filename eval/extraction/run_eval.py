@@ -2,7 +2,9 @@
 
 사용법 (eval/ 폴더에서, 앱이 떠 있어야 한다):
     .venv/bin/python -m extraction.run_eval --subset smoke    # 6개, 로컬 CPU 약 1시간
-    .venv/bin/python -m extraction.run_eval --subset full     # 30개, 로컬 CPU 약 5시간
+    .venv/bin/python -m extraction.run_eval --subset full     # 30개, 로컬 CPU 약 2~3시간
+    .venv/bin/python -m extraction.run_eval --ids sum-008     # 지정한 보고서만
+    .venv/bin/python -m extraction.run_eval --subset full --data ../data/synthetic/extraction/heldout-v1
 
 - 응답은 eval/.cache/extraction/에 캐시한다.
   - 캐시 키는 (모델, 프롬프트 버전, 파이프라인, 입력 형식, 파일 내용)이다. 같은 조건이면 다시 호출하지 않는다.
@@ -21,7 +23,7 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 
-from .metrics import Score, score_document, score_failed_document
+from .metrics import Score, score_document, score_failed_document, score_fields
 
 EVAL_DIR = Path(__file__).resolve().parent.parent
 CACHE_DIR = EVAL_DIR / ".cache" / "extraction"
@@ -36,14 +38,18 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="결과지 추출 평가")
     parser.add_argument("--data", type=Path, default=DEFAULT_DATA)
     parser.add_argument("--subset", choices=["smoke", "full"], default="smoke")
+    parser.add_argument("--ids", help="쉼표로 구분한 보고서 id. 주면 --subset 대신 쓴다")
     parser.add_argument("--format", choices=["pdf", "txt"], default="pdf", help="API에 보낼 입력 형식")
     parser.add_argument("--api", default="http://localhost:8080")
     parser.add_argument("--timeout", type=int, default=1800, help="보고서 하나당 최대 대기 초")
     args = parser.parse_args()
 
     info = _get_json(f"{args.api}/api/reports/extract/info")
-    ids = SMOKE_IDS if args.subset == "smoke" else _all_ids(args.data)
-    print(f"평가 시작: {info} | {args.subset} {len(ids)}개 | 입력 {args.format}", flush=True)
+    if args.ids:
+        ids, args.subset = [i.strip() for i in args.ids.split(",") if i.strip()], "ids"
+    else:
+        ids = SMOKE_IDS if args.subset == "smoke" else _all_ids(args.data)
+    print(f"평가 시작: {info} | {args.data.name} {args.subset} {len(ids)}개 | 입력 {args.format}", flush=True)
 
     # first_total: 같은 실행의 1차 추출 원본(검증 전) 점수. 최종 점수와 짝지어 비교하면
     # 모델 출력이 실행마다 흔들려도 "검증이 바꾼 것"만 정확히 잴 수 있다 (v1 평가에서 배운 점).
@@ -111,6 +117,7 @@ def _save(args, info: dict, ids: list[str], total: Score, first_total: Score, pe
     summary = {
         "runAt": datetime.now().isoformat(timespec="seconds"),
         **info,
+        "dataset": args.data.name,
         "subset": args.subset,
         "format": args.format,
         "documents": len(ids),
@@ -118,6 +125,11 @@ def _save(args, info: dict, ids: list[str], total: Score, first_total: Score, pe
         "itemF1": total.summary(),
         "firstPassF1": first_total.summary(),  # 같은 실행의 1차 추출(검증 전) 점수
         "byTemplate": {t: s.summary() for t, s in sorted(per_template.items())},
+        # 보조 지표: 값이 맞은 항목의 단위·참고치·판정 정확도 (metrics.py 참고)
+        "fieldAccuracy": score_fields(total.matches),
+        "firstPassFieldAccuracy": score_fields(first_total.matches),
+        "fieldAccuracyByTemplate": {t: {k: v["accuracy"] for k, v in score_fields(s.matches).items()}
+                                    for t, s in sorted(per_template.items())},
         "avgLatencyMs": avg("latencyMs"),
         "avgPromptTokens": avg("promptTokens"),
         "avgCompletionTokens": avg("completionTokens"),
@@ -130,7 +142,8 @@ def _save(args, info: dict, ids: list[str], total: Score, first_total: Score, pe
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now().strftime("%Y%m%d-%H%M")
     model = str(info.get("model", "unknown")).replace(":", "-").replace("/", "-")
-    out = RESULTS_DIR / f"{stamp}_{info.get('pipeline')}_{model}_{args.subset}_{args.format}.json"
+    dataset = "" if args.data.name == DEFAULT_DATA.name else f"{args.data.name}_"
+    out = RESULTS_DIR / f"{stamp}_{info.get('pipeline')}_{model}_{dataset}{args.subset}_{args.format}.json"
     out.write_text(json.dumps({"summary": summary, "documents": documents}, ensure_ascii=False, indent=2) + "\n",
                    encoding="utf-8")
 
@@ -139,16 +152,19 @@ def _save(args, info: dict, ids: list[str], total: Score, first_total: Score, pe
         history.write_text("# 추출 평가 기록\n\n대표 지표: 항목 F1 (code + value 일치). 정밀도 P, 재현율 R.\n"
                            "1차 F1: 같은 실행의 1차 추출(검증 전) 점수. 최종 F1과의 차이가 검증의 효과다.\n\n"
                            "| 실행 시각 | 파이프라인 | 모델 | 프롬프트 | 평가셋 | 입력 | F1 | P | R | 실패 | 평균 지연 "
-                           "| 평균 토큰(입/출) | 1차 F1 |\n"
-                           "|---|---|---|---|---|---|---|---|---|---|---|---|---|\n", encoding="utf-8")
+                           "| 평균 토큰(입/출) | 1차 F1 | 필드 정확도 (단위/참고치/판정) |\n"
+                           "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n", encoding="utf-8")
     f1 = summary["itemF1"]
     latency = f"{summary['avgLatencyMs'] / 1000:.0f}초" if summary["avgLatencyMs"] else "-"
+    fields = "/".join(f"{v['accuracy'] * 100:.1f}" if v["accuracy"] is not None else "-"
+                      for v in summary["fieldAccuracy"].values())
+    subset = f"{args.subset}({len(ids)})" if not dataset else f"{args.data.name} {args.subset}({len(ids)})"
     with history.open("a", encoding="utf-8") as f:
         f.write(f"| {summary['runAt']} | {info.get('pipeline')} | {info.get('model')} | {info.get('promptVersion')} "
-                f"| {args.subset}({len(ids)}) | {args.format} | **{f1['f1']:.3f}** | {f1['precision']:.3f} "
+                f"| {subset} | {args.format} | **{f1['f1']:.3f}** | {f1['precision']:.3f} "
                 f"| {f1['recall']:.3f} | {summary['failed']} | {latency} "
                 f"| {summary['avgPromptTokens']}/{summary['avgCompletionTokens']} "
-                f"| {summary['firstPassF1']['f1']:.3f} |\n")
+                f"| {summary['firstPassF1']['f1']:.3f} | {fields} |\n")
 
     print(json.dumps(summary, ensure_ascii=False, indent=2))
     print(f"저장: {out.relative_to(EVAL_DIR)}")

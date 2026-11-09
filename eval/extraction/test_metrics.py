@@ -1,7 +1,7 @@
 """metrics.py 단위 테스트.  실행: .venv/bin/python -m unittest discover -s extraction -t ."""
 import unittest
 
-from extraction.metrics import normalize_value, score_document, score_failed_document
+from extraction.metrics import normalize_field, normalize_value, score_document, score_failed_document, score_fields
 
 
 def item(code, value, raw="x"):
@@ -63,6 +63,34 @@ class NormalizeValueTest(unittest.TestCase):
 
     def test_none(self):
         self.assertIsNone(normalize_value(None))
+
+
+def full(code, value, unit=None, ref=None, judgment=None, raw="x"):
+    return {"code": code, "rawName": raw, "value": value, "unit": unit, "referenceRaw": ref, "centerJudgment": judgment}
+
+
+class ScoreFieldsTest(unittest.TestCase):
+
+    def test_only_matched_items_are_scored(self):
+        expected = [full("FASTING_GLUCOSE", "112", "mg/dL", "100 미만", "정상B"), full("HEMOGLOBIN", "13.1")]
+        predicted = [full("FASTING_GLUCOSE", "112", "mg/dL", "100미만", "정상B"), full("HEMOGLOBIN", "31.1", "g/dL")]
+        fields = score_fields(score_document(expected, predicted).matches)
+        self.assertEqual(fields["unit"]["total"], 1)  # 값이 틀린 혈색소는 필드를 보지 않는다
+        self.assertEqual(fields["referenceRaw"]["accuracy"], 1.0)  # 공백 차이는 무시
+
+    def test_error_kinds(self):
+        expected = [full("BMI", "22.9", ref=None, judgment="정상A"), full("WEIGHT", "68.5", ref="-"),
+                    full("OTHER", "3.88", ref="0.4-4.5", raw="TSH")]
+        predicted = [full("BMI", "22.9", ref="정상A", judgment=None), full("WEIGHT", "68.5", ref="null"),
+                     full("OTHER", "3.88", ref="4.18", raw="TSH")]
+        fields = score_fields(score_document(expected, predicted).matches)
+        self.assertEqual({k: fields["referenceRaw"][k] for k in ("correct", "invented", "dropped", "wrong")},
+                         {"correct": 1, "invented": 1, "dropped": 0, "wrong": 1})
+        self.assertEqual(fields["centerJudgment"]["dropped"], 1)
+
+    def test_empty_marks(self):
+        for mark in (None, "", "-", "없음", "null", " N/A "):
+            self.assertIsNone(normalize_field(mark))
 
 
 if __name__ == "__main__":

@@ -4,15 +4,18 @@
 #   - Docker(DB), Ollama, 앱이 꺼져 있으면 켠다.
 #   - 평가가 도는 동안만 caffeinate로 시스템 잠자기를 막는다(화면 꺼짐은 허용, 설정은 바꾸지 않음).
 #
-# 사용법 (저장소 어디서든):  eval/run_eval_resumable.sh [smoke|full]    기본값 full
-# 진행 로그:                 eval/.cache/logs/<smoke|full>-latest.log  (tail -f 로 보기)
+# 사용법 (저장소 어디서든):  eval/run_eval_resumable.sh [smoke|full] [run_eval 추가 인자...]    기본값 full
+#   예: eval/run_eval_resumable.sh full --data ../data/synthetic/extraction/heldout-v1   (경로는 eval/ 기준)
+#       eval/run_eval_resumable.sh full --ids sum-008
+# 진행 로그:                 eval/.cache/logs/<LOG_NAME 또는 smoke|full>-latest.log  (tail -f 로 보기)
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SUBSET="${1:-full}"
+shift || true
 LOG_DIR="$ROOT/eval/.cache/logs"
 mkdir -p "$LOG_DIR"
-LOG="$LOG_DIR/$SUBSET-latest.log"
+LOG="$LOG_DIR/${LOG_NAME:-$SUBSET}-latest.log"
 APP_LOG="$LOG_DIR/app.log"
 
 log() { echo "[$(date '+%m-%d %H:%M:%S')] $*" | tee -a "$LOG"; }
@@ -32,7 +35,7 @@ db_healthy() { [ "$(docker inspect -f '{{.State.Health.Status}}' checkup-postgre
 ollama_up() { curl -s -m 3 localhost:11434/api/version; }
 app_up() { curl -s -m 3 localhost:8080/actuator/health | grep -q UP; }
 
-log "=== 평가 시작/재개: $SUBSET ==="
+log "=== 평가 시작/재개: $SUBSET $* ==="
 
 # 1) Docker Desktop + PostgreSQL
 if ! docker info >/dev/null 2>&1; then
@@ -64,7 +67,7 @@ log "앱 준비됨: $(curl -s localhost:8080/api/reports/extract/info)"
 
 # 4) 평가 (캐시 덕분에 다시 실행하면 끝난 보고서는 건너뛴다)
 cd "$ROOT/eval" || exit 1
-caffeinate -is .venv/bin/python -u -m extraction.run_eval --subset "$SUBSET" --format pdf 2>&1 | tee -a "$LOG"
+caffeinate -is .venv/bin/python -u -m extraction.run_eval --subset "$SUBSET" --format pdf "$@" 2>&1 | tee -a "$LOG"
 STATUS=${PIPESTATUS[0]}
 
 # 5) 이 스크립트가 켠 앱만 끈다
