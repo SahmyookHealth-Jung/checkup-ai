@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
  *   <li>숫자 항목 상식 검사: 숫자가 아니거나 생리적으로 불가능한 값은 버린다</li>
  *   <li>같은 코드에 다른 값이 여럿이면 처음 것만 남긴다</li>
  *   <li>필드 원문 대조: 값이 있는 줄에 없는 단위·참고치·판정은 null로 바꾼다</li>
- *   <li>커버리지: 검사 결과처럼 보이지만 아무 값도 추출되지 않은 줄을 모은다 (누락 의심)</li>
+ *   <li>커버리지: 검사 결과처럼 보이지만 아무 값도 추출되지 않은 줄 조각을 모은다 (누락 의심)</li>
  * </ol>
  */
 @Component
@@ -55,6 +55,7 @@ public class ExtractionValidator {
     private static final Pattern NUMBER = Pattern.compile("(?<![\\d.])\\d+(\\.\\d+)?(?![\\d])");
     private static final Pattern DATE = Pattern.compile("\\d{4}\\s*[-./년]\\s*\\d{1,2}\\s*[-./월]\\s*\\d{1,2}");
     private static final Pattern RESULT_WORD = Pattern.compile("음성|양성|정상|비정상");
+    private static final Pattern EMPTY_MARK = Pattern.compile("[-–—]+|없음|N/?A", Pattern.CASE_INSENSITIVE);
 
     public ValidationResult validate(CheckupReport report, String source) {
         return run(report, List.of(), report.items() == null ? List.of() : report.items(), source);
@@ -106,7 +107,7 @@ public class ExtractionValidator {
         }
 
         CheckupReport cleaned = new CheckupReport(report.examDate(), report.examType(), report.sex(), report.age(), kept);
-        return new ValidationResult(cleaned, issues, uncoveredLines(lines, kept, report.age()));
+        return new ValidationResult(cleaned, issues, uncoveredSegments(lines, kept, report.age()));
     }
 
     private static String implausible(ReportItem item) {
@@ -138,8 +139,8 @@ public class ExtractionValidator {
 
     private static String keepIfOnLine(ReportItem item, String field, String fieldValue, List<String> valueLines,
                                        List<Issue> issues) {
-        if (fieldValue == null || fieldValue.isBlank()) {
-            return null;
+        if (fieldValue == null || fieldValue.isBlank() || EMPTY_MARK.matcher(fieldValue.strip()).matches()) {
+            return null;  // "-", "–" 같은 '없음' 표기는 값이 없는 것으로 본다
         }
         boolean onLine = valueLines.stream().anyMatch(line -> SourceText.containsIgnoringSpaces(line, fieldValue));
         if (!onLine) {
@@ -150,18 +151,24 @@ public class ExtractionValidator {
     }
 
     /**
-     * 검사 결과처럼 보이는데 추출된 값이 하나도 없는 줄.
+     * 검사 결과처럼 보이는데 추출된 값이 하나도 없는 조각(쉼표로 나눈 줄 조각).
      * 검사 결과처럼 보인다 = 날짜·연도·나이가 아닌 숫자가 있거나, 음성/양성/정상 같은 결과어가 있다.
+     * v1은 줄 단위로 봐서 "시력 좌 0.7, ..., 청력 좌 정상"에서 청력만 뽑혀도 시력 누락을 놓쳤다.
      */
-    private static List<String> uncoveredLines(List<String> lines, List<ReportItem> kept, Integer age) {
+    private static List<String> uncoveredSegments(List<String> lines, List<ReportItem> kept, Integer age) {
         List<String> uncovered = new ArrayList<>();
         for (String line : lines) {
-            if (META_LINE.matcher(line).find() || !looksLikeResult(line, age)) {
+            if (META_LINE.matcher(line).find()) {
                 continue;
             }
-            boolean covered = kept.stream().anyMatch(item -> SourceText.containsValue(line, item.value()));
-            if (!covered) {
-                uncovered.add(line);
+            for (String segment : SourceText.segments(line)) {
+                if (!looksLikeResult(segment, age)) {
+                    continue;
+                }
+                boolean covered = kept.stream().anyMatch(item -> SourceText.containsValue(segment, item.value()));
+                if (!covered) {
+                    uncovered.add(segment);
+                }
             }
         }
         return uncovered;
@@ -191,8 +198,8 @@ public class ExtractionValidator {
     /**
      * @param report 고친 결과 (버린 항목 제외, 근거 없는 필드는 null)
      * @param issues 발견한 문제
-     * @param uncoveredLines 누락이 의심되는 원문 줄
+     * @param uncoveredSegments 누락이 의심되는 원문 조각 (쉼표로 나눈 줄 조각)
      */
-    public record ValidationResult(CheckupReport report, List<Issue> issues, List<String> uncoveredLines) {
+    public record ValidationResult(CheckupReport report, List<Issue> issues, List<String> uncoveredSegments) {
     }
 }

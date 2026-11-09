@@ -29,15 +29,32 @@ spring:
       chat:
         model: ${ANTHROPIC_CHAT_MODEL:claude-haiku-5-5}
 
+    # Spring AI 자동 재시도. 기본값(10회, 2초×5배씩 증가, 상한 없음)은 로컬 CPU 모델에 위험하다:
+    # 시간 제한에 걸린 무거운 요청을 Ollama에 10번 다시 쌓는다 (2026-11-09 실측).
+    # 로컬은 재시도 없음(1). 일시적 과부하(429/5xx)가 있는 API 공급자를 쓸 때만 늘린다 (예: 3).
+    retry:
+      max-attempts: ${AI_RETRY_MAX_ATTEMPTS:1}
+      backoff:
+        max-interval: 30s
+
     vectorstore:
       pgvector:
         # 벡터 테이블(메타데이터, 키워드 검색 컬럼, 인덱스)은 2주차에 설계해 Flyway로 만든다.
         initialize-schema: false
         dimensions: 1024                   # bge-m3 출력 차원
 
+  # 외부 HTTP 호출(Ollama, Anthropic) 시간 제한. API 응답이 무한정 묶이지 않게 하는 용도다.
+  # 주의 (2026-11-09 실측): 연결이 끊겨도 Ollama는 생성을 끝까지 계속한다(CPU를 아끼지 못함).
+  # 그래서 폭주를 막는 진짜 방어선은 아래 출력 상한(max-tokens)이다. CPU에서 정상 추출은 5분 안팎.
+  http:
+    clients:
+      read-timeout: 15m
+
 checkupai:
   extraction:
     pipeline: ${EXTRACTION_PIPELINE:validated}   # baseline | validated (ADR 0003)
+    first-pass-max-tokens: 2500                  # 정상 출력 1,400~1,800토큰. 반복 루프 폭주 방지
+    retry-max-tokens: 600
 
 management:
   endpoints:

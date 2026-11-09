@@ -87,6 +87,25 @@ class ExtractionValidatorTest {
     }
 
     @Test
+    @DisplayName("판정 칸이 없는 결과지에서 모델이 지어낸 판정('정상')을 지운다 (2026-11-09 실측 사례)")
+    void clearsInventedJudgment() {
+        String noJudgmentColumn = """
+                검사항목 | 결과 | 단위 | 참고치
+                공복혈당 | 112 | mg/dL | 100 미만
+                요단백 | 음성 | - | 음성
+                """;
+        CheckupReport report = new CheckupReport(null, CheckupReport.ExamType.GENERAL, CheckupReport.Sex.FEMALE, 51,
+                List.of(new ReportItem(ItemCode.FASTING_GLUCOSE, "공복혈당", "112", "mg/dL", "100 미만", "정상"),
+                        new ReportItem(ItemCode.URINE_PROTEIN, "요단백", "음성", "-", "음성", "정상")));
+
+        ValidationResult result = validator.validate(report, noJudgmentColumn);
+
+        assertThat(result.report().items()).extracting(ReportItem::centerJudgment).containsOnlyNulls();
+        assertThat(result.report().items().get(1).unit()).as("'-'는 단위 없음").isNull();
+        assertThat(types(result)).containsExactly(IssueType.UNGROUNDED_FIELD, IssueType.UNGROUNDED_FIELD);
+    }
+
+    @Test
     @DisplayName("PDF의 넓은 공백이 끼어 있어도 글자 값을 원문에서 찾는다")
     void matchesTextValuesAcrossWideSpaces() {
         ValidationResult result = validate(item(ItemCode.CHEST_XRAY, "Chest PA", "비활동성 폐결핵"));
@@ -112,9 +131,26 @@ class ExtractionValidatorTest {
                 item(ItemCode.HEMOGLOBIN, "Hb", "10.4"),
                 item(ItemCode.FASTING_GLUCOSE, "FBS", "183"));
 
-        assertThat(result.uncoveredLines()).hasSize(2);
-        assertThat(result.uncoveredLines().get(0)).startsWith("Chest PA");
-        assertThat(result.uncoveredLines().get(1)).startsWith("HbA1c");
+        assertThat(result.uncoveredSegments()).hasSize(2);
+        assertThat(result.uncoveredSegments().get(0)).startsWith("Chest PA");
+        assertThat(result.uncoveredSegments().get(1)).startsWith("HbA1c");
+    }
+
+    @Test
+    @DisplayName("한 줄에 여러 항목이 있으면 쉼표 조각 단위로 누락을 찾는다 (v1은 줄 단위라 놓쳤다)")
+    void findsMissingItemsWithinMultiItemLine() {
+        String narrative = """
+                · 시력 좌 0.7, 시력 우 0.8, 청력 좌 비정상, 청력 우 정상
+                · 공복 혈당 206 mg/dL (참고 100 미만) → 질환의심
+                """;
+        CheckupReport report = new CheckupReport(null, CheckupReport.ExamType.GENERAL, CheckupReport.Sex.MALE, null,
+                List.of(item(ItemCode.HEARING_LEFT, "청력 좌", "비정상"),
+                        item(ItemCode.HEARING_RIGHT, "청력 우", "정상"),
+                        item(ItemCode.FASTING_GLUCOSE, "공복 혈당", "206")));
+
+        ValidationResult result = validator.validate(report, narrative);
+
+        assertThat(result.uncoveredSegments()).containsExactly("· 시력 좌 0.7", "시력 우 0.8");
     }
 
     @Test

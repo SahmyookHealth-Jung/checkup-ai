@@ -45,28 +45,38 @@ def main() -> None:
     ids = SMOKE_IDS if args.subset == "smoke" else _all_ids(args.data)
     print(f"평가 시작: {info} | {args.subset} {len(ids)}개 | 입력 {args.format}", flush=True)
 
-    total, per_template, documents = Score(), {}, []
+    # first_total: 같은 실행의 1차 추출 원본(검증 전) 점수. 최종 점수와 짝지어 비교하면
+    # 모델 출력이 실행마다 흔들려도 "검증이 바꾼 것"만 정확히 잴 수 있다 (v1 평가에서 배운 점).
+    total, first_total, per_template, documents = Score(), Score(), {}, []
     for index, report_id in enumerate(ids, start=1):
         expected = json.loads((args.data / f"{report_id}.expected.json").read_text(encoding="utf-8"))
         content = (args.data / f"{report_id}.{args.format}").read_bytes()
+        print(f"[{index}/{len(ids)}] {datetime.now():%H:%M:%S} {report_id} 추출 중...", flush=True)
         response, cached = _extract(args, info, report_id, content)
 
+        diagnostics = response.get("diagnostics") or {}
         if "error" in response:
             score = score_failed_document(expected["items"], response["error"])
+            first = score
         else:
             score = score_document(expected["items"], response["report"].get("items") or [])
+            first = score_document(expected["items"], diagnostics.get("firstPassItems") or []) \
+                if "firstPassItems" in diagnostics else score
 
         template = report_id.split("-")[0]
         total = total.add(score)
+        first_total = first_total.add(first)
         per_template[template] = per_template.get(template, Score()).add(score)
         metrics = response.get("metrics") or {}
-        documents.append({"id": report_id, "cached": cached, **score.summary(),
-                          "metrics": metrics, "error": response.get("error"), "errors": score.errors})
-        print(f"[{index}/{len(ids)}] {report_id} F1={score.f1:.3f} (TP {score.tp} / FP {score.fp} / FN {score.fn})"
-              f" {'캐시' if cached else str(metrics.get('latencyMs', '-')) + 'ms'}"
-              + (f" 오류: {response['error'][:80]}" if "error" in response else ""), flush=True)
+        documents.append({"id": report_id, "cached": cached, **score.summary(), "firstPass": first.summary(),
+                          "metrics": metrics, "error": response.get("error"), "errors": score.errors,
+                          "diagnostics": diagnostics or None})
+        print(f"      → 1차 F1={first.f1:.3f} → 최종 F1={score.f1:.3f} (TP {score.tp} / FP {score.fp} / FN {score.fn})"
+              f" | {'캐시' if cached else str(round((metrics.get('latencyMs') or 0) / 1000)) + '초'}"
+              f" | 호출 {metrics.get('attempts', '-')}회, 재요청 조각 {metrics.get('retriedSegments', 0)}개"
+              + (f" | 오류: {response['error'][:80]}" if "error" in response else ""), flush=True)
 
-    _save(args, info, ids, total, per_template, documents)
+    _save(args, info, ids, total, first_total, per_template, documents)
 
 
 def _extract(args, info: dict, report_id: str, content: bytes) -> tuple[dict, bool]:
@@ -77,13 +87,13 @@ def _extract(args, info: dict, report_id: str, content: bytes) -> tuple[dict, bo
         return json.loads(cache_file.read_text(encoding="utf-8")), True
 
     started = time.monotonic()
+    url = f"{args.api}/api/reports/extract?diagnostics=true"
     try:
         if args.format == "txt":
-            response = _post(f"{args.api}/api/reports/extract", content,
-                             "text/plain;charset=UTF-8", args.timeout)
+            response = _post(url, content, "text/plain;charset=UTF-8", args.timeout)
         else:
             body, content_type = _multipart(f"{report_id}.pdf", content)
-            response = _post(f"{args.api}/api/reports/extract", body, content_type, args.timeout)
+            response = _post(url, body, content_type, args.timeout)
     except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as e:
         detail = e.read().decode("utf-8", "replace")[:500] if isinstance(e, urllib.error.HTTPError) else ""
         return {"error": f"{type(e).__name__}: {e} {detail}".strip(),
@@ -94,7 +104,8 @@ def _extract(args, info: dict, report_id: str, content: bytes) -> tuple[dict, bo
     return response, False
 
 
-def _save(args, info: dict, ids: list[str], total: Score, per_template: dict, documents: list[dict]) -> None:
+def _save(args, info: dict, ids: list[str], total: Score, first_total: Score, per_template: dict,
+          documents: list[dict]) -> None:
     calls = [d["metrics"] for d in documents if d["metrics"]]
     avg = lambda key: round(sum(c.get(key) or 0 for c in calls) / len(calls)) if calls else None
     summary = {
@@ -105,13 +116,14 @@ def _save(args, info: dict, ids: list[str], total: Score, per_template: dict, do
         "documents": len(ids),
         "failed": sum(1 for d in documents if d["error"]),
         "itemF1": total.summary(),
+        "firstPassF1": first_total.summary(),  # 같은 실행의 1차 추출(검증 전) 점수
         "byTemplate": {t: s.summary() for t, s in sorted(per_template.items())},
         "avgLatencyMs": avg("latencyMs"),
         "avgPromptTokens": avg("promptTokens"),
         "avgCompletionTokens": avg("completionTokens"),
-        # validated 파이프라인: LLM 호출 수, 재요청한 줄 수, 검증에서 찾은 문제 유형별 건수
+        # validated 파이프라인: LLM 호출 수, 재요청한 조각 수, 검증에서 찾은 문제 유형별 건수
         "totalAttempts": sum(c.get("attempts") or 1 for c in calls),
-        "totalRetriedLines": sum(c.get("retriedLines") or 0 for c in calls),
+        "totalRetriedSegments": sum(c.get("retriedSegments") or c.get("retriedLines") or 0 for c in calls),
         "issueCounts": _sum_counts(c.get("issues") or {} for c in calls),
     }
 
@@ -124,16 +136,19 @@ def _save(args, info: dict, ids: list[str], total: Score, per_template: dict, do
 
     history = RESULTS_DIR / "history.md"
     if not history.exists():
-        history.write_text("# 추출 평가 기록\n\n대표 지표: 항목 F1 (code + value 일치). 정밀도 P, 재현율 R.\n\n"
-                           "| 실행 시각 | 파이프라인 | 모델 | 프롬프트 | 평가셋 | 입력 | F1 | P | R | 실패 | 평균 지연 | 평균 토큰(입/출) |\n"
-                           "|---|---|---|---|---|---|---|---|---|---|---|---|\n", encoding="utf-8")
+        history.write_text("# 추출 평가 기록\n\n대표 지표: 항목 F1 (code + value 일치). 정밀도 P, 재현율 R.\n"
+                           "1차 F1: 같은 실행의 1차 추출(검증 전) 점수. 최종 F1과의 차이가 검증의 효과다.\n\n"
+                           "| 실행 시각 | 파이프라인 | 모델 | 프롬프트 | 평가셋 | 입력 | F1 | P | R | 실패 | 평균 지연 "
+                           "| 평균 토큰(입/출) | 1차 F1 |\n"
+                           "|---|---|---|---|---|---|---|---|---|---|---|---|---|\n", encoding="utf-8")
     f1 = summary["itemF1"]
     latency = f"{summary['avgLatencyMs'] / 1000:.0f}초" if summary["avgLatencyMs"] else "-"
     with history.open("a", encoding="utf-8") as f:
         f.write(f"| {summary['runAt']} | {info.get('pipeline')} | {info.get('model')} | {info.get('promptVersion')} "
                 f"| {args.subset}({len(ids)}) | {args.format} | **{f1['f1']:.3f}** | {f1['precision']:.3f} "
                 f"| {f1['recall']:.3f} | {summary['failed']} | {latency} "
-                f"| {summary['avgPromptTokens']}/{summary['avgCompletionTokens']} |\n")
+                f"| {summary['avgPromptTokens']}/{summary['avgCompletionTokens']} "
+                f"| {summary['firstPassF1']['f1']:.3f} |\n")
 
     print(json.dumps(summary, ensure_ascii=False, indent=2))
     print(f"저장: {out.relative_to(EVAL_DIR)}")
