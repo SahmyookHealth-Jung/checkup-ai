@@ -2,7 +2,8 @@
 
 사용법 (eval/ 폴더에서):
     .venv/bin/python -m synth.generate --out ../data/synthetic/extraction/v1
-    .venv/bin/python -m synth.generate --heldout --seed 20261109 --out ../data/synthetic/extraction/heldout-v1
+    .venv/bin/python -m synth.generate --templates lab --seed 20261109 --out ../data/synthetic/extraction/heldout-v1
+    .venv/bin/python -m synth.generate --templates trend --seed 20261110 --out ../data/synthetic/extraction/heldout-v2
 
 결과물 (보고서마다):
     {id}.txt            텍스트 결과지
@@ -37,7 +38,7 @@ def generate(out: Path, per_template: int, seed: int, font: Path, pdf: bool, tem
             report_id = f"{template_id}-{i:03d}"
             rng = random.Random(f"{seed}:{report_id}")  # 보고서별 시드: 개수를 바꿔도 기존 보고서는 그대로
             subject = sample_subject(rng)
-            if template_id == "lab":
+            if template_id in HELDOUT_TEMPLATES:
                 items = sample_items(rng, spec, subject, include_lipids=rng.random() < 0.5,
                                      include_senses=rng.random() < 0.8, n_other=rng.randint(1, 3))
             else:  # 개발용 3종: 같은 시드로 같은 문서가 나오도록 그대로 둔다
@@ -92,11 +93,13 @@ def main() -> None:
     parser.add_argument("--font", type=Path, default=Path(os.environ.get("SYNTH_FONT", DEFAULT_FONT)),
                         help="한글 TrueType 폰트 경로 (환경변수 SYNTH_FONT로도 지정)")
     parser.add_argument("--no-pdf", action="store_true", help="텍스트와 정답만 만든다")
-    parser.add_argument("--heldout", action="store_true", help="일반화 시험용 양식(검사실 결과지형)만 만든다")
+    parser.add_argument("--templates", default=",".join(TEMPLATES),
+                        help=f"만들 템플릿 (쉼표 구분). 개발용 {list(TEMPLATES)}, 일반화 시험용 {list(HELDOUT_TEMPLATES)}")
     args = parser.parse_args()
 
-    manifest = generate(args.out, args.per_template, args.seed, args.font, pdf=not args.no_pdf,
-                        templates=HELDOUT_TEMPLATES if args.heldout else TEMPLATES)
+    available = {**TEMPLATES, **HELDOUT_TEMPLATES}
+    chosen = {name: available[name] for name in args.templates.split(",")}
+    manifest = generate(args.out, args.per_template, args.seed, args.font, pdf=not args.no_pdf, templates=chosen)
     items = sum(r["itemCount"] for r in manifest)
     bands = Counter()
     for r in manifest:

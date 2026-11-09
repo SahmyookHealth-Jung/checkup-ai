@@ -1,4 +1,4 @@
-"""레이아웃 템플릿 (개발용 3종 + 일반화 시험용 1종). 각 템플릿은 (문서 블록, 정답 JSON, 메타)를 돌려준다.
+"""레이아웃 템플릿 (개발용 3종 + 일반화 시험용 2종). 각 템플릿은 (문서 블록, 정답 JSON, 메타)를 돌려준다.
 
 정답 JSON의 문자열 값은 문서에 "찍힌 그대로"다. 그래서 정답은 렌더링과 항상 일치한다.
 """
@@ -7,7 +7,7 @@ from __future__ import annotations
 import random
 from dataclasses import dataclass
 
-from .sampling import Measured, Subject
+from .sampling import Measured, Subject, _previous
 
 SYNTHETIC_NOTICE = "※ 이 문서는 테스트용 합성 데이터입니다. 실제 개인 정보나 검진 결과가 아닙니다."
 FAKE_CENTER = "가상건강검진센터"
@@ -293,7 +293,83 @@ TEMPLATES = {
     "nar": narrative,       # 목록 + 의사 소견형
 }
 
+# ---- 템플릿 5 (일반화 시험용, held-out v2): 3개년 추이표형 ----
+#
+# 검증 v2.3을 만들기 전에 설계·생성했다 (2026-11-09). heldout-v1(lab)의 결과를 본 뒤라 lab은 더 이상
+# 처음 보는 양식이 아니기 때문이다. 실제 결과지에서 흔하지만 템플릿 1~4에 없던 특징만 넣었다.
+#   - 한 행에 2024, 2025, 2026(이번) 세 해의 값이 있다. 이번 값은 세 번째 열이다
+#   - 열 순서: 검사항목 | 단위 | 연도들 | 참고치 | 판정 (단위가 값 앞)
+#   - 시력·청력은 "시력: 좌 1.0 우 0.8 / 청력: 좌 정상 우 정상" 한 줄
+#   - 판정 어휘 정상/주의/재검
+#   - 고객번호, 대표번호(1588-0000), 상담 시간처럼 결과가 아닌 숫자
+
+TREND_LABELS = {"normal": "정상", "borderline": "주의", "abnormal": "재검"}
+
+
+def _older(rng: random.Random, m: Measured) -> str:
+    """2년 전 값. 숫자는 작년 값의 근사치, 글자 값은 이번·작년 값 중 하나."""
+    try:
+        number = float(m.previous)
+    except ValueError:
+        return rng.choice([m.previous, m.value])
+    decimals = len(m.value.split(".")[1]) if "." in m.value else 0
+    return _previous(rng, number, decimals)
+
+
+def trend_report(rng: random.Random, subject: Subject, items: list[Measured], labels: dict) -> tuple:
+    codes = _by_code(items)
+    expected: list[dict] = []
+    rows = []
+    for m in items:
+        if m.code in ("DIASTOLIC_BP", "VISION_LEFT", "VISION_RIGHT", "HEARING_LEFT", "HEARING_RIGHT", "CHEST_XRAY"):
+            continue
+        judgment = TREND_LABELS[m.band] if m.band else None
+        if m.code == "SYSTOLIC_BP":
+            dbp = codes["DIASTOLIC_BP"]
+            name = "혈압(수축기/이완기)"
+            rows.append([name, "mmHg", f"{_older(rng, m)}/{_older(rng, dbp)}", f"{m.previous}/{dbp.previous}",
+                         f"{m.value}/{dbp.value}", "120/80 미만", judgment or ""])
+            expected.append(_expected_item(m, name, unit="mmHg", reference="120/80 미만", judgment=judgment))
+            expected.append(_expected_item(dbp, name, unit="mmHg", reference="120/80 미만", judgment=judgment))
+            continue
+        name = m.names[0]
+        older = "-" if m.code == "OTHER" and rng.random() < 0.5 else _older(rng, m)  # 추가 검사는 2년 전 기록이 없기도 하다
+        rows.append([name, m.unit or "", older, m.previous, m.value, m.reference or "", judgment or ""])
+        expected.append(_expected_item(m, name, unit=m.unit, reference=m.reference, judgment=judgment))
+
+    senses = ""
+    if "VISION_LEFT" in codes:
+        vl, vr, hl, hr = (codes[c] for c in ("VISION_LEFT", "VISION_RIGHT", "HEARING_LEFT", "HEARING_RIGHT"))
+        senses = f"시력: 좌 {vl.value} 우 {vr.value} / 청력: 좌 {hl.value} 우 {hr.value}"
+        for m, name in ((vl, "시력"), (vr, "시력"), (hl, "청력"), (hr, "청력")):
+            expected.append(_expected_item(m, name))
+
+    xray = codes["CHEST_XRAY"]
+    xray_judgment = TREND_LABELS[xray.band] if xray.band else None
+    expected.append(_expected_item(xray, "흉부 X선", judgment=xray_judgment))
+
+    sex_ko = "남" if subject.sex == "MALE" else "여"
+    d = subject.exam_date
+    blocks: list[Block] = [
+        Heading("건강검진 3개년 추이 보고서"),
+        Para(SYNTHETIC_NOTICE),
+        Para(f"고객번호 C-{rng.randint(100000, 999999)} / 성별 {sex_ko} / 나이 {subject.age}세 / "
+             f"검진일 {d.year}. {d.month}. {d.day}."),
+        Heading("검사 결과 추이 (2024~2026)"),
+        Table(["검사항목", "단위", "2024", "2025", "2026(이번)", "참고치", "판정"], rows),
+        *([Heading("시력·청력"), Para(senses)] if senses else []),
+        Heading("영상 검사"),
+        Para(f"흉부 X선 소견: {xray.value}" + (f" (판정: {xray_judgment})" if xray_judgment else "")),
+        Para("※ 2024·2025년 값은 비교용입니다. 판정은 2026년 결과 기준입니다."),
+        Para("상담 문의 1588-0000 (평일 09:00~18:00)"),
+    ]
+    meta = {"distractors": ["three_year_columns", "unit_before_values", "senses_slash_line", "trend_vocabulary",
+                            "non_result_numbers"], "age_printed": True}
+    return blocks, _expected(subject, "UNKNOWN", expected, age_printed=True), meta
+
+
 # 일반화 시험용. 검증 규칙을 만들 때 쓰지 않는다
 HELDOUT_TEMPLATES = {
-    "lab": lab_report,      # 검사실 결과지형
+    "lab": lab_report,      # 검사실 결과지형 (heldout-v1, 검증 v2.2 시험에 사용. 결과를 봤으므로 이후로는 '본 양식')
+    "trend": trend_report,  # 3개년 추이표형 (heldout-v2, 검증 v2.3 전에 생성)
 }

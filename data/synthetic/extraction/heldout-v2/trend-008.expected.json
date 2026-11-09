@@ -1,0 +1,184 @@
+{
+  "examDate": "2026-10-10",
+  "examType": "UNKNOWN",
+  "sex": "MALE",
+  "age": 39,
+  "items": [
+    {
+      "code": "HEIGHT",
+      "rawName": "신장",
+      "value": "179.6",
+      "unit": "cm",
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "WEIGHT",
+      "rawName": "체중",
+      "value": "74.8",
+      "unit": "kg",
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "WAIST_CIRCUMFERENCE",
+      "rawName": "허리둘레",
+      "value": "98",
+      "unit": "cm",
+      "referenceRaw": "90 미만",
+      "centerJudgment": "재검"
+    },
+    {
+      "code": "BMI",
+      "rawName": "체질량지수",
+      "value": "23.2",
+      "unit": "kg/m²",
+      "referenceRaw": "18.5~24.9",
+      "centerJudgment": "정상"
+    },
+    {
+      "code": "SYSTOLIC_BP",
+      "rawName": "혈압(수축기/이완기)",
+      "value": "147",
+      "unit": "mmHg",
+      "referenceRaw": "120/80 미만",
+      "centerJudgment": "재검"
+    },
+    {
+      "code": "DIASTOLIC_BP",
+      "rawName": "혈압(수축기/이완기)",
+      "value": "92",
+      "unit": "mmHg",
+      "referenceRaw": "120/80 미만",
+      "centerJudgment": "재검"
+    },
+    {
+      "code": "URINE_PROTEIN",
+      "rawName": "요단백",
+      "value": "약양성(±)",
+      "unit": null,
+      "referenceRaw": "음성",
+      "centerJudgment": "주의"
+    },
+    {
+      "code": "HEMOGLOBIN",
+      "rawName": "혈색소",
+      "value": "13.5",
+      "unit": "g/dL",
+      "referenceRaw": "13.0~16.5",
+      "centerJudgment": "정상"
+    },
+    {
+      "code": "FASTING_GLUCOSE",
+      "rawName": "공복혈당",
+      "value": "93",
+      "unit": "mg/dL",
+      "referenceRaw": "100 미만",
+      "centerJudgment": "정상"
+    },
+    {
+      "code": "SERUM_CREATININE",
+      "rawName": "혈청 크레아티닌",
+      "value": "1.48",
+      "unit": "mg/dL",
+      "referenceRaw": "1.5 이하",
+      "centerJudgment": "주의"
+    },
+    {
+      "code": "EGFR",
+      "rawName": "신사구체여과율",
+      "value": "66",
+      "unit": "mL/min/1.73m²",
+      "referenceRaw": "60 이상",
+      "centerJudgment": "주의"
+    },
+    {
+      "code": "AST",
+      "rawName": "AST",
+      "value": "33",
+      "unit": "U/L",
+      "referenceRaw": "40 이하",
+      "centerJudgment": "정상"
+    },
+    {
+      "code": "ALT",
+      "rawName": "ALT",
+      "value": "49",
+      "unit": "U/L",
+      "referenceRaw": "35 이하",
+      "centerJudgment": "재검"
+    },
+    {
+      "code": "GAMMA_GTP",
+      "rawName": "감마지티피",
+      "value": "95",
+      "unit": "U/L",
+      "referenceRaw": "11~63",
+      "centerJudgment": "재검"
+    },
+    {
+      "code": "OTHER",
+      "rawName": "알부민",
+      "value": "4.4",
+      "unit": "g/dL",
+      "referenceRaw": "3.5~5.2",
+      "centerJudgment": null
+    },
+    {
+      "code": "OTHER",
+      "rawName": "당화혈색소",
+      "value": "6.0",
+      "unit": "%",
+      "referenceRaw": "5.7 미만",
+      "centerJudgment": null
+    },
+    {
+      "code": "OTHER",
+      "rawName": "암태아성항원",
+      "value": "3.8",
+      "unit": "ng/mL",
+      "referenceRaw": "5.0 이하",
+      "centerJudgment": null
+    },
+    {
+      "code": "VISION_LEFT",
+      "rawName": "시력",
+      "value": "0.9",
+      "unit": null,
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "VISION_RIGHT",
+      "rawName": "시력",
+      "value": "0.5",
+      "unit": null,
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "HEARING_LEFT",
+      "rawName": "청력",
+      "value": "정상",
+      "unit": null,
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "HEARING_RIGHT",
+      "rawName": "청력",
+      "value": "정상",
+      "unit": null,
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "CHEST_XRAY",
+      "rawName": "흉부 X선",
+      "value": "정상",
+      "unit": null,
+      "referenceRaw": null,
+      "centerJudgment": "정상"
+    }
+  ]
+}
