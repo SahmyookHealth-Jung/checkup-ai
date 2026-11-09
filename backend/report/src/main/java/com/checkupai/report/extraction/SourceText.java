@@ -54,10 +54,17 @@ final class SourceText {
     private static final Pattern HEADER_WORD = Pattern.compile("검사명|검사항목|항목|결과|금회|전회|단위|참고치|정상범위|판정|구분");
     private static final Pattern SEGMENT_SEPARATOR = Pattern.compile("[,，]");
 
-    /** 표 머리 줄: 머리말 단어가 2개 이상이고 숫자가 없는 줄. 재요청할 때 열 구성을 알려 주는 데 쓴다. */
+    /** 안내문·문장: "※"로 시작하거나 "~니다", "~요", 마침표로 끝나는 줄. 표 머리가 아니다. */
+    private static final Pattern SENTENCE = Pattern.compile("^※.*|.*(니다|요|\\.)\\s*$");
+
+    /**
+     * 표 머리 줄: 머리말 단어가 2개 이상이고 숫자가 없으며 문장이 아닌 줄. 재요청할 때 열 구성을 알려 주는 데 쓴다.
+     * (2026-11-09: "※ 전회 결과는 직전 검진 기록입니다."가 '전회', '결과' 때문에 머리 줄로 잡혀 문장 제외 조건을 추가)
+     */
     static List<String> headerLines(String source) {
         return lines(source).stream()
                 .filter(line -> !line.matches(".*\\d.*"))
+                .filter(line -> !SENTENCE.matcher(line).matches())
                 .filter(line -> HEADER_WORD.matcher(line).results().count() >= 2)
                 .toList();
     }

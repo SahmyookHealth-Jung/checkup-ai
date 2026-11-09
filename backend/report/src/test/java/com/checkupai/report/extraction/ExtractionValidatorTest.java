@@ -61,6 +61,18 @@ class ExtractionValidatorTest {
     }
 
     @Test
+    @DisplayName("OTHER 항목은 항목명과 값이 같은 줄에 있어야 남긴다 (다른 줄 값을 빌린 가짜 항목 제거)")
+    void dropsOtherItemWhoseNameAndValueAreOnDifferentLines() {
+        ValidationResult result = validate(
+                item(ItemCode.OTHER, "HbA1c", "5.1"),     // 같은 줄: 남김
+                item(ItemCode.OTHER, "참조) 정상", "5.1"),  // "참조) 정상"은 원문에 없음: 버림
+                item(ItemCode.OTHER, "Chest PA", "5.1"));  // 이름은 있지만 다른 줄: 버림
+
+        assertThat(result.report().items()).extracting(ReportItem::rawName).containsExactly("HbA1c");
+        assertThat(types(result)).containsOnly(IssueType.OTHER_NAME_VALUE_APART);
+    }
+
+    @Test
     @DisplayName("같은 코드에 다른 값이 오면 처음 값만 남긴다")
     void keepsFirstValueOnConflict() {
         ValidationResult result = validate(

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
  * <ol>
  *   <li>중복 제거: 같은 코드·같은 값이 여러 번 나오면 하나만 남긴다 (기준선에서 관찰된 반복 오류)</li>
  *   <li>값 원문 대조: 원문에 없는 값은 버린다 (지어낸 값 차단)</li>
+ *   <li>OTHER 항목: 항목명과 값이 같은 줄에 없으면 버린다 (다른 항목 값을 빌려 만든 가짜 항목 차단)</li>
  *   <li>숫자 항목 상식 검사: 숫자가 아니거나 생리적으로 불가능한 값은 버린다</li>
  *   <li>같은 코드에 다른 값이 여럿이면 처음 것만 남긴다</li>
  *   <li>필드 원문 대조: 값이 있는 줄에 없는 단위·참고치·판정은 null로 바꾼다</li>
@@ -94,6 +95,12 @@ public class ExtractionValidator {
                 issues.add(new Issue(IssueType.UNGROUNDED_VALUE, item.code(), item.value()));
                 continue;
             }
+            if (item.code() == ItemCode.OTHER && !nameAndValueOnSameLine(item, lines)) {
+                // 표준 코드 표에 없는 항목은 모델이 항목명을 원문에서 그대로 옮겨야 한다.
+                // 2026-11-09 v2 평가: 줄바꿈 조각 "참조) 정상"에 다른 항목의 값(3.88)을 붙인 가짜 항목이 나왔다.
+                issues.add(new Issue(IssueType.OTHER_NAME_VALUE_APART, item.code(), item.rawName() + "=" + item.value()));
+                continue;
+            }
             String implausible = implausible(item);
             if (implausible != null) {
                 issues.add(new Issue(IssueType.IMPLAUSIBLE, item.code(), implausible));
@@ -108,6 +115,14 @@ public class ExtractionValidator {
 
         CheckupReport cleaned = new CheckupReport(report.examDate(), report.examType(), report.sex(), report.age(), kept);
         return new ValidationResult(cleaned, issues, uncoveredSegments(lines, kept, report.age()));
+    }
+
+    private static boolean nameAndValueOnSameLine(ReportItem item, List<String> lines) {
+        if (item.rawName() == null || item.rawName().isBlank()) {
+            return false;
+        }
+        return lines.stream().anyMatch(line -> SourceText.containsValue(line, item.value())
+                && SourceText.containsIgnoringSpaces(line, item.rawName()));
     }
 
     private static String implausible(ReportItem item) {
@@ -189,7 +204,8 @@ public class ExtractionValidator {
     }
 
     public enum IssueType {
-        EMPTY, DUPLICATE, UNGROUNDED_VALUE, IMPLAUSIBLE, CONFLICT, UNGROUNDED_FIELD, RAW_NAME_NOT_IN_SOURCE
+        EMPTY, DUPLICATE, UNGROUNDED_VALUE, OTHER_NAME_VALUE_APART, IMPLAUSIBLE, CONFLICT, UNGROUNDED_FIELD,
+        RAW_NAME_NOT_IN_SOURCE
     }
 
     public record Issue(IssueType type, ItemCode code, String detail) {

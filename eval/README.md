@@ -27,3 +27,18 @@ python3 -m venv .venv
   - 폰트가 들어간 PDF는 커밋하지 않습니다(gitignore). 텍스트와 정답 JSON만 커밋합니다.
 - 생성할 때 정답 JSON의 모든 문자열이 문서에 찍혀 있는지 검사합니다. 어긋나면 생성이 실패합니다.
 - 값 구간과 참고치(`item_spec.yaml`)는 **임시값**입니다. 문서를 꾸미는 용도일 뿐, 해설의 의학적 근거로 쓰지 않습니다.
+
+## extraction: 추출 평가
+
+대표 지표는 항목 F1(code + value)입니다. 결과는 `results/extraction/history.md`에 한 줄씩 쌓입니다.
+
+```bash
+eval/run_eval_resumable.sh smoke   # 6개, 로컬 CPU 약 40분
+eval/run_eval_resumable.sh full    # 30개, 로컬 CPU 약 3~4시간
+```
+
+- **중간에 꺼져도 같은 명령을 다시 실행하면 이어서 합니다.**
+  - 보고서마다 응답을 `.cache/extraction/`에 저장하기 때문에, 끝난 보고서는 모델을 다시 부르지 않습니다.
+  - 캐시 키는 (모델, 프롬프트 버전, 파이프라인 버전, 입력 형식, 파일 내용)입니다. 검증 로직을 바꾸면 파이프라인 버전(`ExtractionProperties`)을 올려야 새로 계산합니다.
+- DB·Ollama·앱이 꺼져 있으면 스크립트가 켭니다. 평가가 도는 동안만 `caffeinate`로 잠자기를 막습니다.
+- 진행 상황은 `tail -f eval/.cache/logs/full-latest.log`로 볼 수 있습니다.

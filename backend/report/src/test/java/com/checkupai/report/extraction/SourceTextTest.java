@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 class SourceTextTest {
 
     @Test
-    @DisplayName("표 머리 줄만 고른다: 머리말 단어 2개 이상, 숫자 없음")
+    @DisplayName("표 머리 줄만 고른다: 머리말 단어 2개 이상, 숫자 없음, 안내문·문장 제외")
     void picksHeaderLines() {
         String source = """
                    가상의원   종합건강검진   결과   요약
                    검사명        금회        전회        단위        참고치
                    FBS           183         185         mg/dL       <100
                    성명   생년월일   성별   나이   검진일   검진기관
+                   ※ 전회   결과는    직전    검진   기록입니다.   이상   소견은    담당    의사와    상담하시기       바랍니다.
                 """;
 
         assertThat(SourceText.headerLines(source)).containsExactly("검사명 금회 전회 단위 참고치");
