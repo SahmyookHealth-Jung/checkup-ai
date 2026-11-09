@@ -1,4 +1,4 @@
-"""레이아웃 템플릿 3종. 각 템플릿은 (문서 블록, 정답 JSON, 메타)를 돌려준다.
+"""레이아웃 템플릿 (개발용 3종 + 일반화 시험용 1종). 각 템플릿은 (문서 블록, 정답 JSON, 메타)를 돌려준다.
 
 정답 JSON의 문자열 값은 문서에 "찍힌 그대로"다. 그래서 정답은 렌더링과 항상 일치한다.
 """
@@ -209,8 +209,91 @@ def narrative(rng: random.Random, subject: Subject, items: list[Measured], label
     return blocks, _expected(subject, "GENERAL", expected, age_printed=False), meta
 
 
+# ---- 템플릿 4 (일반화 시험용, held-out): 검사실 결과지형 ----
+#
+# 검증 규칙을 만들 때 보지 않은 양식이다. 규칙에 맞추거나 깨려고 고르지 않고, 실제 결과지에서 흔하지만
+# 템플릿 1~3에 없던 특징만 넣었다 (2026-11-09 설계).
+#   - 신체계측을 2단 표(항목|결과|항목|결과)로 찍는다: 한 줄에 두 항목인데 쉼표가 없다
+#   - 시력·청력은 좌우를 한 칸에 찍는다 ("1.0/0.8", "정상/정상")
+#   - 열 순서: 결과 | 판정 | 참고범위 | 단위. 판정 어휘는 정상/경계/이상 (국가검진 등급이 아니다)
+#   - 항목명은 "공복혈당(FBS)"처럼 이름(약어)
+#   - 등록번호, 채혈일(2026/10/14), 문의 전화번호처럼 결과가 아닌 숫자가 있다
+
+LAB_LABELS = {"normal": "정상", "borderline": "경계", "abnormal": "이상"}
+SUMMARY_CODES = {"HEIGHT", "WEIGHT", "WAIST_CIRCUMFERENCE", "BMI", "SYSTOLIC_BP", "DIASTOLIC_BP"} | {
+    "VISION_LEFT", "VISION_RIGHT", "HEARING_LEFT", "HEARING_RIGHT"}
+
+
+def _lab_name(m: Measured) -> str:
+    standard_name, abbr = m.names[0], m.names[1]
+    return abbr if standard_name in abbr else f"{standard_name}({abbr})"
+
+
+def lab_report(rng: random.Random, subject: Subject, items: list[Measured], labels: dict) -> tuple:
+    codes = _by_code(items)
+    expected: list[dict] = []
+
+    # 2단 요약표: 판정·참고치 없이 "값 단위"만 찍는다
+    cells: list[tuple[str, str]] = []
+    for code in ("HEIGHT", "WEIGHT", "WAIST_CIRCUMFERENCE", "BMI"):
+        m = codes[code]
+        cells.append((m.names[0], f"{m.value} {m.unit}"))
+        expected.append(_expected_item(m, m.names[0], unit=m.unit))
+    sbp, dbp = codes["SYSTOLIC_BP"], codes["DIASTOLIC_BP"]
+    cells.append(("혈압(수축기/이완기)", f"{sbp.value}/{dbp.value} mmHg"))
+    expected.append(_expected_item(sbp, "혈압(수축기/이완기)", unit="mmHg"))
+    expected.append(_expected_item(dbp, "혈압(수축기/이완기)", unit="mmHg"))
+    if "VISION_LEFT" in codes:
+        for name, left, right in (("시력(좌/우)", "VISION_LEFT", "VISION_RIGHT"),
+                                  ("청력(좌/우)", "HEARING_LEFT", "HEARING_RIGHT")):
+            cells.append((name, f"{codes[left].value}/{codes[right].value}"))
+            expected.append(_expected_item(codes[left], name))
+            expected.append(_expected_item(codes[right], name))
+    if len(cells) % 2:
+        cells.append(("", ""))
+    summary_rows = [[*cells[i], *cells[i + 1]] for i in range(0, len(cells), 2)]
+
+    # 상세표: 혈액·소변 검사와 추가 검사
+    rows = []
+    for m in items:
+        if m.code in SUMMARY_CODES or m.code == "CHEST_XRAY":
+            continue
+        name = _lab_name(m)
+        judgment = LAB_LABELS[m.band] if m.band else None
+        rows.append([name, m.value, judgment or "", m.reference or "", m.unit or ""])
+        expected.append(_expected_item(m, name, unit=m.unit, reference=m.reference, judgment=judgment))
+
+    xray = codes["CHEST_XRAY"]
+    xray_judgment = LAB_LABELS[xray.band] if xray.band else None
+    expected.append(_expected_item(xray, "흉부 X-ray", judgment=xray_judgment))
+
+    sex_ko = "남" if subject.sex == "MALE" else "여"
+    blocks: list[Block] = [
+        Heading("가상병원 진단검사의학과 검사 결과 보고서"),
+        Para(SYNTHETIC_NOTICE),
+        Para(f"등록번호: SYN-{rng.randint(10000, 99999)}    성별/나이: {sex_ko}/{subject.age}    "
+             f"채혈일: {subject.exam_date.strftime('%Y/%m/%d')}"),
+        Heading("신체 계측 및 기본 검사"),
+        Table(["항목", "결과", "항목", "결과"], summary_rows),
+        Heading("혈액·소변 검사"),
+        Table(["검사항목", "결과", "판정", "참고범위", "단위"], rows),
+        Heading("영상 검사"),
+        Table(["검사", "판독 소견", "판정"], [["흉부 X-ray", xray.value, xray_judgment or ""]]),
+        Para("※ 참고범위는 검사 방법에 따라 다를 수 있습니다. 판정: 정상 / 경계 / 이상"),
+        Para("문의: 진단검사의학과 000-0000-0000"),
+    ]
+    meta = {"distractors": ["two_column_table", "pair_in_one_cell", "judgment_after_result", "lab_vocabulary",
+                            "non_result_numbers"], "age_printed": True}
+    return blocks, _expected(subject, "UNKNOWN", expected, age_printed=True), meta
+
+
 TEMPLATES = {
     "std": standard,        # 공단 표준 서식형
     "sum": clinic_summary,  # 기관 요약표형
     "nar": narrative,       # 목록 + 의사 소견형
+}
+
+# 일반화 시험용. 검증 규칙을 만들 때 쓰지 않는다
+HELDOUT_TEMPLATES = {
+    "lab": lab_report,      # 검사실 결과지형
 }

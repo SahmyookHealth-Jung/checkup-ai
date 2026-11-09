@@ -2,6 +2,7 @@
 
 사용법 (eval/ 폴더에서):
     .venv/bin/python -m synth.generate --out ../data/synthetic/extraction/v1
+    .venv/bin/python -m synth.generate --heldout --seed 20261109 --out ../data/synthetic/extraction/heldout-v1
 
 결과물 (보고서마다):
     {id}.txt            텍스트 결과지
@@ -20,29 +21,33 @@ from pathlib import Path
 
 from . import render
 from .sampling import load_spec, sample_items, sample_subject
-from .templates import TEMPLATES
+from .templates import HELDOUT_TEMPLATES, TEMPLATES
 
 DEFAULT_FONT = "/System/Library/Fonts/Supplemental/AppleGothic.ttf"
 
 
-def generate(out: Path, per_template: int, seed: int, font: Path, pdf: bool) -> list[dict]:
+def generate(out: Path, per_template: int, seed: int, font: Path, pdf: bool, templates: dict = TEMPLATES) -> list[dict]:
     spec = load_spec()
     labels = spec["judgment_labels"]
     out.mkdir(parents=True, exist_ok=True)
     manifest = []
 
-    for template_id, template in TEMPLATES.items():
+    for template_id, template in templates.items():
         for i in range(1, per_template + 1):
             report_id = f"{template_id}-{i:03d}"
             rng = random.Random(f"{seed}:{report_id}")  # 보고서별 시드: 개수를 바꿔도 기존 보고서는 그대로
             subject = sample_subject(rng)
-            comprehensive = template_id == "sum"
-            items = sample_items(
-                rng, spec, subject,
-                include_lipids=comprehensive or rng.random() < 0.5,  # 지질 검사는 4년 주기
-                include_senses=template_id != "sum" and rng.random() < 0.8,
-                n_other=rng.randint(2, 4) if comprehensive else 0,
-            )
+            if template_id == "lab":
+                items = sample_items(rng, spec, subject, include_lipids=rng.random() < 0.5,
+                                     include_senses=rng.random() < 0.8, n_other=rng.randint(1, 3))
+            else:  # 개발용 3종: 같은 시드로 같은 문서가 나오도록 그대로 둔다
+                comprehensive = template_id == "sum"
+                items = sample_items(
+                    rng, spec, subject,
+                    include_lipids=comprehensive or rng.random() < 0.5,  # 지질 검사는 4년 주기
+                    include_senses=template_id != "sum" and rng.random() < 0.8,
+                    n_other=rng.randint(2, 4) if comprehensive else 0,
+                )
             blocks, expected, meta = template(rng, subject, items, labels)
             text = render.to_text(blocks)
             _check_consistency(report_id, text, expected)
@@ -87,9 +92,11 @@ def main() -> None:
     parser.add_argument("--font", type=Path, default=Path(os.environ.get("SYNTH_FONT", DEFAULT_FONT)),
                         help="한글 TrueType 폰트 경로 (환경변수 SYNTH_FONT로도 지정)")
     parser.add_argument("--no-pdf", action="store_true", help="텍스트와 정답만 만든다")
+    parser.add_argument("--heldout", action="store_true", help="일반화 시험용 양식(검사실 결과지형)만 만든다")
     args = parser.parse_args()
 
-    manifest = generate(args.out, args.per_template, args.seed, args.font, pdf=not args.no_pdf)
+    manifest = generate(args.out, args.per_template, args.seed, args.font, pdf=not args.no_pdf,
+                        templates=HELDOUT_TEMPLATES if args.heldout else TEMPLATES)
     items = sum(r["itemCount"] for r in manifest)
     bands = Counter()
     for r in manifest:
