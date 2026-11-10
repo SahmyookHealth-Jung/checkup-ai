@@ -1,0 +1,149 @@
+{
+  "source": {
+    "id": "mohw-2026-6-annex4",
+    "title": "건강검진 실시기준 [별표 4의 별첨] 검사항목별 판정기준",
+    "edition": "보건복지부고시 제2026-6호 (2026-01-07)",
+    "url": "https://www.nhis.or.kr/lm/lmxsrv/law/lawFullContent.do?SEQ=80"
+  },
+  "interpretation": "표의 구간은 경계값 사이에 빈틈이 없도록 읽는다. 'a-b'와 다음 구간 'c 이상'은 a 이상 c 미만과 c 이상으로, 'n 이하'와 다음 'n+1'은 n 이하와 n 초과로 본다. 표에 없는 구간(예: 혈색소 남 16.5 초과, 감마지티피 남 11 미만)은 판정하지 않는다. 혈압은 수축기·이완기를 따로 판정하고, 둘 중 나쁜 쪽이 표의 판정과 같다. 당뇨병 동반 시 LDL 기준(100 미만)과 '의사 판단 시 수정 가능' 단서는 자동 판정하지 않는다.",
+  "items": {
+    "SYSTOLIC_BP": {
+      "row": "고혈압 · 혈압 수축기 · mmHg · 정상A 120 미만 / 정상B(경계) 120-139 / 질환의심 140 이상",
+      "bands": [
+        {"judgment": "NORMAL_A", "max": 120},
+        {"judgment": "NORMAL_B", "min": 120, "max": 140},
+        {"judgment": "SUSPECT", "min": 140}
+      ]
+    },
+    "DIASTOLIC_BP": {
+      "row": "고혈압 · 혈압 이완기 · mmHg · 정상A 80 미만 / 정상B(경계) 80-89 / 질환의심 90 이상",
+      "bands": [
+        {"judgment": "NORMAL_A", "max": 80},
+        {"judgment": "NORMAL_B", "min": 80, "max": 90},
+        {"judgment": "SUSPECT", "min": 90}
+      ]
+    },
+    "BMI": {
+      "row": "비만 · BMI · kg/m2 · 정상A 18.5-24.9 / 정상B(경계) 25-29.9, 18.5 미만 / 질환의심 30 이상",
+      "bands": [
+        {"judgment": "NORMAL_B", "max": 18.5},
+        {"judgment": "NORMAL_A", "min": 18.5, "max": 25},
+        {"judgment": "NORMAL_B", "min": 25, "max": 30},
+        {"judgment": "SUSPECT", "min": 30}
+      ]
+    },
+    "WAIST_CIRCUMFERENCE": {
+      "row": "비만 · 허리둘레 · cm · 정상A 남 90 미만, 여 85 미만 / 질환의심 남 90 이상, 여 85 이상",
+      "bySex": {
+        "MALE": [{"judgment": "NORMAL_A", "max": 90}, {"judgment": "SUSPECT", "min": 90}],
+        "FEMALE": [{"judgment": "NORMAL_A", "max": 85}, {"judgment": "SUSPECT", "min": 85}]
+      }
+    },
+    "HEMOGLOBIN": {
+      "row": "빈혈 · 혈색소 · g/dL · 정상A 남 13.0-16.5, 여 12.0-15.5 / 정상B(경계) 남 12.0-12.9, 여 10.0-11.9 / 질환의심 남 12.0 미만, 여 10.0 미만",
+      "bySex": {
+        "MALE": [{"judgment": "SUSPECT", "max": 12.0}, {"judgment": "NORMAL_B", "min": 12.0, "max": 13.0},
+                 {"judgment": "NORMAL_A", "min": 13.0, "maxInclusive": 16.5}],
+        "FEMALE": [{"judgment": "SUSPECT", "max": 10.0}, {"judgment": "NORMAL_B", "min": 10.0, "max": 12.0},
+                   {"judgment": "NORMAL_A", "min": 12.0, "maxInclusive": 15.5}]
+      }
+    },
+    "FASTING_GLUCOSE": {
+      "row": "당뇨병 · 공복 혈당 · mg/dL · 정상A 100 미만 / 정상B(경계) 100-125 / 질환의심 126 이상",
+      "bands": [
+        {"judgment": "NORMAL_A", "max": 100},
+        {"judgment": "NORMAL_B", "min": 100, "max": 126},
+        {"judgment": "SUSPECT", "min": 126}
+      ]
+    },
+    "TOTAL_CHOLESTEROL": {
+      "row": "이상지질혈증 · 총콜레스테롤 · mg/dL · 정상A 200 미만 / 정상B(경계) 200-239 / 질환의심 240 이상",
+      "bands": [
+        {"judgment": "NORMAL_A", "max": 200},
+        {"judgment": "NORMAL_B", "min": 200, "max": 240},
+        {"judgment": "SUSPECT", "min": 240}
+      ]
+    },
+    "HDL_CHOLESTEROL": {
+      "row": "이상지질혈증 · 고밀도(HDL) 콜레스테롤 · mg/dL · 정상A 60 이상 / 정상B(경계) 40-59 / 질환의심 40 미만",
+      "bands": [
+        {"judgment": "SUSPECT", "max": 40},
+        {"judgment": "NORMAL_B", "min": 40, "max": 60},
+        {"judgment": "NORMAL_A", "min": 60}
+      ]
+    },
+    "TRIGLYCERIDES": {
+      "row": "이상지질혈증 · 중성지방 · mg/dL · 정상A 150 미만 / 정상B(경계) 150-199 / 질환의심 200 이상",
+      "bands": [
+        {"judgment": "NORMAL_A", "max": 150},
+        {"judgment": "NORMAL_B", "min": 150, "max": 200},
+        {"judgment": "SUSPECT", "min": 200}
+      ]
+    },
+    "LDL_CHOLESTEROL": {
+      "row": "이상지질혈증 · 저밀도(LDL) 콜레스테롤 · mg/dL · 정상A 130 미만 / 정상B(경계) 130-159 / 질환의심 160 이상 (당뇨병 동반 시 100 미만, 의사 판단 시 수정 가능)",
+      "bands": [
+        {"judgment": "NORMAL_A", "max": 130},
+        {"judgment": "NORMAL_B", "min": 130, "max": 160},
+        {"judgment": "SUSPECT", "min": 160}
+      ]
+    },
+    "AST": {
+      "row": "간장질환 · 에이에스티(AST(SGOT)) · U/L · 정상A 40 이하 / 정상B(경계) 41-50 / 질환의심 51 이상",
+      "bands": [
+        {"judgment": "NORMAL_A", "maxInclusive": 40},
+        {"judgment": "NORMAL_B", "minExclusive": 40, "maxInclusive": 50},
+        {"judgment": "SUSPECT", "minExclusive": 50}
+      ]
+    },
+    "ALT": {
+      "row": "간장질환 · 에이엘티(ALT(SGPT)) · U/L · 정상A 35 이하 / 정상B(경계) 36-45 / 질환의심 46 이상",
+      "bands": [
+        {"judgment": "NORMAL_A", "maxInclusive": 35},
+        {"judgment": "NORMAL_B", "minExclusive": 35, "maxInclusive": 45},
+        {"judgment": "SUSPECT", "minExclusive": 45}
+      ]
+    },
+    "GAMMA_GTP": {
+      "row": "간장질환 · 감마지티피(γ-GTP) · U/L · 정상A 남 11-63, 여 8-35 / 정상B(경계) 남 64-77, 여 36-45 / 질환의심 남 78 이상, 여 46 이상",
+      "bySex": {
+        "MALE": [{"judgment": "NORMAL_A", "min": 11, "maxInclusive": 63},
+                 {"judgment": "NORMAL_B", "minExclusive": 63, "maxInclusive": 77},
+                 {"judgment": "SUSPECT", "minExclusive": 77}],
+        "FEMALE": [{"judgment": "NORMAL_A", "min": 8, "maxInclusive": 35},
+                   {"judgment": "NORMAL_B", "minExclusive": 35, "maxInclusive": 45},
+                   {"judgment": "SUSPECT", "minExclusive": 45}]
+      }
+    },
+    "URINE_PROTEIN": {
+      "row": "신장질환 · 요단백 · 정상A 음성(-) / 정상B(경계) 약양성(±) / 질환의심 양성(+1) 이상",
+      "textBands": [
+        {"judgment": "NORMAL_A", "pattern": "^(음성|-)"},
+        {"judgment": "NORMAL_B", "pattern": "^(약양성|±)"},
+        {"judgment": "SUSPECT", "pattern": "^(양성|\\+|[1-4]\\+)"}
+      ]
+    },
+    "SERUM_CREATININE": {
+      "row": "신장질환 · 혈청크레아티닌 · mg/dL · 정상A 1.5 이하 / 질환의심 1.5 초과",
+      "bands": [
+        {"judgment": "NORMAL_A", "maxInclusive": 1.5},
+        {"judgment": "SUSPECT", "minExclusive": 1.5}
+      ]
+    },
+    "EGFR": {
+      "row": "신장질환 · 신사구체여과율(e-GFR) · mL/min/1.73m2 · 정상A 60 이상 / 질환의심 60 미만",
+      "bands": [
+        {"judgment": "SUSPECT", "max": 60},
+        {"judgment": "NORMAL_A", "min": 60}
+      ]
+    },
+    "CHEST_XRAY": {
+      "row": "폐결핵 및 기타흉부질환 · 흉부방사선촬영 · 정상A 정상 / 정상B(경계) 비활동성 폐결핵 / 질환의심 정상 및 비활동성 폐결핵 이외의 자(사진불량, 미촬영 등은 제외)",
+      "textBands": [
+        {"judgment": "NORMAL_A", "pattern": "^정상$"},
+        {"judgment": "NORMAL_B", "pattern": "비활동성\\s*폐결핵"},
+        {"judgment": "SUSPECT", "pattern": "^(?!.*(사진\\s*불량|미촬영)).+"}
+      ]
+    }
+  }
+}

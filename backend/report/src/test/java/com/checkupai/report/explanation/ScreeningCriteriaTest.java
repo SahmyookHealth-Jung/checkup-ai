@@ -1,0 +1,72 @@
+package com.checkupai.report.explanation;
+
+import static com.checkupai.report.extraction.CheckupReport.Sex.FEMALE;
+import static com.checkupai.report.extraction.CheckupReport.Sex.MALE;
+import static com.checkupai.report.extraction.CheckupReport.Sex.UNKNOWN;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.checkupai.report.extraction.CheckupReport;
+import com.checkupai.report.extraction.ItemCode;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.api.Test;
+
+/** 건강검진 실시기준 별표 4 별첨의 경계값을 그대로 확인한다 */
+class ScreeningCriteriaTest {
+
+    private final ScreeningCriteria criteria = new ScreeningCriteria();
+
+    @ParameterizedTest(name = "{0} {1} ({2}) → {3}")
+    @DisplayName("숫자 항목: 표의 경계값에서 판정이 바뀐다 ('미만'·'이상'·'이하'·'초과', 성별 기준)")
+    @CsvSource({
+            "FASTING_GLUCOSE, 99, MALE, NORMAL_A", "FASTING_GLUCOSE, 100, MALE, NORMAL_B",
+            "FASTING_GLUCOSE, 125, MALE, NORMAL_B", "FASTING_GLUCOSE, 126, MALE, SUSPECT",
+            "SYSTOLIC_BP, 119, MALE, NORMAL_A", "SYSTOLIC_BP, 120, MALE, NORMAL_B", "SYSTOLIC_BP, 140, MALE, SUSPECT",
+            "DIASTOLIC_BP, 89, MALE, NORMAL_B", "DIASTOLIC_BP, 90, MALE, SUSPECT",
+            "BMI, 18.4, MALE, NORMAL_B", "BMI, 18.5, MALE, NORMAL_A", "BMI, 24.9, MALE, NORMAL_A",
+            "BMI, 25.0, MALE, NORMAL_B", "BMI, 30, MALE, SUSPECT",
+            "HDL_CHOLESTEROL, 39, MALE, SUSPECT", "HDL_CHOLESTEROL, 40, MALE, NORMAL_B", "HDL_CHOLESTEROL, 60, MALE, NORMAL_A",
+            "AST, 40, MALE, NORMAL_A", "AST, 41, MALE, NORMAL_B", "AST, 50, MALE, NORMAL_B", "AST, 51, MALE, SUSPECT",
+            "SERUM_CREATININE, 1.5, MALE, NORMAL_A", "SERUM_CREATININE, 1.51, MALE, SUSPECT",
+            "EGFR, 59, MALE, SUSPECT", "EGFR, 60, MALE, NORMAL_A",
+            "HEMOGLOBIN, 12.9, MALE, NORMAL_B", "HEMOGLOBIN, 12.9, FEMALE, NORMAL_A", "HEMOGLOBIN, 9.9, FEMALE, SUSPECT",
+            "WAIST_CIRCUMFERENCE, 89, MALE, NORMAL_A", "WAIST_CIRCUMFERENCE, 85, FEMALE, SUSPECT",
+            "GAMMA_GTP, 63, MALE, NORMAL_A", "GAMMA_GTP, 64, MALE, NORMAL_B", "GAMMA_GTP, 78, MALE, SUSPECT",
+            "GAMMA_GTP, 46, FEMALE, SUSPECT"
+    })
+    void judgesNumbersAtBoundaries(ItemCode code, String value, CheckupReport.Sex sex, Judgment expected) {
+        assertThat(criteria.judge(code, value, sex).judgment()).isEqualTo(expected);
+    }
+
+    @ParameterizedTest(name = "{0} {1} → {2}")
+    @DisplayName("글자 항목: 요단백과 흉부방사선은 표의 표현으로 판정한다")
+    @CsvSource({
+            "URINE_PROTEIN, 음성, NORMAL_A", "URINE_PROTEIN, 약양성(±), NORMAL_B", "URINE_PROTEIN, 양성(2+), SUSPECT",
+            "CHEST_XRAY, 정상, NORMAL_A", "CHEST_XRAY, 비활동성 폐결핵, NORMAL_B",
+            "CHEST_XRAY, 기타 질환 의심(소견서 참조), SUSPECT"
+    })
+    void judgesTextValues(ItemCode code, String value, Judgment expected) {
+        assertThat(criteria.judge(code, value, MALE).judgment()).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("표에 없는 구간·항목, 성별을 모르는 성별 기준, 숫자가 아닌 값은 판정하지 않는다")
+    void doesNotJudgeOutsideTheTable() {
+        assertThat(criteria.judge(ItemCode.HEMOGLOBIN, "16.6", MALE).judgment()).isEqualTo(Judgment.NOT_JUDGED);
+        assertThat(criteria.judge(ItemCode.GAMMA_GTP, "10", MALE).judgment()).isEqualTo(Judgment.NOT_JUDGED);
+        assertThat(criteria.judge(ItemCode.WAIST_CIRCUMFERENCE, "95", UNKNOWN).judgment()).isEqualTo(Judgment.NOT_JUDGED);
+        assertThat(criteria.judge(ItemCode.FASTING_GLUCOSE, "<100", MALE).judgment()).isEqualTo(Judgment.NOT_JUDGED);
+        assertThat(criteria.judge(ItemCode.VISION_LEFT, "1.0", MALE).judgment()).isEqualTo(Judgment.NOT_JUDGED);
+        assertThat(criteria.judge(ItemCode.OTHER, "5.4", MALE).judgment()).isEqualTo(Judgment.NOT_JUDGED);
+    }
+
+    @Test
+    @DisplayName("판정에는 근거가 된 기준 표의 행과 출처(고시 번호)가 붙는다 (가드레일 원칙 6)")
+    void attachesCriterionAndSource() {
+        CriteriaJudgment judgment = criteria.judge(ItemCode.FASTING_GLUCOSE, "126", FEMALE);
+
+        assertThat(judgment.criterion()).contains("공복 혈당", "126 이상");
+        assertThat(judgment.source()).contains("검사항목별 판정기준", "보건복지부고시 제2026-6호");
+    }
+}
