@@ -75,7 +75,7 @@ checkupai:
     min-similarity: 0.5       # 이보다 낮은 근거만 있으면 "근거 없음"으로 답한다 (가드레일). 4단계 측정 뒤 조정
   explanation:
     max-items: 8              # 해설할 항목 수 상한 (질환의심 먼저)
-    max-tokens: 2000
+    max-tokens: 4000          # 2026-11-10: 8개 항목 해설이 2,000토큰에서 잘렸다
   demo:
     # 화면의 합성 샘플 결과지 폴더 (PDF는 gitignore, 생성기로 다시 만든다). 공개 데모는 샘플만 쓴다 (ADR 0007 7절)
     samples-dir: ${DEMO_SAMPLES_DIR:../../data/synthetic/extraction/v1}

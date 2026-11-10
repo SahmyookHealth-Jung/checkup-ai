@@ -51,9 +51,11 @@ public record ExplanationResult(List<ItemJudgment> judgments, List<ItemExplanati
      * @param ungroundedNumberSentences 결과값·기준·인용 근거에 없는 숫자가 있어 버린 문장 수
      * @param forbiddenHits 진단 단정·치료 지시 표현이 걸린 문장 수 (막지 않고 기록만)
      * @param llmError 해설 생성이 실패했으면 오류 종류
+     * @param salvagedItems 출력이 상한에서 잘려 살린 항목 수 (잘리지 않았으면 -1)
      */
     public record Metrics(int targets, int targetsWithEvidence, int sentencesGenerated, int sentencesKept,
                           int invalidCitations, int uncitedSentences, int ungroundedNumberSentences,
-                          int forbiddenHits, long retrievalMs, long llmMs, long totalMs, String llmError) {
+                          int forbiddenHits, long retrievalMs, long llmMs, long totalMs, String llmError,
+                          int salvagedItems) {
     }
 }

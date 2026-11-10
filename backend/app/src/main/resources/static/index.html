@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>검진 결과 해설 데모</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --card: #ffffff; --text: #1d1d1f; --muted: #6b6b70; --line: #e3e3e0;
+    --a: #2f7d4f; --b: #b07a10; --s: #b8323a; --none: #8a8a8f; --accent: #2557a7; --warn-bg: #fff4e5; --warn: #8a5300;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #161618; --card: #202023; --text: #ececee; --muted: #a0a0a6; --line: #34343a;
+            --a: #5cc185; --b: #e2b04a; --s: #f07a80; --none: #8a8a8f; --accent: #7aa7ff; --warn-bg: #3a2c12; --warn: #f3c46b; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.6 -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+  main { max-width: 900px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 17px; margin: 28px 0 10px; }
+  .sub { color: var(--muted); margin: 0 0 16px; }
+  .tag { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+  .disclaimer { background: var(--warn-bg); color: var(--warn); border-radius: 8px; padding: 10px 14px; margin: 12px 0; }
+  .controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+  select, button { font: inherit; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: var(--text); }
+  button { background: var(--accent); color: #fff; border-color: var(--accent); cursor: pointer; }
+  button:disabled { opacity: .5; cursor: progress; }
+  .status { color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); font-size: 14px; }
+  th { color: var(--muted); font-weight: 600; }
+  .scroll { overflow-x: auto; }
+  .j { font-weight: 600; white-space: nowrap; }
+  .j-NORMAL_A { color: var(--a); } .j-NORMAL_B { color: var(--b); } .j-SUSPECT { color: var(--s); } .j-NOT_JUDGED { color: var(--none); font-weight: 400; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin: 10px 0; }
+  .card h3 { margin: 0 0 6px; font-size: 16px; }
+  .criterion { color: var(--muted); font-size: 13px; margin: 0 0 8px; }
+  .advice { border-left: 3px solid var(--s); padding: 6px 10px; margin-top: 8px; background: var(--warn-bg); color: var(--warn); border-radius: 4px; }
+  .review { border-left-color: var(--b); }
+  .noevidence { color: var(--muted); font-style: italic; }
+  sup a { color: var(--accent); text-decoration: none; font-weight: 600; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; margin: 6px 0; }
+  details summary { cursor: pointer; }
+  details p { white-space: pre-wrap; font-size: 13px; color: var(--muted); }
+  .metrics { color: var(--muted); font-size: 12px; margin-top: 24px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>검진 결과 해설 <span class="tag">합성 데이터 데모</span></h1>
+  <p class="sub">합성 결과지를 골라 추출 → 국가건강검진 기준 판정 → 공개 문서 근거 검색 → 출처 붙은 해설 순서를 확인합니다. 실제 결과지는 올리지 마세요.</p>
+  <div class="disclaimer" id="disclaimer">이 내용은 의료 진단이 아니며, 정확한 판단은 의료진과 상담하세요.</div>
+
+  <div class="controls">
+    <label for="sample">합성 샘플</label>
+    <select id="sample"><option>불러오는 중…</option></select>
+    <button id="run" type="button">해설 보기</button>
+    <span class="status" id="status"></span>
+  </div>
+
+  <section id="result" hidden>
+    <div id="review"></div>
+    <h2>결과 표</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>항목</th><th>결과지 항목명</th><th>결과</th><th>결과지 판정</th><th>국가 기준 판정</th></tr></thead>
+      <tbody id="table"></tbody>
+    </table></div>
+    <h2>항목별 해설</h2>
+    <div id="items"></div>
+    <h2>출처</h2>
+    <div id="citations"></div>
+    <div class="metrics" id="metrics"></div>
+  </section>
+</main>
+<script>
+  const $ = id => document.getElementById(id);
+  const el = (tag, attrs = {}, ...children) => {
+    const node = document.createElement(tag);
+    Object.entries(attrs).forEach(([k, v]) => k === 'class' ? node.className = v : node.setAttribute(k, v));
+    children.flat().forEach(child => node.append(child instanceof Node ? child : document.createTextNode(child ?? '')));
+    return node;
+  };
+
+  async function loadSamples() {
+    const ids = await fetch('/api/demo/samples').then(r => r.json());
+    $('sample').replaceChildren(...ids.map(id => el('option', { value: id }, id)));
+    if (!ids.length) $('status').textContent = '샘플 PDF가 없습니다 (eval/에서 생성기로 만드세요).';
+  }
+
+  async function run() {
+    const id = $('sample').value;
+    $('run').disabled = true;
+    $('status').textContent = '추출하고 해설하는 중… (10초 안팎)';
+    try {
+      const response = await fetch(`/api/demo/samples/${encodeURIComponent(id)}/explain`, { method: 'POST' });
+      if (!response.ok) throw new Error(`${response.status} ${await response.text()}`);
+      render(await response.json());
+      $('status').textContent = '';
+    } catch (e) {
+      $('status').textContent = '실패: ' + e.message;
+    } finally {
+      $('run').disabled = false;
+    }
+  }
+
+  function render(data) {
+    const x = data.explanation;
+    $('disclaimer').textContent = x.disclaimer;
+    $('review').replaceChildren(...x.needsReview.map(r =>
+      el('div', { class: 'advice review' }, `확인 필요: ${r.rawName ?? r.code} ${r.value} — ${r.advice}`)));
+    $('table').replaceChildren(...x.judgments.map(j => el('tr', {},
+      el('td', {}, j.name), el('td', {}, j.rawName ?? ''), el('td', {}, `${j.value}${j.unit ? ' ' + j.unit : ''}`),
+      el('td', {}, j.centerJudgment ?? '-'), el('td', { class: `j j-${j.judgment}` }, j.judgmentLabel))));
+    $('items').replaceChildren(...(x.items.length ? x.items.map(item => el('div', { class: 'card' },
+      el('h3', {}, `${item.name} ${item.value}${item.unit ? ' ' + item.unit : ''} `,
+        el('span', { class: `j j-${item.judgment}` }, item.judgmentLabel)),
+      el('p', { class: 'criterion' }, `판정 기준: ${item.criterion ?? '-'} (${item.criterionSource ?? ''})`),
+      item.noEvidence ? el('p', { class: 'noevidence' }, '이 항목을 설명할 근거를 공개 문서에서 찾지 못했습니다.')
+        : el('p', {}, ...item.sentences.map(s => [s.text, ...s.citations.map(n =>
+            el('sup', {}, el('a', { href: `#cite-${n}` }, `[${n}]`))), ' '])),
+      item.careAdvice ? el('div', { class: 'advice' }, item.careAdvice) : ''
+    )) : [el('p', { class: 'sub' }, '정상B(경계)·질환의심 항목이 없어 해설할 항목이 없습니다.')]));
+    $('citations').replaceChildren(...x.citations.map(c => el('details', { id: `cite-${c.number}` },
+      el('summary', {}, `[${c.number}] ${c.title} · ${c.publisher} · ${c.edition} · ${c.section} `,
+        c.url ? el('a', { href: c.url, target: '_blank', rel: 'noopener' }, '원문') : ''),
+      el('p', {}, c.text), el('p', {}, `이용 조건: ${c.license ?? '-'}`))));
+    const m = x.metrics;
+    $('metrics').textContent = `해설 대상 ${m.targets}개 (근거 있음 ${m.targetsWithEvidence}) · 문장 ${m.sentencesKept}/${m.sentencesGenerated} 통과`
+      + ` · 검색 ${m.retrievalMs}ms · 생성 ${m.llmMs}ms · 전체 ${m.totalMs}ms` + (m.llmError ? ` · 생성 실패 ${m.llmError}` : '');
+    $('result').hidden = false;
+  }
+
+  $('run').addEventListener('click', run);
+  loadSamples().catch(e => $('status').textContent = '샘플 목록을 불러오지 못했습니다: ' + e.message);
+</script>
+</body>
+</html>

@@ -9,6 +9,7 @@ import com.checkupai.report.explanation.ExplanationResult.Sentence;
 import com.checkupai.report.extraction.CheckupReport;
 import com.checkupai.report.extraction.ExtractionResult;
 import com.checkupai.report.extraction.ReportItem;
+import com.checkupai.report.extraction.SalvagingOutputConverter;
 import com.checkupai.report.retrieval.GuidelineSearch;
 import com.checkupai.report.retrieval.RetrievedChunk;
 import java.io.IOException;
@@ -111,11 +112,15 @@ public class ExplanationService {
         List<Target> withEvidence = targets.stream().filter(target -> !target.sources().isEmpty()).toList();
         ExplanationDraft draft = null;
         String llmError = null;
+        int salvagedItems = -1;
         long llmMs = 0;
         if (!withEvidence.isEmpty()) {
             long llmStarted = System.nanoTime();
             try {
-                draft = generate(withEvidence, chunkByLabel);
+                // 출력이 상한에서 잘리면 완성된 항목까지만 살린다 (추출과 같은 변환기). 나머지 항목은 '근거 없음'이 된다
+                var converter = new SalvagingOutputConverter<>(ExplanationDraft.class);
+                draft = generate(withEvidence, chunkByLabel, converter);
+                salvagedItems = converter.salvagedItems();
             } catch (RuntimeException e) {
                 llmError = e.getClass().getSimpleName();  // 해설이 실패해도 판정·근거 없음·고지문은 돌려준다
             }
@@ -169,11 +174,12 @@ public class ExplanationService {
                 .toList();
         var metrics = new ExplanationResult.Metrics(targets.size(), withEvidence.size(), generated, kept,
                 invalidCitations, uncited, ungrounded, forbidden, retrievalMs, llmMs,
-                (System.nanoTime() - started) / 1_000_000, llmError);
+                (System.nanoTime() - started) / 1_000_000, llmError, salvagedItems);
         return new ExplanationResult(judgments, items, needsReview, citations, ExplanationGuardrails.DISCLAIMER, metrics);
     }
 
-    private ExplanationDraft generate(List<Target> targets, Map<String, RetrievedChunk> chunkByLabel) {
+    private ExplanationDraft generate(List<Target> targets, Map<String, RetrievedChunk> chunkByLabel,
+                                      SalvagingOutputConverter<ExplanationDraft> converter) {
         String sources = chunkByLabel.entrySet().stream()
                 .map(entry -> "[" + entry.getKey() + "] " + entry.getValue().text())
                 .collect(Collectors.joining("\n"));
@@ -192,7 +198,7 @@ public class ExplanationService {
                 .advisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
                 .advisors(advisor -> advisor.param(LlmCallContext.FEATURE, FEATURE))  // 호출 기록의 기능 이름
                 .call()
-                .entity(ExplanationDraft.class);
+                .entity(converter);
     }
 
     private static Citation citation(int number, RetrievedChunk chunk) {

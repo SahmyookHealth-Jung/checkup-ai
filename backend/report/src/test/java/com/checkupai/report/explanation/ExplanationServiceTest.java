@@ -79,7 +79,7 @@ class ExplanationServiceTest {
     private static ExplanationService service(ChatModel model, List<Document> documents) {
         var properties = new GuidelineProperties("unused", 4, 0.5);
         return new ExplanationService(ChatClient.builder(model), new ScreeningCriteria(),
-                new GuidelineSearch(new FixedVectorStore(documents), properties), new ExplanationProperties(8, 2000));
+                new GuidelineSearch(new FixedVectorStore(documents), properties), new ExplanationProperties(8, 4000));
     }
 
     private static ExtractionResult extraction(List<ReportItem> items, List<ReviewItem> review) {
