@@ -402,7 +402,9 @@ public class ExtractionValidator {
         OTHER_NAME_HOLDS_VALUE,
         OTHER_NAME_VALUE_APART, IMPLAUSIBLE, CONFLICT, UNGROUNDED_FIELD, MISPLACED_FIELD, RAW_NAME_NOT_IN_SOURCE,
         /** 출력이 상한에서 잘려 JSON이 깨졌고, 완성된 항목까지만 살렸다 ({@link ReportExtractor}가 기록) */
-        TRUNCATED_OUTPUT
+        TRUNCATED_OUTPUT,
+        /** 1차 출력이 비정상적으로 적다: 누락 의심 조각이 뽑은 항목보다 많다 ({@link ReportExtractor}가 기록, 재요청으로 복구) */
+        INCOMPLETE_FIRST_PASS
     }
 
     public record Issue(IssueType type, ItemCode code, String detail) {

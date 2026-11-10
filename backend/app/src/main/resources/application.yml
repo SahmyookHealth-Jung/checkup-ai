@@ -56,6 +56,8 @@ spring:
       read-timeout: 15m
 
 checkupai:
+  privacy:
+    redaction-enabled: true   # 외부 전송 전 식별정보 제거 (ADR 0006). 끄는 것은 영향 측정 실험용뿐
   llm:
     # 모델별 가격 (100만 토큰당 달러). LLM 호출 기록의 비용 계산에 쓴다 (ADR 0006).
     # 출처: Anthropic 가격표 (claude-api 참고 자료, 2026-11-03 기준). Haiku 5.5는 입력 10만 토큰 이하 요청 가격이다
@@ -69,7 +71,8 @@ checkupai:
     retry-max-tokens: ${EXTRACTION_RETRY_MAX_TOKENS:600}
     retry-batch-size: 4                          # 누락 조각이 많으면 4개씩 나눠 재요청 (v2.3)
     retry-enabled: false                         # Haiku에는 재요청이 이득 없음 (ADR 0005). 오프라인 모드에서 켠다. 잘린 출력은 예외
-    model-settings: thinking=${ANTHROPIC_THINKING:disabled}   # 결과를 바꾸는 공급자 설정 요약 (평가 캐시 키). 위 thinking과 같은 값
+    # 결과를 바꾸는 설정 요약 (평가 캐시 키). 위 thinking, 아래 식별정보 제거와 같은 값
+    model-settings: thinking=${ANTHROPIC_THINKING:disabled},redaction=${checkupai.privacy.redaction-enabled}
 
 management:
   endpoints:

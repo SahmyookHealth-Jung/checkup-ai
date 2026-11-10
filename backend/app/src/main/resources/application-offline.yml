@@ -12,4 +12,4 @@ spring:
 checkupai:
   extraction:
     retry-enabled: true      # 작은 모델은 재요청으로 재현율이 오른다 (처음 보는 양식 0.834 -> 0.891)
-    model-settings: think=false   # 결과를 바꾸는 공급자 설정 요약 (평가 캐시 키). application.yml의 ollama think와 같은 값
+    model-settings: think=false,redaction=${checkupai.privacy.redaction-enabled}   # 결과를 바꾸는 설정 요약 (평가 캐시 키)

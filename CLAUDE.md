@@ -38,6 +38,8 @@ docker compose up -d                       # PostgreSQL + pgvector (저장소 �
 cd backend && ./gradlew build              # 컴파일 + 단위 테스트 (외부 의존 없음)
 ./gradlew :app:integrationTest             # 통합 테스트 (DB, Ollama 필요)
 ./gradlew :app:bootRun                     # 앱 실행 → http://localhost:8080/actuator/health
+./gradlew :report:replay --args="<입력> <출력>"   # 재생 비교: 저장된 LLM 출력에 현재 검증기 적용 (eval/extraction/replay.py)
+./gradlew :report:piiLeakCheck --args="<데이터 폴더> ..."   # 합성 결과지 식별정보 잔존율 (모델 호출 없음)
 ```
 
 Gradle이 실행·테스트 환경변수로 저장소 루트의 `.env`를 읽어 넣는다(`buildSrc`의 컨벤션 플러그인).

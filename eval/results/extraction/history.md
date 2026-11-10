@@ -22,3 +22,7 @@
 | 2026-11-10T16:54:08 | validated-v2.4 (지표 v2) | claude-haiku-5-5 | extraction-v1 | heldout-v2 full(10) | pdf | **0.971** | 0.976 | 0.967 | 0 | 7초 | 6951/1438 | 0.974 | 100.0/98.0/89.6 |
 | 2026-11-10T16:55:22 | validated-v2.4 (지표 v2) | claude-haiku-5-5 | extraction-v1 | heldout-v3 full(10) | pdf | **1.000** | 1.000 | 1.000 | 0 | 7초 | 7011/1495 | 1.000 | 72.6/99.5/82.7 |
 | 2026-11-10T17:35:01 | validated-v2.4-noretry (지표 v2) | claude-haiku-5-5 | extraction-v1 | ids(1) | pdf | **1.000** | 1.000 | 1.000 | 0 | 7초 | 4147/1434 | 1.000 | 100.0/100.0/100.0 |
+| 2026-11-10T17:56:06 | validated-v2.4-noretry (지표 v2) | claude-haiku-5-5 | extraction-v1 | full(30) | pdf | **0.978** | 0.995 | 0.962 | 0 | 5초 | 4268/1384 | 0.978 | 100.0/100.0/95.2 |
+| 2026-11-10T17:57:10 | validated-v2.4-noretry (지표 v2) | claude-haiku-5-5 | extraction-v1 | heldout-v1 full(10) | pdf | **1.000** | 1.000 | 1.000 | 0 | 5초 | 4220/1507 | 1.000 | 100.0/100.0/94.4 |
+| 2026-11-10T17:58:07 | validated-v2.4-noretry (지표 v2) | claude-haiku-5-5 | extraction-v1 | heldout-v2 full(10) | pdf | **0.995** | 1.000 | 0.990 | 0 | 5초 | 4201/1392 | 0.995 | 100.0/100.0/90.3 |
+| 2026-11-10T17:59:07 | validated-v2.4-noretry (지표 v2) | claude-haiku-5-5 | extraction-v1 | heldout-v3 full(10) | pdf | **1.000** | 1.000 | 1.000 | 0 | 5초 | 4454/1489 | 1.000 | 72.6/92.7/82.7 |

@@ -124,8 +124,16 @@ public class ReportExtractor {
         List<ReportItem> retryItems = null;
         String retryError = null;
 
-        // 재요청을 꺼도, 1차 출력이 상한에서 잘렸으면 잘린 뒷부분을 채우려고 재요청한다 (ADR 0004 4절의 복구 경로)
-        boolean retry = !segments.isEmpty() && (properties.retryEnabled() || firstPassTruncated);
+        // 재요청을 꺼도 1차 출력이 실패한 것으로 보이면 복구하려고 재요청한다.
+        // - 잘림: 출력 상한에서 끊겼다 (ADR 0004 4절)
+        // - 일찍 멈춤: 누락 의심 조각이 뽑은 항목보다 많다. 2026-11-10 Haiku 5.5가 63회 중 2회, 22개 중 1개만 내고
+        //   멈췄다(같은 결과지를 다시 부르면 정상). 정상 보고서는 항목 20여 개, 누락 의심 조각 2~5개라 걸리지 않는다
+        boolean firstPassIncomplete = segments.size() > report.items().size();
+        if (firstPassIncomplete) {
+            issues.add(new Issue(IssueType.INCOMPLETE_FIRST_PASS, null,
+                    "누락 의심 조각 " + segments.size() + "개가 뽑은 항목 " + report.items().size() + "개보다 많다"));
+        }
+        boolean retry = !segments.isEmpty() && (properties.retryEnabled() || firstPassTruncated || firstPassIncomplete);
         if (retry) {
             String headerText = header.isEmpty() ? "(없음)" : String.join("\n", header);
             List<String> errors = new ArrayList<>();

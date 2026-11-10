@@ -65,17 +65,36 @@ class ReportExtractorTest {
     @Test
     @DisplayName("재요청을 끄면 1차 호출만 하고, 누락 조각은 진단 기록에만 남긴다 (ADR 0005)")
     void recordsMissingSegmentsWithoutRetryWhenDisabled() {
-        var model = new ScriptedChatModel(
-                "{\"examType\":\"COMPREHENSIVE\",\"sex\":\"MALE\",\"age\":50,\"items\":[]}");
+        var model = new ScriptedChatModel("{\"examType\":\"COMPREHENSIVE\",\"sex\":\"MALE\",\"age\":50,\"items\":["
+                + "{\"code\":\"OTHER\",\"rawName\":\"요산\",\"value\":\"5.4\"},"
+                + "{\"code\":\"OTHER\",\"rawName\":\"알부민\",\"value\":\"4.9\"},"
+                + "{\"code\":\"OTHER\",\"rawName\":\"TSH\",\"value\":\"4.42\"},"
+                + "{\"code\":\"OTHER\",\"rawName\":\"총빌리루빈\",\"value\":\"0.9\"}]}");
 
         ExtractionResult result = extractor(model, false).extract(SOURCE, true);
 
-        assertThat(model.userMessages).hasSize(1);
+        assertThat(model.userMessages).hasSize(1);  // 누락 의심 2조각 <= 뽑은 4개: 정상으로 보고 재요청하지 않는다
         assertThat(result.metrics().attempts()).isEqualTo(1);
         assertThat(result.metrics().retriedSegments()).isZero();
         assertThat(result.metrics().pipeline()).isEqualTo("validated-v2.4-noretry");
-        assertThat(result.diagnostics().retryInput()).contains("요산 5.4 mg/dL", "hs-CRP 1.6 mg/L");
+        assertThat(result.diagnostics().retryInput()).contains("CEA 3.3 ng/mL", "hs-CRP 1.6 mg/L");
         assertThat(result.diagnostics().retryItems()).isNull();
+    }
+
+    @Test
+    @DisplayName("재요청을 꺼도 1차가 일찍 멈췄으면(누락 의심 조각이 뽑은 항목보다 많으면) 재요청으로 복구한다")
+    void retriesWhenFirstPassStoppedEarlyEvenWhenRetryDisabled() {
+        var model = new ScriptedChatModel(
+                "{\"examType\":\"COMPREHENSIVE\",\"sex\":\"MALE\",\"age\":50,\"items\":["
+                        + "{\"code\":\"OTHER\",\"rawName\":\"요산\",\"value\":\"5.4\"}]}",
+                "{\"items\":[{\"code\":\"OTHER\",\"rawName\":\"알부민\",\"value\":\"4.9\"}]}",
+                "{\"items\":[{\"code\":\"OTHER\",\"rawName\":\"hs-CRP\",\"value\":\"1.6\"}]}");
+
+        ExtractionResult result = extractor(model, false).extract(SOURCE, true);
+
+        assertThat(model.userMessages).hasSize(3);  // 누락 의심 5조각 > 뽑은 1개 → 4개·1개로 나눠 재요청
+        assertThat(result.report().items()).extracting(ReportItem::value).containsExactly("5.4", "4.9", "1.6");
+        assertThat(result.diagnostics().issues()).extracting(Issue::type).contains(IssueType.INCOMPLETE_FIRST_PASS);
     }
 
     @Test
