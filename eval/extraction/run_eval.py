@@ -74,8 +74,11 @@ def main() -> None:
         first_total = first_total.add(first)
         per_template[template] = per_template.get(template, Score()).add(score)
         metrics = response.get("metrics") or {}
+        # header: 모델이 뽑은 수검자 정보. 재생 비교(extraction.replay)가 누락 조각을 실제와 같게 판별하려면 필요하다
+        report = response.get("report") or {}
         documents.append({"id": report_id, "cached": cached, **score.summary(), "firstPass": first.summary(),
                           "metrics": metrics, "error": response.get("error"), "errors": score.errors,
+                          "header": {k: report.get(k) for k in ("examDate", "examType", "sex", "age")} if report else None,
                           "diagnostics": diagnostics or None})
         print(f"      → 1차 F1={first.f1:.3f} → 최종 F1={score.f1:.3f} (TP {score.tp} / FP {score.fp} / FN {score.fn})"
               f" | {'캐시' if cached else str(round((metrics.get('latencyMs') or 0) / 1000)) + '초'}"
