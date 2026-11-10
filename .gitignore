@@ -44,3 +44,6 @@ data/synthetic/**/*.pdf
 
 # --- Logs ---
 *.log
+
+# 해설 근거 청크 (원문에서 다시 만든다. 포털 글은 공공누리 제4유형이라 올리지 않는다)
+data/guidelines/chunks/

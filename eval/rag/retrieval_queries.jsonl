@@ -1,0 +1,20 @@
+{"query": "공복혈당(Glucose) 질환의심", "item_code": "FASTING_GLUCOSE", "judgment": "SUSPECT", "primary": "mohw-annex4-row-fasting-glucose", "relevant": ["mohw-annex4-row-fasting-glucose", "kdca-5305-diagnosis-1", "mohw-annex4-def-suspect-chronic"]}
+{"query": "공복혈당(Glucose) 정상B(경계)", "item_code": "FASTING_GLUCOSE", "judgment": "NORMAL_B", "primary": "mohw-annex4-row-fasting-glucose", "relevant": ["mohw-annex4-row-fasting-glucose", "kdca-5305-diagnosis-1", "mohw-annex4-def-normal-b"]}
+{"query": "수축기 혈압 질환의심", "item_code": "SYSTOLIC_BP", "judgment": "SUSPECT", "primary": "mohw-annex4-row-blood-pressure", "relevant": ["mohw-annex4-row-blood-pressure", "kdca-6765-overview-1", "kdca-6765-definition-1", "mohw-annex4-def-suspect-chronic"]}
+{"query": "이완기 혈압 정상B(경계)", "item_code": "DIASTOLIC_BP", "judgment": "NORMAL_B", "primary": "mohw-annex4-row-blood-pressure", "relevant": ["mohw-annex4-row-blood-pressure", "kdca-6765-definition-1", "mohw-annex4-def-normal-b"]}
+{"query": "체질량지수(BMI) 질환의심", "item_code": "BMI", "judgment": "SUSPECT", "primary": "mohw-annex4-row-bmi", "relevant": ["mohw-annex4-row-bmi", "mohw-annex4-def-suspect"]}
+{"query": "체질량지수(BMI) 정상B(경계)", "item_code": "BMI", "judgment": "NORMAL_B", "primary": "mohw-annex4-row-bmi", "relevant": ["mohw-annex4-row-bmi", "mohw-annex4-def-normal-b"]}
+{"query": "허리둘레 질환의심", "item_code": "WAIST_CIRCUMFERENCE", "judgment": "SUSPECT", "primary": "mohw-annex4-row-waist", "relevant": ["mohw-annex4-row-waist", "mohw-annex4-def-suspect"]}
+{"query": "혈색소(Hb) 질환의심", "item_code": "HEMOGLOBIN", "judgment": "SUSPECT", "primary": "mohw-annex4-row-hemoglobin", "relevant": ["mohw-annex4-row-hemoglobin", "mohw-annex4-def-suspect"]}
+{"query": "총콜레스테롤 정상B(경계)", "item_code": "TOTAL_CHOLESTEROL", "judgment": "NORMAL_B", "primary": "mohw-annex4-row-total-cholesterol", "relevant": ["mohw-annex4-row-total-cholesterol", "kdca-6715-definition-1", "mohw-annex4-def-normal-b"]}
+{"query": "HDL 콜레스테롤 질환의심", "item_code": "HDL_CHOLESTEROL", "judgment": "SUSPECT", "primary": "mohw-annex4-row-hdl", "relevant": ["mohw-annex4-row-hdl", "kdca-6715-definition-1", "mohw-annex4-def-suspect-chronic"]}
+{"query": "중성지방(TG) 질환의심", "item_code": "TRIGLYCERIDES", "judgment": "SUSPECT", "primary": "mohw-annex4-row-triglycerides", "relevant": ["mohw-annex4-row-triglycerides", "kdca-6715-definition-1", "mohw-annex4-def-suspect-chronic"]}
+{"query": "LDL 콜레스테롤 질환의심", "item_code": "LDL_CHOLESTEROL", "judgment": "SUSPECT", "primary": "mohw-annex4-row-ldl", "relevant": ["mohw-annex4-row-ldl", "kdca-6715-definition-1", "mohw-annex4-def-suspect-chronic"]}
+{"query": "LDL 콜레스테롤 정상B(경계)", "item_code": "LDL_CHOLESTEROL", "judgment": "NORMAL_B", "primary": "mohw-annex4-row-ldl", "relevant": ["mohw-annex4-row-ldl", "kdca-6715-definition-1", "mohw-annex4-def-normal-b"]}
+{"query": "AST(SGOT) 정상B(경계)", "item_code": "AST", "judgment": "NORMAL_B", "primary": "mohw-annex4-row-ast", "relevant": ["mohw-annex4-row-ast", "mohw-annex4-def-normal-b"]}
+{"query": "ALT(SGPT) 질환의심", "item_code": "ALT", "judgment": "SUSPECT", "primary": "mohw-annex4-row-alt", "relevant": ["mohw-annex4-row-alt", "mohw-annex4-def-suspect"]}
+{"query": "감마지티피(γ-GTP) 질환의심", "item_code": "GAMMA_GTP", "judgment": "SUSPECT", "primary": "mohw-annex4-row-gamma-gtp", "relevant": ["mohw-annex4-row-gamma-gtp", "mohw-annex4-def-suspect"]}
+{"query": "요단백 질환의심", "item_code": "URINE_PROTEIN", "judgment": "SUSPECT", "primary": "mohw-annex4-row-urine-protein", "relevant": ["mohw-annex4-row-urine-protein", "mohw-annex4-def-suspect"]}
+{"query": "혈청 크레아티닌 질환의심", "item_code": "SERUM_CREATININE", "judgment": "SUSPECT", "primary": "mohw-annex4-row-creatinine", "relevant": ["mohw-annex4-row-creatinine", "mohw-annex4-def-suspect"]}
+{"query": "신사구체여과율(eGFR) 질환의심", "item_code": "EGFR", "judgment": "SUSPECT", "primary": "mohw-annex4-row-egfr", "relevant": ["mohw-annex4-row-egfr", "mohw-annex4-def-suspect"]}
+{"query": "흉부방사선 정상B(경계)", "item_code": "CHEST_XRAY", "judgment": "NORMAL_B", "primary": "mohw-annex4-row-chest-xray", "relevant": ["mohw-annex4-row-chest-xray", "mohw-annex4-def-normal-b"]}
