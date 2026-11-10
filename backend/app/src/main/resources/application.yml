@@ -44,8 +44,11 @@ spring:
 
     vectorstore:
       pgvector:
-        # 벡터 테이블(메타데이터, 키워드 검색 컬럼, 인덱스)은 4단계 RAG 설계(ADR)에서 정해 Flyway로 만든다.
+        # 테이블은 Flyway V3가 만든다 (ADR 0007). 청크 id는 사람이 읽을 수 있는 문자열이다 (예: kdca-6765-definition-1)
         initialize-schema: false
+        schema-validation: true            # 기동할 때 테이블·컬럼이 PgVectorStore 형식과 맞는지 확인한다
+        table-name: guideline_chunk
+        id-type: text
         dimensions: 1024                   # bge-m3 출력 차원
 
   # 외부 HTTP 호출(Ollama, Anthropic) 시간 제한. API 응답이 무한정 묶이지 않게 하는 용도다.
@@ -65,6 +68,17 @@ checkupai:
     pricing:
       claude-haiku-5-5: { input: 0.10, output: 0.50 }
       "[qwen3:4b]": { input: 0, output: 0 }
+  guidelines:
+    # 해설 근거 청크 파일 (eval/rag/build_chunks.py가 만든다). bootRun의 작업 폴더는 backend/app이다
+    chunks-file: ${GUIDELINE_CHUNKS_FILE:../../data/guidelines/chunks/chunks.jsonl}
+    top-k: 4                  # 검색 기준선 (ADR 0007 3절)
+    min-similarity: 0.5       # 이보다 낮은 근거만 있으면 "근거 없음"으로 답한다 (가드레일). 4단계 측정 뒤 조정
+  explanation:
+    max-items: 8              # 해설할 항목 수 상한 (질환의심 먼저)
+    max-tokens: 2000
+  demo:
+    # 화면의 합성 샘플 결과지 폴더 (PDF는 gitignore, 생성기로 다시 만든다). 공개 데모는 샘플만 쓴다 (ADR 0007 7절)
+    samples-dir: ${DEMO_SAMPLES_DIR:../../data/synthetic/extraction/v1}
   extraction:
     pipeline: ${EXTRACTION_PIPELINE:validated}   # baseline | validated (ADR 0003)
     first-pass-max-tokens: ${EXTRACTION_FIRST_PASS_MAX_TOKENS:2500}   # 정상 출력 1,400~1,800토큰(qwen3). 반복 루프 폭주 방지

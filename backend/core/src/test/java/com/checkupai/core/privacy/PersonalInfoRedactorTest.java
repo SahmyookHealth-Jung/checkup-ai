@@ -40,6 +40,8 @@ class PersonalInfoRedactorTest {
         assertThat(redactor.redact("조*준 님 (남성, 1989-**-** 생)").text()).isEqualTo("[이름] 님 (남성, [생년월일] 생)");
         assertThat(redactor.redact("홍길동 님, 결과를 안내드립니다").text()).isEqualTo("[이름] 님, 결과를 안내드립니다");
         assertThat(redactor.redact("담당 의사 선생님과 상담하세요").text()).isEqualTo("담당 의사 선생님과 상담하세요");
+        // 라벨 단어 바로 뒤에 붙은 말은 이름이 아니다 (근거 문서 오탐)
+        assertThat(redactor.redact("소변으로 포도당이 넘쳐 나오는 데서 붙은 이름입니다.").total()).isZero();
     }
 
     @Test

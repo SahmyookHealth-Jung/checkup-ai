@@ -22,6 +22,7 @@ junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher
 spring-ai-client-chat = { module = "org.springframework.ai:spring-ai-client-chat" }
 spring-ai-model = { module = "org.springframework.ai:spring-ai-model" }
 spring-ai-pdf-document-reader = { module = "org.springframework.ai:spring-ai-pdf-document-reader" }
+spring-ai-vector-store = { module = "org.springframework.ai:spring-ai-vector-store" }
 spring-web = { module = "org.springframework:spring-web" }
 spring-boot = { module = "org.springframework.boot:spring-boot" }
 spring-jdbc = { module = "org.springframework:spring-jdbc" }
