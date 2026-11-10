@@ -1,0 +1,494 @@
+{
+  "summary": {
+    "runAt": "2026-11-10T20:43:12",
+    "k": 4,
+    "queries": 20,
+    "hitAt1": 0.75,
+    "hitAt4": 1.0,
+    "primaryHitAt4": 1.0,
+    "mrr": 0.875,
+    "avgLatencyMs": 68
+  },
+  "rows": [
+    {
+      "query": "공복혈당(Glucose) 질환의심",
+      "rank": 2,
+      "primaryRank": 4,
+      "latencyMs": 76,
+      "top": [
+        [
+          "kdca-5305-diagnosis-2",
+          0.638
+        ],
+        [
+          "mohw-annex4-def-suspect-chronic",
+          0.628
+        ],
+        [
+          "kdca-5305-checkup-2",
+          0.607
+        ],
+        [
+          "mohw-annex4-row-fasting-glucose",
+          0.587
+        ]
+      ]
+    },
+    {
+      "query": "공복혈당(Glucose) 정상B(경계)",
+      "rank": 1,
+      "primaryRank": 1,
+      "latencyMs": 77,
+      "top": [
+        [
+          "mohw-annex4-row-fasting-glucose",
+          0.696
+        ],
+        [
+          "kdca-5305-diagnosis-2",
+          0.682
+        ],
+        [
+          "mohw-annex4-def-normal-b",
+          0.669
+        ],
+        [
+          "kdca-5305-diagnosis-1",
+          0.661
+        ]
+      ]
+    },
+    {
+      "query": "수축기 혈압 질환의심",
+      "rank": 2,
+      "primaryRank": 3,
+      "latencyMs": 64,
+      "top": [
+        [
+          "kdca-6765-summary-1",
+          0.649
+        ],
+        [
+          "kdca-6765-overview-1",
+          0.597
+        ],
+        [
+          "mohw-annex4-row-blood-pressure",
+          0.581
+        ],
+        [
+          "kdca-5305-checkup-3",
+          0.581
+        ]
+      ]
+    },
+    {
+      "query": "이완기 혈압 정상B(경계)",
+      "rank": 1,
+      "primaryRank": 1,
+      "latencyMs": 61,
+      "top": [
+        [
+          "mohw-annex4-row-blood-pressure",
+          0.654
+        ],
+        [
+          "kdca-6765-overview-1",
+          0.649
+        ],
+        [
+          "mohw-annex4-def-normal-b",
+          0.62
+        ],
+        [
+          "kdca-6765-summary-1",
+          0.603
+        ]
+      ]
+    },
+    {
+      "query": "체질량지수(BMI) 질환의심",
+      "rank": 1,
+      "primaryRank": 1,
+      "latencyMs": 64,
+      "top": [
+        [
+          "mohw-annex4-row-bmi",
+          0.622
+        ],
+        [
+          "mohw-annex4-row-triglycerides",
+          0.601
+        ],
+        [
+          "kdca-6715-lifestyle-treatment-2",
+          0.598
+        ],
+        [
+          "mohw-annex4-def-suspect-chronic",
+          0.588
+        ]
+      ]
+    },
+    {
+      "query": "체질량지수(BMI) 정상B(경계)",
+      "rank": 1,
+      "primaryRank": 1,
+      "latencyMs": 75,
+      "top": [
+        [
+          "mohw-annex4-row-bmi",
+          0.691
+        ],
+        [
+          "mohw-annex4-def-normal-b",
+          0.683
+        ],
+        [
+          "mohw-annex4-row-triglycerides",
+          0.666
+        ],
+        [
+          "mohw-annex4-row-waist",
+          0.648
+        ]
+      ]
+    },
+    {
+      "query": "허리둘레 질환의심",
+      "rank": 2,
+      "primaryRank": 2,
+      "latencyMs": 63,
+      "top": [
+        [
+          "mohw-annex4-def-suspect-chronic",
+          0.543
+        ],
+        [
+          "mohw-annex4-row-waist",
+          0.543
+        ],
+        [
+          "mohw-annex4-def-suspect",
+          0.542
+        ],
+        [
+          "mohw-annex4-row-hdl",
+          0.519
+        ]
+      ]
+    },
+    {
+      "query": "혈색소(Hb) 질환의심",
+      "rank": 2,
+      "primaryRank": 2,
+      "latencyMs": 66,
+      "top": [
+        [
+          "mohw-annex4-def-suspect-chronic",
+          0.568
+        ],
+        [
+          "mohw-annex4-row-hemoglobin",
+          0.56
+        ],
+        [
+          "kdca-5305-checkup-3",
+          0.545
+        ],
+        [
+          "mohw-annex4-row-hdl",
+          0.541
+        ]
+      ]
+    },
+    {
+      "query": "총콜레스테롤 정상B(경계)",
+      "rank": 1,
+      "primaryRank": 2,
+      "latencyMs": 64,
+      "top": [
+        [
+          "mohw-annex4-def-normal-b",
+          0.641
+        ],
+        [
+          "mohw-annex4-row-total-cholesterol",
+          0.635
+        ],
+        [
+          "mohw-annex4-row-hdl",
+          0.621
+        ],
+        [
+          "mohw-annex4-row-triglycerides",
+          0.619
+        ]
+      ]
+    },
+    {
+      "query": "HDL 콜레스테롤 질환의심",
+      "rank": 1,
+      "primaryRank": 1,
+      "latencyMs": 62,
+      "top": [
+        [
+          "mohw-annex4-row-hdl",
+          0.605
+        ],
+        [
+          "kdca-6715-definition-1",
+          0.594
+        ],
+        [
+          "mohw-annex4-row-ldl",
+          0.574
+        ],
+        [
+          "mohw-annex4-def-suspect-chronic",
+          0.573
+        ]
+      ]
+    },
+    {
+      "query": "중성지방(TG) 질환의심",
+      "rank": 1,
+      "primaryRank": 4,
+      "latencyMs": 65,
+      "top": [
+        [
+          "mohw-annex4-def-suspect-chronic",
+          0.568
+        ],
+        [
+          "kdca-6715-summary-1",
+          0.565
+        ],
+        [
+          "kdca-6715-definition-1",
+          0.565
+        ],
+        [
+          "mohw-annex4-row-triglycerides",
+          0.56
+        ]
+      ]
+    },
+    {
+      "query": "LDL 콜레스테롤 질환의심",
+      "rank": 1,
+      "primaryRank": 2,
+      "latencyMs": 61,
+      "top": [
+        [
+          "kdca-6715-definition-1",
+          0.595
+        ],
+        [
+          "mohw-annex4-row-ldl",
+          0.592
+        ],
+        [
+          "mohw-annex4-row-hdl",
+          0.585
+        ],
+        [
+          "kdca-5305-prevention-4",
+          0.582
+        ]
+      ]
+    },
+    {
+      "query": "LDL 콜레스테롤 정상B(경계)",
+      "rank": 1,
+      "primaryRank": 1,
+      "latencyMs": 65,
+      "top": [
+        [
+          "mohw-annex4-row-ldl",
+          0.621
+        ],
+        [
+          "mohw-annex4-def-normal-b",
+          0.619
+        ],
+        [
+          "mohw-annex4-row-hdl",
+          0.618
+        ],
+        [
+          "mohw-annex4-row-total-cholesterol",
+          0.615
+        ]
+      ]
+    },
+    {
+      "query": "AST(SGOT) 정상B(경계)",
+      "rank": 1,
+      "primaryRank": 2,
+      "latencyMs": 68,
+      "top": [
+        [
+          "mohw-annex4-def-normal-b",
+          0.624
+        ],
+        [
+          "mohw-annex4-row-ast",
+          0.591
+        ],
+        [
+          "mohw-annex4-row-triglycerides",
+          0.555
+        ],
+        [
+          "mohw-annex4-row-alt",
+          0.552
+        ]
+      ]
+    },
+    {
+      "query": "ALT(SGPT) 질환의심",
+      "rank": 1,
+      "primaryRank": 1,
+      "latencyMs": 58,
+      "top": [
+        [
+          "mohw-annex4-row-alt",
+          0.576
+        ],
+        [
+          "mohw-annex4-def-suspect-chronic",
+          0.56
+        ],
+        [
+          "mohw-annex4-row-ast",
+          0.536
+        ],
+        [
+          "kdca-6715-symptoms-1",
+          0.526
+        ]
+      ]
+    },
+    {
+      "query": "감마지티피(γ-GTP) 질환의심",
+      "rank": 2,
+      "primaryRank": 2,
+      "latencyMs": 68,
+      "top": [
+        [
+          "mohw-annex4-def-suspect-chronic",
+          0.552
+        ],
+        [
+          "mohw-annex4-row-gamma-gtp",
+          0.552
+        ],
+        [
+          "mohw-annex4-def-suspect",
+          0.509
+        ],
+        [
+          "kdca-6715-prognosis-2",
+          0.509
+        ]
+      ]
+    },
+    {
+      "query": "요단백 질환의심",
+      "rank": 1,
+      "primaryRank": 1,
+      "latencyMs": 54,
+      "top": [
+        [
+          "mohw-annex4-row-urine-protein",
+          0.532
+        ],
+        [
+          "mohw-annex4-def-suspect",
+          0.52
+        ],
+        [
+          "kdca-5305-checkup-8",
+          0.496
+        ],
+        [
+          "mohw-annex4-def-suspect-chronic",
+          0.496
+        ]
+      ]
+    },
+    {
+      "query": "혈청 크레아티닌 질환의심",
+      "rank": 1,
+      "primaryRank": 1,
+      "latencyMs": 80,
+      "top": [
+        [
+          "mohw-annex4-row-creatinine",
+          0.626
+        ],
+        [
+          "mohw-annex4-def-suspect-chronic",
+          0.559
+        ],
+        [
+          "mohw-annex4-def-suspect",
+          0.537
+        ],
+        [
+          "kdca-5305-checkup-3",
+          0.516
+        ]
+      ]
+    },
+    {
+      "query": "신사구체여과율(eGFR) 질환의심",
+      "rank": 1,
+      "primaryRank": 1,
+      "latencyMs": 90,
+      "top": [
+        [
+          "mohw-annex4-row-egfr",
+          0.668
+        ],
+        [
+          "mohw-annex4-def-suspect",
+          0.579
+        ],
+        [
+          "mohw-annex4-def-suspect-chronic",
+          0.578
+        ],
+        [
+          "kdca-6715-prognosis-2",
+          0.572
+        ]
+      ]
+    },
+    {
+      "query": "흉부방사선 정상B(경계)",
+      "rank": 1,
+      "primaryRank": 2,
+      "latencyMs": 72,
+      "top": [
+        [
+          "mohw-annex4-def-normal-b",
+          0.654
+        ],
+        [
+          "mohw-annex4-row-chest-xray",
+          0.616
+        ],
+        [
+          "mohw-annex4-row-triglycerides",
+          0.565
+        ],
+        [
+          "mohw-annex4-row-hemoglobin",
+          0.553
+        ]
+      ]
+    }
+  ]
+}

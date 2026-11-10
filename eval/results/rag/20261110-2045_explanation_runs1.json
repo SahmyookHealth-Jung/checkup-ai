@@ -1,0 +1,36 @@
+{
+  "ids": [
+    "std-001",
+    "std-002",
+    "std-003",
+    "std-004",
+    "sum-001",
+    "sum-002",
+    "sum-003",
+    "nar-001",
+    "nar-002",
+    "nar-003"
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "reports": 10,
+      "sentencePassRate": 0.988,
+      "invalidCitations": 4,
+      "uncitedSentences": 2,
+      "ungroundedNumberSentences": 0,
+      "forbiddenHits": 0,
+      "noEvidenceItems": 0,
+      "llmErrors": 0,
+      "salvaged": 0,
+      "careAdviceRecall": 0.96,
+      "careAdvicePrecision": 1.0,
+      "expectedSuspectItems": 25,
+      "disclaimerRate": 1.0,
+      "avgTargets": 5.5,
+      "avgRetrievalMs": 348,
+      "avgLlmMs": 6562,
+      "avgTotalMs": 6913
+    }
+  ]
+}
