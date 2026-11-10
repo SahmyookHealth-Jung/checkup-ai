@@ -4,6 +4,7 @@
     .venv/bin/python -m synth.generate --out ../data/synthetic/extraction/v1
     .venv/bin/python -m synth.generate --templates lab --seed 20261109 --out ../data/synthetic/extraction/heldout-v1
     .venv/bin/python -m synth.generate --templates trend --seed 20261110 --out ../data/synthetic/extraction/heldout-v2
+    .venv/bin/python -m synth.generate --templates guide --seed 20261111 --out ../data/synthetic/extraction/heldout-v3
 
 결과물 (보고서마다):
     {id}.txt            텍스트 결과지

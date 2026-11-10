@@ -1,4 +1,4 @@
-"""레이아웃 템플릿 (개발용 3종 + 일반화 시험용 2종). 각 템플릿은 (문서 블록, 정답 JSON, 메타)를 돌려준다.
+"""레이아웃 템플릿 (개발용 3종 + 일반화 시험용 3종). 각 템플릿은 (문서 블록, 정답 JSON, 메타)를 돌려준다.
 
 정답 JSON의 문자열 값은 문서에 "찍힌 그대로"다. 그래서 정답은 렌더링과 항상 일치한다.
 """
@@ -368,8 +368,101 @@ def trend_report(rng: random.Random, subject: Subject, items: list[Measured], la
     return blocks, _expected(subject, "UNKNOWN", expected, age_printed=True), meta
 
 
+# ---- 템플릿 6 (일반화 시험용, held-out v3): 안내문형 ----
+#
+# 검증 v2.4(항목 모양 규칙)를 정한 뒤, 그 규칙으로 이 양식을 돌려 보기 전에 설계·생성했다 (2026-11-09).
+# heldout-v2(trend)는 v2.4 규칙을 만들 때 실패 사례를 봤으므로 더 이상 처음 보는 양식이 아니다.
+# 실제 결과지에서 흔하지만 템플릿 1~5에 없던 특징만 넣었다.
+#   - 신체계측·혈압·시력·청력은 가로 표: 항목명이 윗줄, 값이 아랫줄 (이름과 값이 다른 줄)
+#   - 단위는 항목명 괄호 안 ("신장(cm)")
+#   - 혈액·소변 검사는 표 없이 "이름 ······ 값 단위 [판정] (기준 … / 지난 검진 …)" 한 줄
+#   - 판정 어휘 양호/관찰/진료권고
+#   - 쪽 꼬리말(주소 "가상로 123, 4층", "1 / 2쪽")이 문서 중간에 끼어 있다
+
+GUIDE_LABELS = {"normal": "양호", "borderline": "관찰", "abnormal": "진료권고"}
+GUIDE_TABLE_CODES = {"HEIGHT", "WEIGHT", "WAIST_CIRCUMFERENCE", "BMI", "SYSTOLIC_BP", "DIASTOLIC_BP",
+                     "VISION_LEFT", "VISION_RIGHT", "HEARING_LEFT", "HEARING_RIGHT"}
+
+
+def _guide_line(name: str, m: Measured, judgment: str | None) -> str:
+    leader = "·" * max(3, 14 - len(name))
+    line = f"{name} {leader} {m.value}" + (f" {m.unit}" if m.unit else "") + (f" [{judgment}]" if judgment else "")
+    notes = ([f"기준 {m.reference}"] if m.reference else []) + [f"지난 검진 {m.previous}"]
+    return f"{line} ({' / '.join(notes)})"
+
+
+def guide_report(rng: random.Random, subject: Subject, items: list[Measured], labels: dict) -> tuple:
+    codes = _by_code(items)
+    expected: list[dict] = []
+
+    def label(m: Measured) -> str | None:
+        return GUIDE_LABELS[m.band] if m.band else None
+
+    # 가로 표: 항목명(단위) | 결과 | 판정
+    header, values, judgments = ["구분"], ["결과"], ["판정"]
+    for code in ("HEIGHT", "WEIGHT", "WAIST_CIRCUMFERENCE", "BMI"):
+        m = codes[code]
+        header.append(f"{m.names[0]}({m.unit})")
+        values.append(m.value)
+        judgments.append(label(m) or "")
+        expected.append(_expected_item(m, m.names[0], unit=m.unit, judgment=label(m)))
+    sbp, dbp = codes["SYSTOLIC_BP"], codes["DIASTOLIC_BP"]
+    header.append("혈압(mmHg)")
+    values.append(f"{sbp.value}/{dbp.value}")
+    judgments.append(label(sbp) or "")
+    expected.append(_expected_item(sbp, "혈압", unit="mmHg", judgment=label(sbp)))
+    expected.append(_expected_item(dbp, "혈압", unit="mmHg", judgment=label(sbp)))
+    body_table = Table(header, [values, judgments])
+
+    senses_table = None
+    if "VISION_LEFT" in codes:
+        names = (("VISION_LEFT", "시력(좌)", "시력"), ("VISION_RIGHT", "시력(우)", "시력"),
+                 ("HEARING_LEFT", "청력(좌)", "청력"), ("HEARING_RIGHT", "청력(우)", "청력"))
+        senses_table = Table(["구분", *(printed for _, printed, _ in names)],
+                             [["결과", *(codes[code].value for code, _, _ in names)]])
+        for code, _, raw_name in names:
+            expected.append(_expected_item(codes[code], raw_name))
+
+    # 혈액·소변 검사와 추가 검사: 표 없이 한 줄씩
+    lab_lines, other_lines = [], []
+    for m in items:
+        if m.code in GUIDE_TABLE_CODES or m.code == "CHEST_XRAY":
+            continue
+        name = m.names[0]
+        (other_lines if m.code == "OTHER" else lab_lines).append(Para(_guide_line(name, m, label(m))))
+        expected.append(_expected_item(m, name, unit=m.unit, reference=m.reference, judgment=label(m)))
+
+    xray = codes["CHEST_XRAY"]
+    expected.append(_expected_item(xray, "흉부 촬영", judgment=label(xray)))
+    xray_line = Para(f"흉부 촬영 {'·' * 10} {xray.value}" + (f" [{label(xray)}]" if label(xray) else ""))
+
+    sex_ko = "남" if subject.sex == "MALE" else "여"
+    d = subject.exam_date
+    footer = f"{FAKE_CENTER} · 가상시 가상구 가상로 123, 4층"
+    blocks: list[Block] = [
+        Heading("건강검진 결과 안내문"),
+        Para(SYNTHETIC_NOTICE),
+        Para(f"{subject.masked_name} 님 ({sex_ko}, 만 {subject.age}세) · 수검일 {d.year}년 {d.month}월 {d.day}일"),
+        Heading("■ 신체 계측"),
+        body_table,
+        *([Heading("■ 시력·청력"), senses_table] if senses_table else []),
+        Heading("■ 혈액·소변 검사"),
+        *lab_lines,
+        Para(f"{footer} · 1 / 2쪽"),
+        *([Heading("■ 추가 검사"), *other_lines] if other_lines else []),
+        Heading("■ 영상 검사"),
+        xray_line,
+        Para("※ [관찰]·[진료권고] 항목은 의료진과 상담하시기 바랍니다."),
+        Para(f"{footer} · 2 / 2쪽"),
+    ]
+    meta = {"distractors": ["transposed_table", "unit_in_name", "leader_lines", "guide_vocabulary",
+                            "page_footer_numbers"], "age_printed": True}
+    return blocks, _expected(subject, "UNKNOWN", expected, age_printed=True), meta
+
+
 # 일반화 시험용. 검증 규칙을 만들 때 쓰지 않는다
 HELDOUT_TEMPLATES = {
     "lab": lab_report,      # 검사실 결과지형 (heldout-v1, 검증 v2.2 시험에 사용. 결과를 봤으므로 이후로는 '본 양식')
-    "trend": trend_report,  # 3개년 추이표형 (heldout-v2, 검증 v2.3 전에 생성)
+    "trend": trend_report,  # 3개년 추이표형 (heldout-v2, 검증 v2.3 시험에 사용. v2.4 규칙의 근거라 이후로는 '본 양식')
+    "guide": guide_report,  # 안내문형 (heldout-v3, 검증 v2.4 전에 생성)
 }
