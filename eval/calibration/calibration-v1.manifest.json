@@ -1,0 +1,18 @@
+{
+  "name": "calibration-v1",
+  "createdAt": "2026-11-11T00:27:21",
+  "baseline": "20261110-2337_explanation_heldout30-v2.5_baseline",
+  "run": 1,
+  "seed": 20261111,
+  "rubric": "faithfulness-v1",
+  "population": {
+    "other_item_only": 94,
+    "neighbor_band": 102,
+    "rest": 240
+  },
+  "sampled": {
+    "other_item_only": 20,
+    "neighbor_band": 10,
+    "rest": 20
+  }
+}

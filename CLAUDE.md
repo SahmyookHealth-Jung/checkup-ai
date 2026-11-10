@@ -44,6 +44,7 @@ cd backend && ./gradlew build              # 컴파일 + 단위 테스트 (외�
 (cd ../eval && .venv/bin/python -m rag.run_retrieval_eval)  # 검색 평가 (앱이 떠 있어야 함)
 (cd ../eval && .venv/bin/python -m rag.freeze_extractions)  # heldout 30개 추출을 eval/frozen/에 고정 (Haiku 30회, 캐시 있으면 0회)
 (cd ../eval && .venv/bin/python -m rag.run_explanation_eval --label <이름>)  # 고정한 추출로 해설만 30개 x 2회 (Haiku 60회 약 $0.10)
+(cd ../eval && .venv/bin/python -m rag.build_calibration_set)  # 충실도 보정셋 50문장 + 라벨링 화면(eval/.cache/labeling/, 커밋 안 함)
 (cd ../eval && .venv/bin/python -m unittest discover -s rag -t .)            # 평가 지표 단위 테스트
 ```
 

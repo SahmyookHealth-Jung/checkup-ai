@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>충실도 라벨링</title>
+<!-- 템플릿. build_calibration_set.py가 __DATA__ 자리에 보정셋을 넣어 eval/.cache/labeling/에 화면을 만든다 (근거 원문이 들어가므로 커밋하지 않는다) -->
+<style>
+:root {
+  --bg: #f7f7f5; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6b66; --line: #e2e1dc;
+  --accent: #2f5bd3; --accent-ink: #ffffff; --soft: #eef2fc; --warn: #b4441c; --ok: #2d7a46; --quote: #f3f2ee;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161615; --panel: #1f1f1d; --ink: #ecebe6; --muted: #a09f98; --line: #34332f;
+    --accent: #7c9bf0; --accent-ink: #10131c; --soft: #232a3d; --warn: #ec8a63; --ok: #6cc58a; --quote: #262623;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+header { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line); padding: 10px 16px; }
+.bar { max-width: 980px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.bar h1 { font-size: 16px; margin: 0; }
+.count { color: var(--muted); font-variant-numeric: tabular-nums; }
+.spacer { flex: 1; }
+button, .filebtn { font: inherit; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+button:disabled { opacity: .45; cursor: default; }
+.dots { max-width: 980px; margin: 8px auto 0; display: flex; flex-wrap: wrap; gap: 4px; }
+.dot { width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--line); background: var(--panel); padding: 0; font-size: 0; }
+.dot.done { background: var(--ok); border-color: var(--ok); }
+.dot.current { outline: 2px solid var(--accent); outline-offset: 1px; }
+main { max-width: 980px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; }
+section { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+.label { color: var(--muted); font-size: 13px; margin: 0 0 6px; }
+.item { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px 16px; }
+.item b { display: block; font-size: 15px; }
+.criterion { margin-top: 8px; color: var(--muted); font-size: 14px; }
+.sentence { font-size: 19px; line-height: 1.7; margin: 0; }
+.source { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 12px; }
+.source:first-of-type { border-top: 0; margin-top: 0; padding-top: 0; }
+.source .meta { font-size: 13px; color: var(--muted); }
+.source .meta code { font-size: 12px; }
+.source p { background: var(--quote); border-radius: 8px; padding: 10px 12px; margin: 6px 0 0; white-space: pre-wrap; }
+.axis { display: grid; gap: 6px; margin-bottom: 16px; }
+.axis h3 { font-size: 15px; margin: 0; }
+.axis .q { color: var(--muted); font-size: 13px; margin: 0; }
+.choices { display: flex; flex-wrap: wrap; gap: 8px; }
+.choice { flex: 1 1 180px; text-align: left; border-radius: 10px; padding: 8px 12px; }
+.choice small { display: block; color: var(--muted); font-size: 12px; line-height: 1.45; margin-top: 2px; }
+.choice kbd { float: right; font-size: 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
+.choice[aria-pressed="true"] { background: var(--soft); border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+textarea { width: 100%; min-height: 56px; font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
+.nav { display: flex; gap: 8px; flex-wrap: wrap; }
+.hint { color: var(--muted); font-size: 13px; }
+.status { color: var(--warn); font-size: 13px; min-height: 1em; }
+details summary { cursor: pointer; }
+details dl { margin: 8px 0 0; }
+details dt { font-weight: 600; margin-top: 8px; }
+details dd { margin: 2px 0 0 0; color: var(--muted); font-size: 14px; }
+input[type=file] { display: none; }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <h1>의미 충실도 라벨링</h1>
+    <span class="count" id="count"></span>
+    <span class="spacer"></span>
+    <label class="filebtn">라벨 불러오기<input type="file" id="import" accept="application/json"></label>
+    <button class="primary" id="export">라벨 내려받기</button>
+  </div>
+  <div class="dots" id="dots" aria-label="문장 목록"></div>
+</header>
+<main>
+  <section>
+    <details>
+      <summary>판단 기준 보기 (라벨링 전에 한 번 읽어 주세요)</summary>
+      <p class="hint">"뒷받침"은 <b>그 문장이 인용한 근거만</b> 보고 판단합니다. 항목 정보와 내용이 맞아도 인용이 엉뚱하면 미지지입니다. "판정 구간"은 위쪽 항목 정보와 비교합니다.</p>
+      <dl id="rubric"></dl>
+    </details>
+  </section>
+  <section>
+    <p class="label" id="calid"></p>
+    <div class="item" id="item"></div>
+    <div class="criterion" id="criterion"></div>
+  </section>
+  <section>
+    <p class="label">해설 문장</p>
+    <p class="sentence" id="sentence"></p>
+  </section>
+  <section>
+    <p class="label">이 문장이 인용한 근거</p>
+    <div id="sources"></div>
+  </section>
+  <section>
+    <div id="axes"></div>
+    <div class="axis">
+      <h3>메모 (선택)</h3>
+      <textarea id="memo" placeholder="판단이 애매했던 이유 등"></textarea>
+    </div>
+    <div class="nav">
+      <button id="prev">← 이전</button>
+      <button id="next">다음 →</button>
+      <button id="nextTodo">다음 미완료</button>
+    </div>
+    <p class="hint">단축키: 뒷받침 1·2·3, 판정 구간 Q·W·E, 치료·약 A·S, 이동 ←·→. 선택은 이 브라우저에 자동 저장됩니다. 끝나면 "라벨 내려받기"를 눌러 주세요.</p>
+    <p class="status" id="status"></p>
+  </section>
+</main>
+<script>
+const DATA = __DATA__;
+const KEYS = { support: ["1", "2", "3"], band: ["q", "w", "e"], treatment: ["a", "s"] };
+const STORE = "checkup-ai:" + DATA.set + ":" + DATA.rubricVersion;
+let labels = {};
+try { labels = JSON.parse(localStorage.getItem(STORE) || "{}"); } catch (e) { labels = {}; }
+let index = 0;
+
+const $ = (id) => document.getElementById(id);
+const el = (tag, attrs = {}, ...children) => {
+  const node = document.createElement(tag);
+  Object.entries(attrs).forEach(([k, v]) => (k === "class" ? (node.className = v) : node.setAttribute(k, v)));
+  children.forEach((c) => node.append(c));
+  return node;
+};
+const axisNames = Object.keys(DATA.axes);
+const complete = (l) => l && axisNames.every((a) => l[a]);
+const save = () => { try { localStorage.setItem(STORE, JSON.stringify(labels)); } catch (e) { $("status").textContent = "자동 저장이 안 됩니다. 중간에 '라벨 내려받기'로 저장해 주세요."; } };
+
+function renderRubric() {
+  const dl = $("rubric");
+  axisNames.forEach((a) => {
+    const axis = DATA.axes[a];
+    dl.append(el("dt", {}, axis.name));
+    dl.append(el("dd", {}, axis.question));
+    Object.values(axis.labels).forEach(([name, desc]) => dl.append(el("dd", {}, "· " + name + ": " + desc)));
+  });
+}
+
+function render() {
+  const row = DATA.rows[index];
+  const label = labels[row.calId] || {};
+  const done = DATA.rows.filter((r) => complete(labels[r.calId])).length;
+  $("count").textContent = `${index + 1} / ${DATA.rows.length} · 완료 ${done}`;
+  $("calid").textContent = row.calId;
+  const it = row.item;
+  $("item").replaceChildren(
+    el("div", {}, el("span", { class: "label" }, "항목"), el("b", {}, it.name)),
+    el("div", {}, el("span", { class: "label" }, "결과값"), el("b", {}, it.value + (it.unit ? " " + it.unit : ""))),
+    el("div", {}, el("span", { class: "label" }, "판정 (국가건강검진 기준)"), el("b", {}, it.judgmentLabel)));
+  $("criterion").textContent = it.criterion ? "판정 기준: " + it.criterion : "";
+  $("sentence").textContent = row.text;
+  $("sources").replaceChildren(...row.sources.map((s, i) => el("div", { class: "source" },
+    el("div", { class: "meta" }, `[근거 ${i + 1}] ${s.publisher || ""} · ${s.section || ""} `, el("code", {}, s.id)),
+    el("p", {}, s.text))));
+  $("axes").replaceChildren(...axisNames.map((a) => {
+    const axis = DATA.axes[a];
+    return el("div", { class: "axis" }, el("h3", {}, axis.name), el("p", { class: "q" }, axis.question),
+      el("div", { class: "choices" }, ...Object.entries(axis.labels).map(([value, [name, desc]], i) => {
+        const b = el("button", { class: "choice", "aria-pressed": String(label[a] === value) },
+          el("kbd", {}, KEYS[a][i].toUpperCase()), name, el("small", {}, desc));
+        b.addEventListener("click", () => choose(a, value));
+        return b;
+      })));
+  }));
+  $("memo").value = label.memo || "";
+  $("prev").disabled = index === 0;
+  $("next").disabled = index === DATA.rows.length - 1;
+  $("dots").replaceChildren(...DATA.rows.map((r, i) => {
+    const d = el("button", { class: "dot" + (complete(labels[r.calId]) ? " done" : "") + (i === index ? " current" : ""),
+      title: r.calId, "aria-label": r.calId });
+    d.addEventListener("click", () => go(i));
+    return d;
+  }));
+  $("status").textContent = "";
+}
+
+function choose(axis, value) {
+  const id = DATA.rows[index].calId;
+  labels[id] = { ...(labels[id] || {}), [axis]: value };
+  save();
+  render();
+}
+function go(i) { index = Math.max(0, Math.min(DATA.rows.length - 1, i)); render(); window.scrollTo(0, 0); }
+
+$("memo").addEventListener("input", (e) => {
+  const id = DATA.rows[index].calId;
+  labels[id] = { ...(labels[id] || {}), memo: e.target.value };
+  save();
+});
+$("prev").addEventListener("click", () => go(index - 1));
+$("next").addEventListener("click", () => go(index + 1));
+$("nextTodo").addEventListener("click", () => {
+  const order = DATA.rows.map((_, i) => (index + 1 + i) % DATA.rows.length);
+  const todo = order.find((i) => !complete(labels[DATA.rows[i].calId]));
+  if (todo === undefined) { $("status").textContent = "모두 완료했습니다. '라벨 내려받기'를 눌러 주세요."; } else { go(todo); }
+});
+document.addEventListener("keydown", (e) => {
+  if (e.target.tagName === "TEXTAREA" || e.metaKey || e.ctrlKey || e.altKey) return;
+  const key = e.key.toLowerCase();
+  if (key === "arrowleft") return go(index - 1);
+  if (key === "arrowright") return go(index + 1);
+  for (const a of axisNames) {
+    const i = KEYS[a].indexOf(key);
+    if (i >= 0) return choose(a, Object.keys(DATA.axes[a].labels)[i]);
+  }
+});
+$("export").addEventListener("click", () => {
+  const rows = DATA.rows.map((r) => ({ calId: r.calId, ...(labels[r.calId] || {}) }));
+  const missing = rows.filter((r) => !complete(r)).length;
+  const out = { set: DATA.set, rubricVersion: DATA.rubricVersion, exportedAt: new Date().toISOString(),
+    complete: missing === 0, labels: rows };
+  const a = el("a", { href: URL.createObjectURL(new Blob([JSON.stringify(out, null, 2)], { type: "application/json" })),
+    download: DATA.set + ".labels.json" });
+  document.body.append(a); a.click(); a.remove();
+  $("status").textContent = missing ? `미완료 ${missing}개가 있는 상태로 내려받았습니다.` : "50개 모두 내려받았습니다.";
+});
+$("import").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const data = JSON.parse(await file.text());
+    if (data.set !== DATA.set || data.rubricVersion !== DATA.rubricVersion) throw new Error("다른 보정셋이나 기준 버전의 파일입니다");
+    data.labels.forEach((l) => { const { calId, ...rest } = l; labels[calId] = rest; });
+    save(); render();
+    $("status").textContent = "불러왔습니다.";
+  } catch (err) { $("status").textContent = "불러오지 못했습니다: " + err.message; }
+  e.target.value = "";
+});
+renderRubric();
+render();
+</script>
+</body>
+</html>
