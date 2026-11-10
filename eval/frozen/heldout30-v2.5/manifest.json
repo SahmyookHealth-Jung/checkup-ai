@@ -3,7 +3,8 @@
   "createdAt": "2026-11-10T23:30:49",
   "git": {
     "commit": "5f1feb6",
-    "dirty": true
+    "dirty": false,
+    "note": "처음 기록은 dirty=true였다. freeze가 자기 출력 폴더(eval/frozen/)를 변경으로 센 오탐이고, 코드는 5f1feb6 그대로였다. run_record 수정과 함께 바로잡음 (2026-11-10)"
   },
   "extraction": {
     "model": "claude-haiku-5-5",

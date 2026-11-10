@@ -18,13 +18,16 @@ ROOT = EVAL_DIR.parent
 RESULTS = EVAL_DIR / "results"
 INDEX = RESULTS / "index.jsonl"
 SCHEMA = "checkup-ai/eval-run@1"
+OUTPUT_DIRS = ("eval/results/", "eval/frozen/")
 
 
 def git_state() -> dict:
     def git(*args: str) -> str:
         return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
-    # 결과 폴더 자체의 변경(이번 실행이 쓰는 파일)은 dirty로 보지 않는다
-    changed = [line for line in git("status", "--porcelain").splitlines() if "eval/results/" not in line]
+    # 평가가 쓰는 출력 폴더(결과, 고정한 추출)의 변경은 dirty로 보지 않는다.
+    # 2026-11-10: freeze가 자기 출력 폴더를 변경으로 세어 dirty=true가 찍혔다 (코드 변경은 없었다)
+    changed = [line for line in git("status", "--porcelain").splitlines()
+               if not any(output in line for output in OUTPUT_DIRS)]
     return {"commit": git("rev-parse", "--short", "HEAD"), "dirty": bool(changed)}
 
 
