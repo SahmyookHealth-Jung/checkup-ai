@@ -1,0 +1,3384 @@
+{
+  "summary": {
+    "runAt": "2026-11-09T18:59:52",
+    "model": "qwen3:4b",
+    "promptVersion": "extraction-v1",
+    "pipeline": "validated-v2.3",
+    "dataset": "heldout-v1",
+    "subset": "full",
+    "format": "pdf",
+    "documents": 10,
+    "failed": 0,
+    "itemF1": {
+      "tp": 202,
+      "fp": 3,
+      "fn": 14,
+      "precision": 0.9854,
+      "recall": 0.9352,
+      "f1": 0.9596
+    },
+    "firstPassF1": {
+      "tp": 170,
+      "fp": 21,
+      "fn": 46,
+      "precision": 0.8901,
+      "recall": 0.787,
+      "f1": 0.8354
+    },
+    "byTemplate": {
+      "lab": {
+        "tp": 202,
+        "fp": 3,
+        "fn": 14,
+        "precision": 0.9854,
+        "recall": 0.9352,
+        "f1": 0.9596
+      }
+    },
+    "fieldAccuracy": {
+      "unit": {
+        "accuracy": 0.9901,
+        "total": 202,
+        "correct": 200,
+        "invented": 2,
+        "dropped": 0,
+        "wrong": 0
+      },
+      "referenceRaw": {
+        "accuracy": 0.7525,
+        "total": 202,
+        "correct": 152,
+        "invented": 39,
+        "dropped": 0,
+        "wrong": 11
+      },
+      "centerJudgment": {
+        "accuracy": 0.7822,
+        "total": 202,
+        "correct": 158,
+        "invented": 40,
+        "dropped": 0,
+        "wrong": 4
+      }
+    },
+    "firstPassFieldAccuracy": {
+      "unit": {
+        "accuracy": 0.9765,
+        "total": 170,
+        "correct": 166,
+        "invented": 4,
+        "dropped": 0,
+        "wrong": 0
+      },
+      "referenceRaw": {
+        "accuracy": 0.8118,
+        "total": 170,
+        "correct": 138,
+        "invented": 21,
+        "dropped": 0,
+        "wrong": 11
+      },
+      "centerJudgment": {
+        "accuracy": 0.6118,
+        "total": 170,
+        "correct": 104,
+        "invented": 64,
+        "dropped": 0,
+        "wrong": 2
+      }
+    },
+    "fieldAccuracyByTemplate": {
+      "lab": {
+        "unit": 0.9901,
+        "referenceRaw": 0.7525,
+        "centerJudgment": 0.7822
+      }
+    },
+    "avgLatencyMs": 261343,
+    "avgPromptTokens": 2285,
+    "avgCompletionTokens": 1539,
+    "totalAttempts": 22,
+    "totalRetriedSegments": 25,
+    "issueCounts": {
+      "CONFLICT": 6,
+      "IMPLAUSIBLE": 6,
+      "RAW_NAME_NOT_IN_SOURCE": 12,
+      "UNGROUNDED_FIELD": 150,
+      "UNGROUNDED_VALUE": 6
+    }
+  },
+  "documents": [
+    {
+      "id": "lab-001",
+      "cached": false,
+      "tp": 21,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "firstPass": {
+        "tp": 20,
+        "fp": 1,
+        "fn": 1,
+        "precision": 0.9524,
+        "recall": 0.9524,
+        "f1": 0.9524
+      },
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "pipeline": "validated-v2.3",
+        "latencyMs": 249981,
+        "promptTokens": 2079,
+        "completionTokens": 1474,
+        "attempts": 2,
+        "retriedSegments": 1,
+        "issues": {
+          "CONFLICT": 1,
+          "UNGROUNDED_FIELD": 24
+        }
+      },
+      "error": null,
+      "errors": [],
+      "diagnostics": {
+        "firstPassItems": [
+          {
+            "code": "HEIGHT",
+            "rawName": "신장",
+            "value": "164.9",
+            "unit": "cm",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WEIGHT",
+            "rawName": "체중",
+            "value": "91.1",
+            "unit": "kg",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WAIST_CIRCUMFERENCE",
+            "rawName": "허리둘레",
+            "value": "74",
+            "unit": "cm",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "BMI",
+            "rawName": "체질량지수",
+            "value": "33.5",
+            "unit": "kg/m²",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "SYSTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "103",
+            "unit": "mmHg",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "DIASTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "72",
+            "unit": "mmHg",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "VISION_LEFT",
+            "rawName": "시력(좌/우)",
+            "value": "0.8",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "0.8/0.8"
+          },
+          {
+            "code": "VISION_RIGHT",
+            "rawName": "시력(좌/우)",
+            "value": "0.8",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "0.8/0.8"
+          },
+          {
+            "code": "HEARING_LEFT",
+            "rawName": "청력(좌/우)",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEARING_RIGHT",
+            "rawName": "청력(좌/우)",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "요단백(U-Protein)",
+            "value": "음성",
+            "unit": "null",
+            "referenceRaw": "음성",
+            "centerJudgment": "음성"
+          },
+          {
+            "code": "HEMOGLOBIN",
+            "rawName": "혈색소(Hb)",
+            "value": "14.8",
+            "unit": "g/dL",
+            "referenceRaw": "12.0~15.5",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "공복혈당(FBS)",
+            "value": "73",
+            "unit": "mg/dL",
+            "referenceRaw": "100 미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청 크레아티닌(Cr)",
+            "value": "1.88",
+            "unit": "mg/dL",
+            "referenceRaw": "1.5 이하",
+            "centerJudgment": "이상"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율(eGFR)",
+            "value": "40",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "이상"
+          },
+          {
+            "code": "AST",
+            "rawName": "SGOT(AST)",
+            "value": "49",
+            "unit": "U/L",
+            "referenceRaw": "40 이하",
+            "centerJudgment": "경계"
+          },
+          {
+            "code": "ALT",
+            "rawName": "SGPT(ALT)",
+            "value": "65",
+            "unit": "U/L",
+            "referenceRaw": "35 이하",
+            "centerJudgment": "이상"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피(r-GTP)",
+            "value": "28",
+            "unit": "U/L",
+            "referenceRaw": "8~35",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "요산(Uric acid)",
+            "value": "5.4",
+            "unit": "mg/dL",
+            "referenceRaw": "3.5~7.2",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "암태아성항원(CEA)",
+            "value": "3.3",
+            "unit": "ng/mL",
+            "referenceRaw": "5.0 이하",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "CHEST_XRAY",
+            "rawName": "흉부 X-ray",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          }
+        ],
+        "issues": [
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WAIST_CIRCUMFERENCE",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WAIST_CIRCUMFERENCE",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "BMI",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "BMI",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "SYSTOLIC_BP",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "SYSTOLIC_BP",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "DIASTOLIC_BP",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "DIASTOLIC_BP",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_LEFT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_LEFT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_RIGHT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_RIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_LEFT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_LEFT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_RIGHT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_RIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "unit=null"
+          },
+          {
+            "type": "CONFLICT",
+            "code": "URINE_PROTEIN",
+            "detail": "같은 코드에 다른 값: 5.4"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "OTHER",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "referenceRaw=null"
+          }
+        ],
+        "retryInput": [
+          "항목 결과 항목 결과",
+          "검사항목 결과 판정 참고범위 단위",
+          "요산(Uric acid) 5.4 3.5~7.2 mg/dL"
+        ],
+        "retryItems": [
+          {
+            "code": "OTHER",
+            "rawName": "요산(Uric acid)",
+            "value": "5.4",
+            "unit": "mg/dL",
+            "referenceRaw": "3.5~7.2",
+            "centerJudgment": "요산(Uric acid)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lab-002",
+      "cached": false,
+      "tp": 22,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "firstPass": {
+        "tp": 21,
+        "fp": 1,
+        "fn": 1,
+        "precision": 0.9545,
+        "recall": 0.9545,
+        "f1": 0.9545
+      },
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "pipeline": "validated-v2.3",
+        "latencyMs": 282793,
+        "promptTokens": 2229,
+        "completionTokens": 1587,
+        "attempts": 2,
+        "retriedSegments": 1,
+        "issues": {
+          "IMPLAUSIBLE": 1,
+          "UNGROUNDED_FIELD": 17
+        }
+      },
+      "error": null,
+      "errors": [],
+      "diagnostics": {
+        "firstPassItems": [
+          {
+            "code": "HEIGHT",
+            "rawName": "신장",
+            "value": "177.8",
+            "unit": "cm",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WEIGHT",
+            "rawName": "체중",
+            "value": "62.6",
+            "unit": "kg",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WAIST_CIRCUMFERENCE",
+            "rawName": "허리둘레",
+            "value": "87",
+            "unit": "cm",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "BMI",
+            "rawName": "체질량지수",
+            "value": "19.8",
+            "unit": "kg/m²",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "SYSTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "106",
+            "unit": "mmHg",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "DIASTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "68",
+            "unit": "mmHg",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "요단백(U-Protein)",
+            "value": "음성",
+            "unit": "null",
+            "referenceRaw": "음성",
+            "centerJudgment": "음성"
+          },
+          {
+            "code": "HEMOGLOBIN",
+            "rawName": "혈색소(Hb)",
+            "value": "16.5",
+            "unit": "g/dL",
+            "referenceRaw": "13.0~16.5",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "공복혈당(FBS)",
+            "value": "90",
+            "unit": "mg/dL",
+            "referenceRaw": "100 미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "TOTAL_CHOLESTEROL",
+            "rawName": "총콜레스테롤(T-Chol)",
+            "value": "229",
+            "unit": "mg/dL",
+            "referenceRaw": "200 미만",
+            "centerJudgment": "경계"
+          },
+          {
+            "code": "HDL_CHOLESTEROL",
+            "rawName": "HDL 콜레스테롤(HDL-C)",
+            "value": "61",
+            "unit": "mg/dL",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "TRIGLYCERIDES",
+            "rawName": "중성지방(TG)",
+            "value": "231",
+            "unit": "mg/dL",
+            "referenceRaw": "150 미만",
+            "centerJudgment": "이상"
+          },
+          {
+            "code": "LDL_CHOLESTEROL",
+            "rawName": "LDL 콜레스테롤(LDL-C)",
+            "value": "131",
+            "unit": "mg/dL",
+            "referenceRaw": "130 미만",
+            "centerJudgment": "경계"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청 크레아티닌(Cr)",
+            "value": "1.15",
+            "unit": "mg/dL",
+            "referenceRaw": "1.5 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율(eGFR)",
+            "value": "107",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "AST",
+            "rawName": "SGOT(AST)",
+            "value": "38",
+            "unit": "U/L",
+            "referenceRaw": "40 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "ALT",
+            "rawName": "SGPT(ALT)",
+            "value": "40",
+            "unit": "U/L",
+            "referenceRaw": "35 이하",
+            "centerJudgment": "경계"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피(r-GTP)",
+            "value": "169",
+            "unit": "U/L",
+            "referenceRaw": "11~63",
+            "centerJudgment": "이상"
+          },
+          {
+            "code": "TOTAL_CHOLESTEROL",
+            "rawName": "갑상선자극호르몬(TSH)",
+            "value": "4.42",
+            "unit": "μIU/mL",
+            "referenceRaw": "0.4~4.5",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "요산(Uric acid)",
+            "value": "6.6",
+            "unit": "mg/dL",
+            "referenceRaw": "3.5~7.2",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "고감도 C반응단백",
+            "value": "0.8",
+            "unit": "mg/L",
+            "referenceRaw": "1.0 미만",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "CHEST_XRAY",
+            "rawName": "흉부 X-ray",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          }
+        ],
+        "issues": [
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WAIST_CIRCUMFERENCE",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WAIST_CIRCUMFERENCE",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "BMI",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "BMI",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "SYSTOLIC_BP",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "SYSTOLIC_BP",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "DIASTOLIC_BP",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "DIASTOLIC_BP",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "unit=null"
+          },
+          {
+            "type": "IMPLAUSIBLE",
+            "code": "TOTAL_CHOLESTEROL",
+            "detail": "가능 범위 밖: 4.42"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "OTHER",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "OTHER",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "referenceRaw=null"
+          }
+        ],
+        "retryInput": [
+          "항목 결과 항목 결과",
+          "검사항목 결과 판정 참고범위 단위",
+          "갑상선자극호르몬(TSH) 4.42 0.4~4.5 μIU/mL"
+        ],
+        "retryItems": [
+          {
+            "code": "OTHER",
+            "rawName": "갑상선자극호르몬(TSH)",
+            "value": "4.42",
+            "unit": "μIU/mL",
+            "referenceRaw": "0.4~4.5",
+            "centerJudgment": "TSH"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lab-003",
+      "cached": false,
+      "tp": 20,
+      "fp": 0,
+      "fn": 2,
+      "precision": 1.0,
+      "recall": 0.9091,
+      "f1": 0.9524,
+      "firstPass": {
+        "tp": 15,
+        "fp": 5,
+        "fn": 7,
+        "precision": 0.75,
+        "recall": 0.6818,
+        "f1": 0.7143
+      },
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "pipeline": "validated-v2.3",
+        "latencyMs": 280613,
+        "promptTokens": 2181,
+        "completionTokens": 1729,
+        "attempts": 2,
+        "retriedSegments": 4,
+        "issues": {
+          "CONFLICT": 1,
+          "IMPLAUSIBLE": 2,
+          "RAW_NAME_NOT_IN_SOURCE": 2,
+          "UNGROUNDED_FIELD": 8,
+          "UNGROUNDED_VALUE": 2
+        }
+      },
+      "error": null,
+      "errors": [
+        {
+          "type": "missing",
+          "code": "VISION_LEFT",
+          "expected": "0.5",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "VISION_RIGHT",
+          "expected": "1.2",
+          "predicted": null
+        }
+      ],
+      "diagnostics": {
+        "firstPassItems": [
+          {
+            "code": "SYSTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "132",
+            "unit": "mmHg",
+            "referenceRaw": "132/81 mmHg",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "DIASTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "81",
+            "unit": "mmHg",
+            "referenceRaw": "132/81 mmHg",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEIGHT",
+            "rawName": "신장",
+            "value": "164.1",
+            "unit": "cm",
+            "referenceRaw": "164.1 cm",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WEIGHT",
+            "rawName": "체중",
+            "value": "57.1",
+            "unit": "kg",
+            "referenceRaw": "57.1 kg",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WAIST_CIRCUMFERENCE",
+            "rawName": "허리둘레",
+            "value": "77",
+            "unit": "cm",
+            "referenceRaw": "77 cm",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "BMI",
+            "rawName": "체질량지수",
+            "value": "21.2",
+            "unit": "kg/m²",
+            "referenceRaw": "21.2 kg/m²",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "요단백(U-Protein)",
+            "value": "양성(1+)",
+            "unit": "null",
+            "referenceRaw": "음성",
+            "centerJudgment": "이상"
+          },
+          {
+            "code": "HEMOGLOBIN",
+            "rawName": "혈색소(Hb)",
+            "value": "15.4",
+            "unit": "g/dL",
+            "referenceRaw": "12.0~15.5",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "공복혈당(FBS)",
+            "value": "109",
+            "unit": "mg/dL",
+            "referenceRaw": "100 미만",
+            "centerJudgment": "경계"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청 크레아티닌(Cr)",
+            "value": "0.56",
+            "unit": "mg/dL",
+            "referenceRaw": "1.5 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율(eGFR)",
+            "value": "103",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "AST",
+            "rawName": "SGOT(AST)",
+            "value": "24",
+            "unit": "U/L",
+            "referenceRaw": "40 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "ALT",
+            "rawName": "SGPT(ALT)",
+            "value": "12",
+            "unit": "U/L",
+            "referenceRaw": "35 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피(r-GTP)",
+            "value": "35",
+            "unit": "U/L",
+            "referenceRaw": "8~35",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "요산(Uric acid)",
+            "value": "6.9",
+            "unit": "mg/dL",
+            "referenceRaw": "3.5~7.2",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "TOTAL_CHOLESTEROL",
+            "rawName": "총빌리루빈(T-Bil)",
+            "value": "0.4",
+            "unit": "mg/dL",
+            "referenceRaw": "0.2~1.2",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HDL_CHOLESTEROL",
+            "rawName": "고감도 C반응단백",
+            "value": "3.7",
+            "unit": "mg/L",
+            "referenceRaw": "1.0 미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "TRIGLYCERIDES",
+            "rawName": "고감도 C반응단백",
+            "value": "null",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "LDL_CHOLESTEROL",
+            "rawName": "고감도 C반응단백",
+            "value": "null",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "CHEST_XRAY",
+            "rawName": "흉부 X-ray",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "정상",
+            "centerJudgment": "정상"
+          }
+        ],
+        "issues": [
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "SYSTOLIC_BP",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "DIASTOLIC_BP",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WAIST_CIRCUMFERENCE",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "BMI",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "unit=null"
+          },
+          {
+            "type": "CONFLICT",
+            "code": "URINE_PROTEIN",
+            "detail": "같은 코드에 다른 값: 6.9"
+          },
+          {
+            "type": "IMPLAUSIBLE",
+            "code": "TOTAL_CHOLESTEROL",
+            "detail": "가능 범위 밖: 0.4"
+          },
+          {
+            "type": "IMPLAUSIBLE",
+            "code": "HDL_CHOLESTEROL",
+            "detail": "가능 범위 밖: 3.7"
+          },
+          {
+            "type": "UNGROUNDED_VALUE",
+            "code": "TRIGLYCERIDES",
+            "detail": "null"
+          },
+          {
+            "type": "UNGROUNDED_VALUE",
+            "code": "LDL_CHOLESTEROL",
+            "detail": "null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "unit=null"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "HEARING_LEFT",
+            "detail": "청력(좌)"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "HEARING_RIGHT",
+            "detail": "청력(우)"
+          }
+        ],
+        "retryInput": [
+          "항목 결과 항목 결과",
+          "검사항목 결과 판정 참고범위 단위",
+          "청력(좌/우) 정상/정상",
+          "요산(Uric acid) 6.9 3.5~7.2 mg/dL",
+          "총빌리루빈(T-Bil) 0.4 0.2~1.2 mg/dL",
+          "(hs-CRP) 3.7 1.0 미만 mg/L"
+        ],
+        "retryItems": [
+          {
+            "code": "HEARING_LEFT",
+            "rawName": "청력(좌)",
+            "value": "정상",
+            "unit": "정상",
+            "referenceRaw": "정상",
+            "centerJudgment": "정상/정상"
+          },
+          {
+            "code": "HEARING_RIGHT",
+            "rawName": "청력(우)",
+            "value": "정상",
+            "unit": "정상",
+            "referenceRaw": "정상",
+            "centerJudgment": "정상/정상"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "요산(Uric acid)",
+            "value": "6.9",
+            "unit": "mg/dL",
+            "referenceRaw": "3.5~7.2",
+            "centerJudgment": "6.9"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "총빌리루빈(T-Bil)",
+            "value": "0.4",
+            "unit": "mg/dL",
+            "referenceRaw": "0.2~1.2",
+            "centerJudgment": "0.4"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "(hs-CRP)",
+            "value": "3.7",
+            "unit": "mg/L",
+            "referenceRaw": "1.0 미만",
+            "centerJudgment": "3.7"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lab-004",
+      "cached": false,
+      "tp": 18,
+      "fp": 2,
+      "fn": 2,
+      "precision": 0.9,
+      "recall": 0.9,
+      "f1": 0.9,
+      "firstPass": {
+        "tp": 17,
+        "fp": 6,
+        "fn": 3,
+        "precision": 0.7391,
+        "recall": 0.85,
+        "f1": 0.7907
+      },
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "pipeline": "validated-v2.3",
+        "latencyMs": 268588,
+        "promptTokens": 2056,
+        "completionTokens": 1600,
+        "attempts": 2,
+        "retriedSegments": 1,
+        "issues": {
+          "RAW_NAME_NOT_IN_SOURCE": 2,
+          "UNGROUNDED_FIELD": 25,
+          "UNGROUNDED_VALUE": 4
+        }
+      },
+      "error": null,
+      "errors": [
+        {
+          "type": "wrong_value",
+          "code": "HEARING_LEFT",
+          "expected": "비정상",
+          "predicted": "비정상/정상"
+        },
+        {
+          "type": "wrong_value",
+          "code": "HEARING_RIGHT",
+          "expected": "정상",
+          "predicted": "비정상/정상"
+        }
+      ],
+      "diagnostics": {
+        "firstPassItems": [
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "요단백(U-Protein)",
+            "value": "양성(1+)",
+            "unit": "g/dL",
+            "referenceRaw": "음성",
+            "centerJudgment": "이상"
+          },
+          {
+            "code": "HEMOGLOBIN",
+            "rawName": "혈색소(Hb)",
+            "value": "10.6",
+            "unit": "g/dL",
+            "referenceRaw": "13.0~16.5",
+            "centerJudgment": "이상"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "공복혈당(FBS)",
+            "value": "158",
+            "unit": "mg/dL",
+            "referenceRaw": "100 미만",
+            "centerJudgment": "이상"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청   크레아티닌(Cr)",
+            "value": "1.02",
+            "unit": "mg/dL",
+            "referenceRaw": "1.5 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율(eGFR)",
+            "value": "83",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "AST",
+            "rawName": "SGOT(AST)",
+            "value": "43",
+            "unit": "U/L",
+            "referenceRaw": "40 이하",
+            "centerJudgment": "경계"
+          },
+          {
+            "code": "ALT",
+            "rawName": "SGPT(ALT)",
+            "value": "10",
+            "unit": "U/L",
+            "referenceRaw": "35 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피(r-GTP)",
+            "value": "277",
+            "unit": "U/L",
+            "referenceRaw": "11~63",
+            "centerJudgment": "이상"
+          },
+          {
+            "code": "HDL_CHOLESTEROL",
+            "rawName": "HDL 콜레스테롤",
+            "value": "null",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "TRIGLYCERIDES",
+            "rawName": "중성지방(TG)",
+            "value": "null",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "LDL_CHOLESTEROL",
+            "rawName": "LDL 콜레스테롤",
+            "value": "null",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "TOTAL_CHOLESTEROL",
+            "rawName": "총콜레스테롤",
+            "value": "null",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "BMI",
+            "rawName": "체질량지수",
+            "value": "19.9",
+            "unit": "kg/m²",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEIGHT",
+            "rawName": "신장",
+            "value": "167.0",
+            "unit": "cm",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WEIGHT",
+            "rawName": "체중",
+            "value": "55.5",
+            "unit": "kg",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WAIST_CIRCUMFERENCE",
+            "rawName": "허리둘레",
+            "value": "81",
+            "unit": "cm",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "SYSTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "133",
+            "unit": "mmHg",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "DIASTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "88",
+            "unit": "mmHg",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "VISION_LEFT",
+            "rawName": "시력(좌/우)",
+            "value": "1.2",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "VISION_RIGHT",
+            "rawName": "시력(우)",
+            "value": "0.9",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEARING_LEFT",
+            "rawName": "청력(좌/우)",
+            "value": "비정상/정상",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEARING_RIGHT",
+            "rawName": "청력(우)",
+            "value": "비정상/정상",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "CHEST_XRAY",
+            "rawName": "흉부   X-ray",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          }
+        ],
+        "issues": [
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "unit=g/dL"
+          },
+          {
+            "type": "UNGROUNDED_VALUE",
+            "code": "HDL_CHOLESTEROL",
+            "detail": "null"
+          },
+          {
+            "type": "UNGROUNDED_VALUE",
+            "code": "TRIGLYCERIDES",
+            "detail": "null"
+          },
+          {
+            "type": "UNGROUNDED_VALUE",
+            "code": "LDL_CHOLESTEROL",
+            "detail": "null"
+          },
+          {
+            "type": "UNGROUNDED_VALUE",
+            "code": "TOTAL_CHOLESTEROL",
+            "detail": "null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "BMI",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "BMI",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WAIST_CIRCUMFERENCE",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WAIST_CIRCUMFERENCE",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "SYSTOLIC_BP",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "SYSTOLIC_BP",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "DIASTOLIC_BP",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "DIASTOLIC_BP",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_LEFT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_LEFT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_LEFT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "VISION_RIGHT",
+            "detail": "시력(우)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_RIGHT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_RIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_RIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_LEFT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_LEFT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "HEARING_RIGHT",
+            "detail": "청력(우)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_RIGHT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_RIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "referenceRaw=null"
+          }
+        ],
+        "retryInput": [
+          "항목 결과 항목 결과",
+          "검사항목 결과 판정 참고범위 단위",
+          "당화혈색소(HbA1c) 5.3 5.7 미만 %"
+        ],
+        "retryItems": [
+          {
+            "code": "OTHER",
+            "rawName": "당화혈색소(HbA1c)",
+            "value": "5.3",
+            "unit": "%",
+            "referenceRaw": "5.7 미만",
+            "centerJudgment": "당화혈색소(HbA1c)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lab-005",
+      "cached": false,
+      "tp": 23,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1.0,
+      "recall": 0.9583,
+      "f1": 0.9787,
+      "firstPass": {
+        "tp": 21,
+        "fp": 1,
+        "fn": 3,
+        "precision": 0.9545,
+        "recall": 0.875,
+        "f1": 0.913
+      },
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "pipeline": "validated-v2.3",
+        "latencyMs": 313764,
+        "promptTokens": 2191,
+        "completionTokens": 1696,
+        "attempts": 2,
+        "retriedSegments": 2,
+        "issues": {
+          "CONFLICT": 1,
+          "RAW_NAME_NOT_IN_SOURCE": 4,
+          "UNGROUNDED_FIELD": 12
+        }
+      },
+      "error": null,
+      "errors": [
+        {
+          "type": "missing",
+          "code": "URINE_PROTEIN",
+          "expected": "음성",
+          "predicted": null
+        }
+      ],
+      "diagnostics": {
+        "firstPassItems": [
+          {
+            "code": "BMI",
+            "rawName": "체질량지수",
+            "value": "20.7",
+            "unit": "kg/m²",
+            "referenceRaw": "20.7 kg/m²",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WEIGHT",
+            "rawName": "체중",
+            "value": "47.2",
+            "unit": "kg",
+            "referenceRaw": "47.2 kg",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEIGHT",
+            "rawName": "신장",
+            "value": "151.0",
+            "unit": "cm",
+            "referenceRaw": "151.0 cm",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WAIST_CIRCUMFERENCE",
+            "rawName": "허리둘레",
+            "value": "70",
+            "unit": "cm",
+            "referenceRaw": "70 cm",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "SYSTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "109",
+            "unit": "mmHg",
+            "referenceRaw": "109/76 mmHg",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "DIASTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "76",
+            "unit": "mmHg",
+            "referenceRaw": "109/76 mmHg",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "VISION_LEFT",
+            "rawName": "시력(좌)",
+            "value": "0.3",
+            "unit": "null",
+            "referenceRaw": "0.3",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "VISION_RIGHT",
+            "rawName": "시력(우)",
+            "value": "0.3",
+            "unit": "null",
+            "referenceRaw": "0.3",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEARING_LEFT",
+            "rawName": "청력(좌)",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "정상",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEARING_RIGHT",
+            "rawName": "청력(우)",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "정상",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEMOGLOBIN",
+            "rawName": "혈색소(Hb)",
+            "value": "11.3",
+            "unit": "g/dL",
+            "referenceRaw": "12.0~15.5 g/dL",
+            "centerJudgment": "경계"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "공복혈당(FBS)",
+            "value": "88",
+            "unit": "mg/dL",
+            "referenceRaw": "100 미만 mg/dL",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "TOTAL_CHOLESTEROL",
+            "rawName": "총콜레스테롤(T-Chol)",
+            "value": "142",
+            "unit": "mg/dL",
+            "referenceRaw": "200 미만 mg/dL",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HDL_CHOLESTEROL",
+            "rawName": "HDL 콜레스테롤(HDL-C)",
+            "value": "64",
+            "unit": "mg/dL",
+            "referenceRaw": "60 이상 mg/dL",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "TRIGLYCERIDES",
+            "rawName": "중성지방(TG)",
+            "value": "63",
+            "unit": "mg/dL",
+            "referenceRaw": "150 미만 mg/dL",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "LDL_CHOLESTEROL",
+            "rawName": "LDL 콜레스테롤(LDL-C)",
+            "value": "206",
+            "unit": "mg/dL",
+            "referenceRaw": "130 미만 mg/dL",
+            "centerJudgment": "이상"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청 크레아티닌(Cr)",
+            "value": "2.36",
+            "unit": "mg/dL",
+            "referenceRaw": "1.5 이하 mg/dL",
+            "centerJudgment": "이상"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율(eGFR)",
+            "value": "51",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "60 이상 mL/min/1.73m²",
+            "centerJudgment": "이상"
+          },
+          {
+            "code": "AST",
+            "rawName": "SGOT(AST)",
+            "value": "36",
+            "unit": "U/L",
+            "referenceRaw": "40 이하 U/L",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "ALT",
+            "rawName": "SGPT(ALT)",
+            "value": "8",
+            "unit": "U/L",
+            "referenceRaw": "35 이하 U/L",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피(r-GTP)",
+            "value": "115",
+            "unit": "U/L",
+            "referenceRaw": "8~35 U/L",
+            "centerJudgment": "이상"
+          },
+          {
+            "code": "ALT",
+            "rawName": "알부민(Albumin)",
+            "value": "4.9",
+            "unit": "g/dL",
+            "referenceRaw": "3.5~5.2 g/dL",
+            "centerJudgment": "정상"
+          }
+        ],
+        "issues": [
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "BMI",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WAIST_CIRCUMFERENCE",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "SYSTOLIC_BP",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "DIASTOLIC_BP",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "VISION_LEFT",
+            "detail": "시력(좌)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_LEFT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_LEFT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "VISION_RIGHT",
+            "detail": "시력(우)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_RIGHT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_RIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "HEARING_LEFT",
+            "detail": "청력(좌)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_LEFT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "HEARING_RIGHT",
+            "detail": "청력(우)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_RIGHT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "CONFLICT",
+            "code": "ALT",
+            "detail": "같은 코드에 다른 값: 4.9"
+          }
+        ],
+        "retryInput": [
+          "항목 결과 항목 결과",
+          "검사항목 결과 판정 참고범위 단위",
+          "알부민(Albumin) 4.9 3.5~5.2 g/dL",
+          "흉부 X-ray 정상 정상"
+        ],
+        "retryItems": [
+          {
+            "code": "OTHER",
+            "rawName": "알부민(Albumin)",
+            "value": "4.9",
+            "unit": "g/dL",
+            "referenceRaw": "3.5~5.2",
+            "centerJudgment": "알부민(Albumin)"
+          },
+          {
+            "code": "CHEST_XRAY",
+            "rawName": "흉부 X-ray",
+            "value": "정상",
+            "unit": "",
+            "referenceRaw": "정상",
+            "centerJudgment": "흉부 X-ray"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lab-006",
+      "cached": false,
+      "tp": 25,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "firstPass": {
+        "tp": 22,
+        "fp": 2,
+        "fn": 3,
+        "precision": 0.9167,
+        "recall": 0.88,
+        "f1": 0.898
+      },
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "pipeline": "validated-v2.3",
+        "latencyMs": 337457,
+        "promptTokens": 2258,
+        "completionTokens": 1844,
+        "attempts": 2,
+        "retriedSegments": 3,
+        "issues": {
+          "CONFLICT": 1,
+          "IMPLAUSIBLE": 1,
+          "UNGROUNDED_FIELD": 23
+        }
+      },
+      "error": null,
+      "errors": [],
+      "diagnostics": {
+        "firstPassItems": [
+          {
+            "code": "HEIGHT",
+            "rawName": "신장",
+            "value": "151.2",
+            "unit": "cm",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WEIGHT",
+            "rawName": "체중",
+            "value": "46.2",
+            "unit": "kg",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WAIST_CIRCUMFERENCE",
+            "rawName": "허리둘레",
+            "value": "70",
+            "unit": "cm",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "BMI",
+            "rawName": "체질량지수",
+            "value": "20.2",
+            "unit": "kg/m²",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "SYSTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "104",
+            "unit": "mmHg",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "DIASTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "72",
+            "unit": "mmHg",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "VISION_LEFT",
+            "rawName": "시력(좌/우)",
+            "value": "1.2",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "VISION_RIGHT",
+            "rawName": "시력(좌/우)",
+            "value": "1.2",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEARING_LEFT",
+            "rawName": "청력(좌/우)",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEARING_RIGHT",
+            "rawName": "청력(좌/우)",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "요단백(U-Protein)",
+            "value": "음성",
+            "unit": "null",
+            "referenceRaw": "음성",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEMOGLOBIN",
+            "rawName": "혈색소(Hb)",
+            "value": "13.7",
+            "unit": "g/dL",
+            "referenceRaw": "12.0~15.5",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "공복혈당(FBS)",
+            "value": "80",
+            "unit": "mg/dL",
+            "referenceRaw": "100 미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "TOTAL_CHOLESTEROL",
+            "rawName": "총콜레스테롤(T-Chol)",
+            "value": "214",
+            "unit": "mg/dL",
+            "referenceRaw": "200 미만",
+            "centerJudgment": "경계"
+          },
+          {
+            "code": "HDL_CHOLESTEROL",
+            "rawName": "HDL 콜레스테롤(HDL-C)",
+            "value": "58",
+            "unit": "mg/dL",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "경계"
+          },
+          {
+            "code": "TRIGLYCERIDES",
+            "rawName": "중성지방(TG)",
+            "value": "189",
+            "unit": "mg/dL",
+            "referenceRaw": "150 미만",
+            "centerJudgment": "경계"
+          },
+          {
+            "code": "LDL_CHOLESTEROL",
+            "rawName": "LDL 콜레스테롤(LDL-C)",
+            "value": "134",
+            "unit": "mg/dL",
+            "referenceRaw": "130 미만",
+            "centerJudgment": "경계"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청 크레아티닌(Cr)",
+            "value": "1.18",
+            "unit": "mg/dL",
+            "referenceRaw": "1.5 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율(eGFR)",
+            "value": "80",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "AST",
+            "rawName": "SGOT(AST)",
+            "value": "106",
+            "unit": "U/L",
+            "referenceRaw": "40 이하",
+            "centerJudgment": "이상"
+          },
+          {
+            "code": "ALT",
+            "rawName": "SGPT(ALT)",
+            "value": "27",
+            "unit": "U/L",
+            "referenceRaw": "35 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피(r-GTP)",
+            "value": "39",
+            "unit": "U/L",
+            "referenceRaw": "8~35",
+            "centerJudgment": "경계"
+          },
+          {
+            "code": "ALT",
+            "rawName": "알부민(Albumin)",
+            "value": "4.3",
+            "unit": "g/dL",
+            "referenceRaw": "3.5~5.2",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "TRIGLYCERIDES",
+            "rawName": "갑상선자극호르몬(TSH)",
+            "value": "4.67",
+            "unit": "μIU/mL",
+            "referenceRaw": "0.4~4.5",
+            "centerJudgment": "null"
+          }
+        ],
+        "issues": [
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WAIST_CIRCUMFERENCE",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WAIST_CIRCUMFERENCE",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "BMI",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "BMI",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "SYSTOLIC_BP",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "SYSTOLIC_BP",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "DIASTOLIC_BP",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "DIASTOLIC_BP",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_LEFT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_LEFT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_LEFT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_RIGHT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_RIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_RIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_LEFT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_LEFT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_RIGHT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_RIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "unit=null"
+          },
+          {
+            "type": "CONFLICT",
+            "code": "ALT",
+            "detail": "같은 코드에 다른 값: 4.3"
+          },
+          {
+            "type": "IMPLAUSIBLE",
+            "code": "TRIGLYCERIDES",
+            "detail": "가능 범위 밖: 4.67"
+          }
+        ],
+        "retryInput": [
+          "항목 결과 항목 결과",
+          "검사항목 결과 판정 참고범위 단위",
+          "알부민(Albumin) 4.3 3.5~5.2 g/dL",
+          "갑상선자극호르몬(TSH) 4.67 0.4~4.5 μIU/mL",
+          "흉부 X-ray 정상 정상"
+        ],
+        "retryItems": [
+          {
+            "code": "OTHER",
+            "rawName": "알부민(Albumin)",
+            "value": "4.3",
+            "unit": "g/dL",
+            "referenceRaw": "3.5~5.2",
+            "centerJudgment": "알부민(Albumin)"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "갑상선자극호르몬(TSH)",
+            "value": "4.67",
+            "unit": "μIU/mL",
+            "referenceRaw": "0.4~4.5",
+            "centerJudgment": "갑상선자극호르몬(TSH)"
+          },
+          {
+            "code": "CHEST_XRAY",
+            "rawName": "흉부 X-ray",
+            "value": "정상",
+            "unit": "",
+            "referenceRaw": "정상",
+            "centerJudgment": "흉부 X-ray"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lab-007",
+      "cached": false,
+      "tp": 20,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.9524,
+      "recall": 0.9524,
+      "f1": 0.9524,
+      "firstPass": {
+        "tp": 19,
+        "fp": 2,
+        "fn": 2,
+        "precision": 0.9048,
+        "recall": 0.9048,
+        "f1": 0.9048
+      },
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "pipeline": "validated-v2.3",
+        "latencyMs": 266439,
+        "promptTokens": 2195,
+        "completionTokens": 1509,
+        "attempts": 2,
+        "retriedSegments": 1,
+        "issues": {
+          "CONFLICT": 1,
+          "UNGROUNDED_FIELD": 16
+        }
+      },
+      "error": null,
+      "errors": [
+        {
+          "type": "missing",
+          "code": "CHEST_XRAY",
+          "expected": "비활동성 폐결핵",
+          "predicted": null
+        },
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "흉부 X-ray=비활동성"
+        }
+      ],
+      "diagnostics": {
+        "firstPassItems": [
+          {
+            "code": "HEIGHT",
+            "rawName": "신장",
+            "value": "171.3",
+            "unit": "cm",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WEIGHT",
+            "rawName": "체중",
+            "value": "93.3",
+            "unit": "kg",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WAIST_CIRCUMFERENCE",
+            "rawName": "허리둘레",
+            "value": "81",
+            "unit": "cm",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "BMI",
+            "rawName": "체질량지수",
+            "value": "31.8",
+            "unit": "kg/m²",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "SYSTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "106",
+            "unit": "mmHg",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "DIASTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "74",
+            "unit": "mmHg",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "요단백(U-Protein)",
+            "value": "양성(1+)",
+            "unit": "null",
+            "referenceRaw": "음성",
+            "centerJudgment": "이상"
+          },
+          {
+            "code": "HEMOGLOBIN",
+            "rawName": "혈색소(Hb)",
+            "value": "12.1",
+            "unit": "g/dL",
+            "referenceRaw": "12.0~15.5",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "공복혈당(FBS)",
+            "value": "75",
+            "unit": "mg/dL",
+            "referenceRaw": "100 미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "TOTAL_CHOLESTEROL",
+            "rawName": "총콜레스테롤(T-Chol)",
+            "value": "136",
+            "unit": "mg/dL",
+            "referenceRaw": "200 미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HDL_CHOLESTEROL",
+            "rawName": "HDL 콜레스테롤(HDL-C)",
+            "value": "34",
+            "unit": "mg/dL",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "이상"
+          },
+          {
+            "code": "TRIGLYCERIDES",
+            "rawName": "중성지방(TG)",
+            "value": "113",
+            "unit": "mg/dL",
+            "referenceRaw": "150 미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "LDL_CHOLESTEROL",
+            "rawName": "LDL 콜레스테롤(LDL-C)",
+            "value": "162",
+            "unit": "mg/dL",
+            "referenceRaw": "130 미만",
+            "centerJudgment": "이상"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청 크레아티닌(Cr)",
+            "value": "1.46",
+            "unit": "mg/dL",
+            "referenceRaw": "1.5 이하",
+            "centerJudgment": "경계"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율(eGFR)",
+            "value": "63",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "경계"
+          },
+          {
+            "code": "AST",
+            "rawName": "SGOT(AST)",
+            "value": "30",
+            "unit": "U/L",
+            "referenceRaw": "40 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "ALT",
+            "rawName": "SGPT(ALT)",
+            "value": "39",
+            "unit": "U/L",
+            "referenceRaw": "35 이하",
+            "centerJudgment": "경계"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피(r-GTP)",
+            "value": "16",
+            "unit": "U/L",
+            "referenceRaw": "8~35",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "ALT",
+            "rawName": "알부민(Albumin)",
+            "value": "4.1",
+            "unit": "g/dL",
+            "referenceRaw": "3.5~5.2",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "고감도 C반응단백",
+            "value": "1.6",
+            "unit": "mg/L",
+            "referenceRaw": "1.0 미만",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "흉부 X-ray",
+            "value": "비활동성",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "경계"
+          }
+        ],
+        "issues": [
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WAIST_CIRCUMFERENCE",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WAIST_CIRCUMFERENCE",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "BMI",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "BMI",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "SYSTOLIC_BP",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "SYSTOLIC_BP",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "DIASTOLIC_BP",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "DIASTOLIC_BP",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "unit=null"
+          },
+          {
+            "type": "CONFLICT",
+            "code": "ALT",
+            "detail": "같은 코드에 다른 값: 4.1"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "OTHER",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "OTHER",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "OTHER",
+            "detail": "referenceRaw=null"
+          }
+        ],
+        "retryInput": [
+          "항목 결과 항목 결과",
+          "검사항목 결과 판정 참고범위 단위",
+          "알부민(Albumin) 4.1 3.5~5.2 g/dL"
+        ],
+        "retryItems": [
+          {
+            "code": "OTHER",
+            "rawName": "알부민(Albumin)",
+            "value": "4.1",
+            "unit": "g/dL",
+            "referenceRaw": "3.5~5.2",
+            "centerJudgment": "알부민(Albumin)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lab-008",
+      "cached": false,
+      "tp": 18,
+      "fp": 0,
+      "fn": 3,
+      "precision": 1.0,
+      "recall": 0.8571,
+      "f1": 0.9231,
+      "firstPass": {
+        "tp": 9,
+        "fp": 2,
+        "fn": 12,
+        "precision": 0.8182,
+        "recall": 0.4286,
+        "f1": 0.5625
+      },
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "pipeline": "validated-v2.3",
+        "latencyMs": 212058,
+        "promptTokens": 2831,
+        "completionTokens": 1453,
+        "attempts": 3,
+        "retriedSegments": 6,
+        "issues": {
+          "IMPLAUSIBLE": 2,
+          "UNGROUNDED_FIELD": 3
+        }
+      },
+      "error": null,
+      "errors": [
+        {
+          "type": "missing",
+          "code": "DIASTOLIC_BP",
+          "expected": "68",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "VISION_RIGHT",
+          "expected": "0.8",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "HEARING_RIGHT",
+          "expected": "정상",
+          "predicted": null
+        }
+      ],
+      "diagnostics": {
+        "firstPassItems": [
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "요단백(U-Protein)",
+            "value": "음성",
+            "unit": "null",
+            "referenceRaw": "음성",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEMOGLOBIN",
+            "rawName": "혈색소(Hb)",
+            "value": "13.5",
+            "unit": "g/dL",
+            "referenceRaw": "12.0~15.5",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "공복혈당(FBS)",
+            "value": "196",
+            "unit": "mg/dL",
+            "referenceRaw": "100 미만",
+            "centerJudgment": "이상"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청   크레아티닌(Cr)",
+            "value": "0.61",
+            "unit": "mg/dL",
+            "referenceRaw": "1.5 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율(eGFR)",
+            "value": "90",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "AST",
+            "rawName": "SGOT(AST)",
+            "value": "43",
+            "unit": "U/L",
+            "referenceRaw": "40 이하",
+            "centerJudgment": "경계"
+          },
+          {
+            "code": "ALT",
+            "rawName": "SGPT(ALT)",
+            "value": "41",
+            "unit": "U/L",
+            "referenceRaw": "35 이하",
+            "centerJudgment": "경계"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피(r-GTP)",
+            "value": "14",
+            "unit": "U/L",
+            "referenceRaw": "8~35",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "TOTAL_CHOLESTEROL",
+            "rawName": "총빌리루빈(T-Bil)",
+            "value": "0.9",
+            "unit": "mg/dL",
+            "referenceRaw": "0.2~1.2",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "TRIGLYCERIDES",
+            "rawName": "요산(Uric  acid)",
+            "value": "4.8",
+            "unit": "mg/dL",
+            "referenceRaw": "3.5~7.2",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "CHEST_XRAY",
+            "rawName": "흉부   X-ray",
+            "value": "기타  질환   의심(소견서      참조)",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "이상"
+          }
+        ],
+        "issues": [
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "unit=null"
+          },
+          {
+            "type": "IMPLAUSIBLE",
+            "code": "TOTAL_CHOLESTEROL",
+            "detail": "가능 범위 밖: 0.9"
+          },
+          {
+            "type": "IMPLAUSIBLE",
+            "code": "TRIGLYCERIDES",
+            "detail": "가능 범위 밖: 4.8"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "referenceRaw=null"
+          }
+        ],
+        "retryInput": [
+          "항목 결과 항목 결과",
+          "검사항목 결과 판정 참고범위 단위",
+          "신장 169.1 cm 체중 66.1 kg",
+          "허리둘레 64 cm 체질량지수 23.1 kg/m²",
+          "혈압(수축기/이완기) 106/68 mmHg 시력(좌/우) 0.9/0.8",
+          "청력(좌/우) 정상/정상",
+          "총빌리루빈(T-Bil) 0.9 0.2~1.2 mg/dL",
+          "요산(Uric acid) 4.8 3.5~7.2 mg/dL"
+        ],
+        "retryItems": [
+          {
+            "code": "HEIGHT",
+            "rawName": "신장",
+            "value": "169.1",
+            "unit": "cm",
+            "referenceRaw": "169.1 cm",
+            "centerJudgment": "신장"
+          },
+          {
+            "code": "WEIGHT",
+            "rawName": "체중",
+            "value": "66.1",
+            "unit": "kg",
+            "referenceRaw": "66.1 kg",
+            "centerJudgment": "체중"
+          },
+          {
+            "code": "WAIST_CIRCUMFERENCE",
+            "rawName": "허리둘레",
+            "value": "64",
+            "unit": "cm",
+            "referenceRaw": "64 cm",
+            "centerJudgment": "허리둘레"
+          },
+          {
+            "code": "BMI",
+            "rawName": "체질량지수",
+            "value": "23.1",
+            "unit": "kg/m²",
+            "referenceRaw": "23.1 kg/m²",
+            "centerJudgment": "체질량지수"
+          },
+          {
+            "code": "SYSTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "106",
+            "unit": "mmHg",
+            "referenceRaw": "106/68 mmHg",
+            "centerJudgment": "혈압(수축기/이완기)"
+          },
+          {
+            "code": "VISION_LEFT",
+            "rawName": "시력(좌/우)",
+            "value": "0.9",
+            "unit": "N/A",
+            "referenceRaw": "0.9/0.8",
+            "centerJudgment": "시력(좌/우)"
+          },
+          {
+            "code": "HEARING_LEFT",
+            "rawName": "청력(좌/우)",
+            "value": "정상",
+            "unit": "N/A",
+            "referenceRaw": "정상/정상",
+            "centerJudgment": "청력(좌/우)"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "총빌리루빈(T-Bil)",
+            "value": "0.9",
+            "unit": "mg/dL",
+            "referenceRaw": "0.2~1.2",
+            "centerJudgment": "총빌리루빈(T-Bil)"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "요산(Uric acid)",
+            "value": "4.8",
+            "unit": "mg/dL",
+            "referenceRaw": "3.5~7.2",
+            "centerJudgment": "요산(Uric acid)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lab-009",
+      "cached": false,
+      "tp": 17,
+      "fp": 0,
+      "fn": 3,
+      "precision": 1.0,
+      "recall": 0.85,
+      "f1": 0.9189,
+      "firstPass": {
+        "tp": 9,
+        "fp": 1,
+        "fn": 11,
+        "precision": 0.9,
+        "recall": 0.45,
+        "f1": 0.6
+      },
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "pipeline": "validated-v2.3",
+        "latencyMs": 207726,
+        "promptTokens": 2769,
+        "completionTokens": 1307,
+        "attempts": 3,
+        "retriedSegments": 5,
+        "issues": {
+          "CONFLICT": 1,
+          "UNGROUNDED_FIELD": 4
+        }
+      },
+      "error": null,
+      "errors": [
+        {
+          "type": "missing",
+          "code": "DIASTOLIC_BP",
+          "expected": "77",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "VISION_RIGHT",
+          "expected": "0.7",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "HEARING_RIGHT",
+          "expected": "비정상",
+          "predicted": null
+        }
+      ],
+      "diagnostics": {
+        "firstPassItems": [
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "요단백(U-Protein)",
+            "value": "약양성(±)",
+            "unit": "g/dL",
+            "referenceRaw": "음성",
+            "centerJudgment": "경계"
+          },
+          {
+            "code": "HEMOGLOBIN",
+            "rawName": "혈색소(Hb)",
+            "value": "15.2",
+            "unit": "g/dL",
+            "referenceRaw": "12.0~15.5",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "공복혈당(FBS)",
+            "value": "150",
+            "unit": "mg/dL",
+            "referenceRaw": "100 미만",
+            "centerJudgment": "이상"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청   크레아티닌(Cr)",
+            "value": "1.36",
+            "unit": "mg/dL",
+            "referenceRaw": "1.5 이하",
+            "centerJudgment": "경계"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율(eGFR)",
+            "value": "63",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "경계"
+          },
+          {
+            "code": "AST",
+            "rawName": "SGOT(AST)",
+            "value": "28",
+            "unit": "U/L",
+            "referenceRaw": "40 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "ALT",
+            "rawName": "SGPT(ALT)",
+            "value": "25",
+            "unit": "U/L",
+            "referenceRaw": "35 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피(r-GTP)",
+            "value": "27",
+            "unit": "U/L",
+            "referenceRaw": "8~35",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "ALT",
+            "rawName": "알부민(Albumin)",
+            "value": "4.7",
+            "unit": "g/dL",
+            "referenceRaw": "3.5~5.2",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "CHEST_XRAY",
+            "rawName": "흉부   X-ray",
+            "value": "정상",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "정상",
+            "centerJudgment": "정상"
+          }
+        ],
+        "issues": [
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "unit=g/dL"
+          },
+          {
+            "type": "CONFLICT",
+            "code": "ALT",
+            "detail": "같은 코드에 다른 값: 4.7"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "unit=mL/min/1.73m²"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_LEFT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_LEFT",
+            "detail": "unit=null"
+          }
+        ],
+        "retryInput": [
+          "항목 결과 항목 결과",
+          "검사항목 결과 판정 참고범위 단위",
+          "신장 153.9 cm 체중 55.7 kg",
+          "허리둘레 81 cm 체질량지수 23.5 kg/m²",
+          "혈압(수축기/이완기) 106/77 mmHg 시력(좌/우) 1.0/0.7",
+          "청력(좌/우) 정상/비정상",
+          "알부민(Albumin) 4.7 3.5~5.2 g/dL"
+        ],
+        "retryItems": [
+          {
+            "code": "HEIGHT",
+            "rawName": "신장",
+            "value": "153.9",
+            "unit": "cm",
+            "referenceRaw": "153.9 cm",
+            "centerJudgment": "신장"
+          },
+          {
+            "code": "WEIGHT",
+            "rawName": "체중",
+            "value": "55.7",
+            "unit": "kg",
+            "referenceRaw": "55.7 kg",
+            "centerJudgment": "체중"
+          },
+          {
+            "code": "WAIST_CIRCUMFERENCE",
+            "rawName": "허리둘레",
+            "value": "81",
+            "unit": "cm",
+            "referenceRaw": "81 cm",
+            "centerJudgment": "허리둘레"
+          },
+          {
+            "code": "BMI",
+            "rawName": "체질량지수",
+            "value": "23.5",
+            "unit": "kg/m²",
+            "referenceRaw": "23.5 kg/m²",
+            "centerJudgment": "체질량지수"
+          },
+          {
+            "code": "SYSTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "106",
+            "unit": "mmHg",
+            "referenceRaw": "106/77 mmHg",
+            "centerJudgment": "혈압(수축기/이완기)"
+          },
+          {
+            "code": "VISION_LEFT",
+            "rawName": "시력(좌/우)",
+            "value": "1.0",
+            "unit": "null",
+            "referenceRaw": "1.0/0.7",
+            "centerJudgment": "시력(좌/우)"
+          },
+          {
+            "code": "HEARING_LEFT",
+            "rawName": "청력(좌/우)",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "정상/비정상",
+            "centerJudgment": "청력(좌/우)"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "알부민(Albumin)",
+            "value": "4.7",
+            "unit": "g/dL",
+            "referenceRaw": "3.5~5.2",
+            "centerJudgment": "알부민(Albumin)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lab-010",
+      "cached": false,
+      "tp": 18,
+      "fp": 0,
+      "fn": 2,
+      "precision": 1.0,
+      "recall": 0.9,
+      "f1": 0.9474,
+      "firstPass": {
+        "tp": 17,
+        "fp": 0,
+        "fn": 3,
+        "precision": 1.0,
+        "recall": 0.85,
+        "f1": 0.9189
+      },
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "pipeline": "validated-v2.3",
+        "latencyMs": 194007,
+        "promptTokens": 2060,
+        "completionTokens": 1190,
+        "attempts": 2,
+        "retriedSegments": 1,
+        "issues": {
+          "RAW_NAME_NOT_IN_SOURCE": 4,
+          "UNGROUNDED_FIELD": 18
+        }
+      },
+      "error": null,
+      "errors": [
+        {
+          "type": "missing",
+          "code": "SYSTOLIC_BP",
+          "expected": "103",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "DIASTOLIC_BP",
+          "expected": "72",
+          "predicted": null
+        }
+      ],
+      "diagnostics": {
+        "firstPassItems": [
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "요단백(U-Protein)",
+            "value": "약양성(±)",
+            "unit": "mg/dL",
+            "referenceRaw": "음성",
+            "centerJudgment": "경계"
+          },
+          {
+            "code": "HEMOGLOBIN",
+            "rawName": "혈색소(Hb)",
+            "value": "16.4",
+            "unit": "g/dL",
+            "referenceRaw": "13.0~16.5",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "공복혈당(FBS)",
+            "value": "98",
+            "unit": "mg/dL",
+            "referenceRaw": "100 미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청 크레아티닌(Cr)",
+            "value": "2.60",
+            "unit": "mg/dL",
+            "referenceRaw": "1.5 이하",
+            "centerJudgment": "이상"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율(eGFR)",
+            "value": "31",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "이상"
+          },
+          {
+            "code": "AST",
+            "rawName": "SGOT(AST)",
+            "value": "26",
+            "unit": "U/L",
+            "referenceRaw": "40 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "ALT",
+            "rawName": "SGPT(ALT)",
+            "value": "11",
+            "unit": "U/L",
+            "referenceRaw": "35 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피(r-GTP)",
+            "value": "262",
+            "unit": "U/L",
+            "referenceRaw": "11~63",
+            "centerJudgment": "이상"
+          },
+          {
+            "code": "CHEST_XRAY",
+            "rawName": "흉부 X-ray",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "정상",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEIGHT",
+            "rawName": "신장",
+            "value": "176.2",
+            "unit": "cm",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WEIGHT",
+            "rawName": "체중",
+            "value": "76.7",
+            "unit": "kg",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WAIST_CIRCUMFERENCE",
+            "rawName": "허리둘레",
+            "value": "83",
+            "unit": "cm",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "BMI",
+            "rawName": "체질량지수",
+            "value": "24.7",
+            "unit": "kg/m²",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "VISION_LEFT",
+            "rawName": "시력(좌)",
+            "value": "0.7",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "VISION_RIGHT",
+            "rawName": "시력(우)",
+            "value": "0.3",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEARING_LEFT",
+            "rawName": "청력(좌)",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "정상",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEARING_RIGHT",
+            "rawName": "청력(우)",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "정상",
+            "centerJudgment": "정상"
+          }
+        ],
+        "issues": [
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "unit=mg/dL"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WAIST_CIRCUMFERENCE",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WAIST_CIRCUMFERENCE",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "BMI",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "BMI",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "VISION_LEFT",
+            "detail": "시력(좌)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_LEFT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_LEFT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_LEFT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "VISION_RIGHT",
+            "detail": "시력(우)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_RIGHT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_RIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_RIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "HEARING_LEFT",
+            "detail": "청력(좌)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_LEFT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "HEARING_RIGHT",
+            "detail": "청력(우)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_RIGHT",
+            "detail": "unit=null"
+          }
+        ],
+        "retryInput": [
+          "항목 결과 항목 결과",
+          "검사항목 결과 판정 참고범위 단위",
+          "(hs-CRP) 3.8 1.0 미만 mg/L"
+        ],
+        "retryItems": [
+          {
+            "code": "OTHER",
+            "rawName": "hs-CRP",
+            "value": "3.8",
+            "unit": "mg/L",
+            "referenceRaw": "1.0 미만",
+            "centerJudgment": "hs-CRP"
+          }
+        ]
+      }
+    }
+  ]
+}

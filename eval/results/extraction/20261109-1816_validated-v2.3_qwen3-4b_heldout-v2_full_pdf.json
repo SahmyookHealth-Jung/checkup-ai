@@ -1,0 +1,3463 @@
+{
+  "summary": {
+    "runAt": "2026-11-09T18:16:08",
+    "model": "qwen3:4b",
+    "promptVersion": "extraction-v1",
+    "pipeline": "validated-v2.3",
+    "dataset": "heldout-v2",
+    "subset": "full",
+    "format": "pdf",
+    "documents": 10,
+    "failed": 0,
+    "itemF1": {
+      "tp": 172,
+      "fp": 26,
+      "fn": 37,
+      "precision": 0.8687,
+      "recall": 0.823,
+      "f1": 0.8452
+    },
+    "firstPassF1": {
+      "tp": 170,
+      "fp": 17,
+      "fn": 39,
+      "precision": 0.9091,
+      "recall": 0.8134,
+      "f1": 0.8586
+    },
+    "byTemplate": {
+      "trend": {
+        "tp": 172,
+        "fp": 26,
+        "fn": 37,
+        "precision": 0.8687,
+        "recall": 0.823,
+        "f1": 0.8452
+      }
+    },
+    "fieldAccuracy": {
+      "unit": {
+        "accuracy": 0.9884,
+        "total": 172,
+        "correct": 170,
+        "invented": 2,
+        "dropped": 0,
+        "wrong": 0
+      },
+      "referenceRaw": {
+        "accuracy": 0.9244,
+        "total": 172,
+        "correct": 159,
+        "invented": 7,
+        "dropped": 5,
+        "wrong": 1
+      },
+      "centerJudgment": {
+        "accuracy": 0.9302,
+        "total": 172,
+        "correct": 160,
+        "invented": 9,
+        "dropped": 2,
+        "wrong": 1
+      }
+    },
+    "firstPassFieldAccuracy": {
+      "unit": {
+        "accuracy": 0.9882,
+        "total": 170,
+        "correct": 168,
+        "invented": 2,
+        "dropped": 0,
+        "wrong": 0
+      },
+      "referenceRaw": {
+        "accuracy": 0.9235,
+        "total": 170,
+        "correct": 157,
+        "invented": 8,
+        "dropped": 5,
+        "wrong": 0
+      },
+      "centerJudgment": {
+        "accuracy": 0.8412,
+        "total": 170,
+        "correct": 143,
+        "invented": 25,
+        "dropped": 0,
+        "wrong": 2
+      }
+    },
+    "fieldAccuracyByTemplate": {
+      "trend": {
+        "unit": 0.9884,
+        "referenceRaw": 0.9244,
+        "centerJudgment": 0.9302
+      }
+    },
+    "avgLatencyMs": 315410,
+    "avgPromptTokens": 2461,
+    "avgCompletionTokens": 1598,
+    "totalAttempts": 22,
+    "totalRetriedSegments": 37,
+    "issueCounts": {
+      "CONFLICT": 2,
+      "EMPTY": 1,
+      "IMPLAUSIBLE": 8,
+      "OTHER_NAME_VALUE_APART": 5,
+      "RAW_NAME_NOT_IN_SOURCE": 23,
+      "UNGROUNDED_FIELD": 102,
+      "UNGROUNDED_VALUE": 5
+    }
+  },
+  "documents": [
+    {
+      "id": "trend-001",
+      "cached": false,
+      "tp": 19,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.95,
+      "recall": 0.95,
+      "f1": 0.95,
+      "firstPass": {
+        "tp": 19,
+        "fp": 1,
+        "fn": 1,
+        "precision": 0.95,
+        "recall": 0.95,
+        "f1": 0.95
+      },
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "pipeline": "validated-v2.3",
+        "latencyMs": 309792,
+        "promptTokens": 2359,
+        "completionTokens": 1376,
+        "attempts": 2,
+        "retriedSegments": 2,
+        "issues": {
+          "UNGROUNDED_FIELD": 9
+        }
+      },
+      "error": null,
+      "errors": [
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "갑상선자극호르몬=-"
+        },
+        {
+          "type": "missing",
+          "code": "OTHER",
+          "expected": "갑상선자극호르몬=0.56",
+          "predicted": null
+        }
+      ],
+      "diagnostics": {
+        "firstPassItems": [
+          {
+            "code": "HEIGHT",
+            "rawName": "신장",
+            "value": "186.0",
+            "unit": "cm",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WEIGHT",
+            "rawName": "체중",
+            "value": "94.1",
+            "unit": "kg",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WAIST_CIRCUMFERENCE",
+            "rawName": "허리둘레",
+            "value": "82",
+            "unit": "cm",
+            "referenceRaw": "90 미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "BMI",
+            "rawName": "체질량지수",
+            "value": "27.2",
+            "unit": "kg/m²",
+            "referenceRaw": "18.5~24.9",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "SYSTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "145",
+            "unit": "mmHg",
+            "referenceRaw": "120/80  미만",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "DIASTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "102",
+            "unit": "mmHg",
+            "referenceRaw": "120/80  미만",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "요단백",
+            "value": "음성",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEMOGLOBIN",
+            "rawName": "혈색소",
+            "value": "15.8",
+            "unit": "g/dL",
+            "referenceRaw": "13.0~16.5",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "공복혈당",
+            "value": "77",
+            "unit": "mg/dL",
+            "referenceRaw": "100  미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "TOTAL_CHOLESTEROL",
+            "rawName": "총콜레스테롤",
+            "value": "192",
+            "unit": "mg/dL",
+            "referenceRaw": "200  미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HDL_CHOLESTEROL",
+            "rawName": "HDL  콜레스테롤",
+            "value": "80",
+            "unit": "mg/dL",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "TRIGLYCERIDES",
+            "rawName": "중성지방",
+            "value": "111",
+            "unit": "mg/dL",
+            "referenceRaw": "150  미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "LDL_CHOLESTEROL",
+            "rawName": "LDL 콜레스테롤",
+            "value": "109",
+            "unit": "mg/dL",
+            "referenceRaw": "130  미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청   크레아티닌",
+            "value": "1.11",
+            "unit": "mg/dL",
+            "referenceRaw": "1.5 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율",
+            "value": "108",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "AST",
+            "rawName": "AST",
+            "value": "32",
+            "unit": "U/L",
+            "referenceRaw": "40 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "ALT",
+            "rawName": "ALT",
+            "value": "41",
+            "unit": "U/L",
+            "referenceRaw": "35 이하",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피",
+            "value": "61",
+            "unit": "U/L",
+            "referenceRaw": "11~63",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "갑상선자극호르몬",
+            "value": "-",
+            "unit": "μIU/mL",
+            "referenceRaw": "0.4~4.5",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "CHEST_XRAY",
+            "rawName": "흉부   X선",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          }
+        ],
+        "issues": [
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "OTHER",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "referenceRaw=null"
+          }
+        ],
+        "retryInput": [
+          "건강검진 3개년 추이 보고서",
+          "상담 문의 1588-0000 (평일 09:00~18:00)"
+        ],
+        "retryItems": []
+      }
+    },
+    {
+      "id": "trend-002",
+      "cached": false,
+      "tp": 21,
+      "fp": 1,
+      "fn": 3,
+      "precision": 0.9545,
+      "recall": 0.875,
+      "f1": 0.913,
+      "firstPass": {
+        "tp": 21,
+        "fp": 0,
+        "fn": 3,
+        "precision": 1.0,
+        "recall": 0.875,
+        "f1": 0.9333
+      },
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "pipeline": "validated-v2.3",
+        "latencyMs": 335571,
+        "promptTokens": 2432,
+        "completionTokens": 1653,
+        "attempts": 2,
+        "retriedSegments": 4,
+        "issues": {
+          "OTHER_NAME_VALUE_APART": 1,
+          "RAW_NAME_NOT_IN_SOURCE": 4,
+          "UNGROUNDED_FIELD": 18,
+          "UNGROUNDED_VALUE": 1
+        }
+      },
+      "error": null,
+      "errors": [
+        {
+          "type": "missing",
+          "code": "WEIGHT",
+          "expected": "81.5",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "WAIST_CIRCUMFERENCE",
+          "expected": "65",
+          "predicted": null
+        },
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "알부민=4.6 4.4 4.3"
+        },
+        {
+          "type": "missing",
+          "code": "OTHER",
+          "expected": "알부민=4.3",
+          "predicted": null
+        }
+      ],
+      "diagnostics": {
+        "firstPassItems": [
+          {
+            "code": "HEIGHT",
+            "rawName": "신장",
+            "value": "159.8",
+            "unit": "cm",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "BMI",
+            "rawName": "체질량지수",
+            "value": "31.9",
+            "unit": "kg/m²",
+            "referenceRaw": "18.5~24.9",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "SYSTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "127",
+            "unit": "mmHg",
+            "referenceRaw": "120/80  미만",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "DIASTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "85",
+            "unit": "mmHg",
+            "referenceRaw": "120/80  미만",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "요단백",
+            "value": "음성",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEMOGLOBIN",
+            "rawName": "혈색소",
+            "value": "10.2",
+            "unit": "g/dL",
+            "referenceRaw": "12.0~15.5",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "공복혈당",
+            "value": "82",
+            "unit": "mg/dL",
+            "referenceRaw": "100  미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "TOTAL_CHOLESTEROL",
+            "rawName": "총콜레스테롤",
+            "value": "167",
+            "unit": "mg/dL",
+            "referenceRaw": "200  미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HDL_CHOLESTEROL",
+            "rawName": "HDL  콜레스테롤",
+            "value": "53",
+            "unit": "mg/dL",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "TRIGLYCERIDES",
+            "rawName": "중성지방",
+            "value": "197",
+            "unit": "mg/dL",
+            "referenceRaw": "150  미만",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "LDL_CHOLESTEROL",
+            "rawName": "LDL 콜레스테롤",
+            "value": "81",
+            "unit": "mg/dL",
+            "referenceRaw": "130  미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청   크레아티닌",
+            "value": "1.26",
+            "unit": "mg/dL",
+            "referenceRaw": "1.5 이하",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율",
+            "value": "73",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "AST",
+            "rawName": "AST",
+            "value": "17",
+            "unit": "U/L",
+            "referenceRaw": "40 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "ALT",
+            "rawName": "ALT",
+            "value": "34",
+            "unit": "U/L",
+            "referenceRaw": "35 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피",
+            "value": "26",
+            "unit": "U/L",
+            "referenceRaw": "8~35",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "VISION_LEFT",
+            "rawName": "시력(좌)",
+            "value": "0.5",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "VISION_RIGHT",
+            "rawName": "시력(우)",
+            "value": "0.3",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "HEARING_LEFT",
+            "rawName": "청력(좌)",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "HEARING_RIGHT",
+            "rawName": "청력(우)",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "CHEST_XRAY",
+            "rawName": "흉부   X선",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          }
+        ],
+        "issues": [
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "VISION_LEFT",
+            "detail": "시력(좌)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_LEFT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_LEFT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_LEFT",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "VISION_RIGHT",
+            "detail": "시력(우)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_RIGHT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_RIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_RIGHT",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "HEARING_LEFT",
+            "detail": "청력(좌)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_LEFT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_LEFT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_LEFT",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "HEARING_RIGHT",
+            "detail": "청력(우)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_RIGHT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_RIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_RIGHT",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "OTHER_NAME_VALUE_APART",
+            "code": "OTHER",
+            "detail": "건강검진 3개년 추이 보고서=97.6 92.3 81.5"
+          },
+          {
+            "type": "UNGROUNDED_VALUE",
+            "code": "OTHER",
+            "detail": "없음"
+          }
+        ],
+        "retryInput": [
+          "건강검진 3개년 추이 보고서",
+          "체중 kg 97.6 92.3 81.5",
+          "알부민 g/dL 4.6 4.4 4.3 3.5~5.2",
+          "상담 문의 1588-0000 (평일 09:00~18:00)"
+        ],
+        "retryItems": [
+          {
+            "code": "OTHER",
+            "rawName": "건강검진 3개년 추이 보고서",
+            "value": "97.6 92.3 81.5",
+            "unit": "없음",
+            "referenceRaw": "없음",
+            "centerJudgment": "건강검진 3개년 추이 보고서"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "알부민",
+            "value": "4.6 4.4 4.3",
+            "unit": "g/dL",
+            "referenceRaw": "3.5~5.2",
+            "centerJudgment": "알부민"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "상담 문의",
+            "value": "없음",
+            "unit": "없음",
+            "referenceRaw": "1588-0000 (평일 09:00~18:00)",
+            "centerJudgment": "상담 문의"
+          }
+        ]
+      }
+    },
+    {
+      "id": "trend-003",
+      "cached": false,
+      "tp": 14,
+      "fp": 4,
+      "fn": 7,
+      "precision": 0.7778,
+      "recall": 0.6667,
+      "f1": 0.7179,
+      "firstPass": {
+        "tp": 14,
+        "fp": 5,
+        "fn": 7,
+        "precision": 0.7368,
+        "recall": 0.6667,
+        "f1": 0.7
+      },
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "pipeline": "validated-v2.3",
+        "latencyMs": 289099,
+        "promptTokens": 2347,
+        "completionTokens": 1668,
+        "attempts": 2,
+        "retriedSegments": 4,
+        "issues": {
+          "IMPLAUSIBLE": 3,
+          "OTHER_NAME_VALUE_APART": 1,
+          "RAW_NAME_NOT_IN_SOURCE": 3,
+          "UNGROUNDED_FIELD": 9
+        }
+      },
+      "error": null,
+      "errors": [
+        {
+          "type": "missing",
+          "code": "VISION_LEFT",
+          "expected": "0.3",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "VISION_RIGHT",
+          "expected": "1.2",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "HEARING_LEFT",
+          "expected": "비정상",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "HEARING_RIGHT",
+          "expected": "비정상",
+          "predicted": null
+        },
+        {
+          "type": "wrong_value",
+          "code": "CHEST_XRAY",
+          "expected": "비활동성 폐결핵",
+          "predicted": "비활동성 폐결핵 (판정: 주의)"
+        },
+        {
+          "type": "extra",
+          "code": "HDL_CHOLESTEROL",
+          "expected": null,
+          "predicted": "5.4"
+        },
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "시력: 좌 0.3 우 1.2 / 청력: 좌 비정상 우 비정상=0.3"
+        },
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "상담 문의 1588-0000 (평일 09:00~18:00)=1588-0000"
+        },
+        {
+          "type": "missing",
+          "code": "OTHER",
+          "expected": "갑상선자극호르몬=4.27",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "OTHER",
+          "expected": "고감도 C반응단백=5.4",
+          "predicted": null
+        }
+      ],
+      "diagnostics": {
+        "firstPassItems": [
+          {
+            "code": "HEIGHT",
+            "rawName": "신장",
+            "value": "165.0",
+            "unit": "cm",
+            "referenceRaw": "18.5~24.9",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WEIGHT",
+            "rawName": "체중",
+            "value": "55.8",
+            "unit": "kg",
+            "referenceRaw": "18.5~24.9",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WAIST_CIRCUMFERENCE",
+            "rawName": "허리둘레",
+            "value": "64",
+            "unit": "cm",
+            "referenceRaw": "85 미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "BMI",
+            "rawName": "체질량지수",
+            "value": "20.5",
+            "unit": "kg/m²",
+            "referenceRaw": "18.5~24.9",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "SYSTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "129",
+            "unit": "mmHg",
+            "referenceRaw": "120/80 미만",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "DIASTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "83",
+            "unit": "mmHg",
+            "referenceRaw": "120/80 미만",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "요단백",
+            "value": "약양성(±)",
+            "unit": "null",
+            "referenceRaw": "음성",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "HEMOGLOBIN",
+            "rawName": "혈색소",
+            "value": "14.0",
+            "unit": "g/dL",
+            "referenceRaw": "12.0~15.5",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "공복혈당",
+            "value": "118",
+            "unit": "mg/dL",
+            "referenceRaw": "100 미만",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청 크레아티닌",
+            "value": "1.46",
+            "unit": "mg/dL",
+            "referenceRaw": "1.5 이하",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율",
+            "value": "72",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "AST",
+            "rawName": "AST(SGOT)",
+            "value": "64",
+            "unit": "U/L",
+            "referenceRaw": "40 이하",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "ALT",
+            "rawName": "ALT(SGPT)",
+            "value": "22",
+            "unit": "U/L",
+            "referenceRaw": "35 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피(γ-GTP)",
+            "value": "11",
+            "unit": "U/L",
+            "referenceRaw": "8~35",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "TOTAL_CHOLESTEROL",
+            "rawName": "갑상선자극호르몬",
+            "value": "4.27",
+            "unit": "μIU/mL",
+            "referenceRaw": "0.4~4.5",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "HDL_CHOLESTEROL",
+            "rawName": "고감도 C반응단백",
+            "value": "5.4",
+            "unit": "mg/L",
+            "referenceRaw": "1.0 미만",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "TRIGLYCERIDES",
+            "rawName": "고감도 C반응단백",
+            "value": "5.4",
+            "unit": "mg/L",
+            "referenceRaw": "1.0 미만",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "LDL_CHOLESTEROL",
+            "rawName": "고감도 C반응단백",
+            "value": "5.4",
+            "unit": "mg/L",
+            "referenceRaw": "1.0 미만",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "CHEST_XRAY",
+            "rawName": "흉부 X선",
+            "value": "비활동성 폐결핵 (판정: 주의)",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "null"
+          }
+        ],
+        "issues": [
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "referenceRaw=18.5~24.9"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "referenceRaw=18.5~24.9"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "unit=null"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "AST",
+            "detail": "AST(SGOT)"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "ALT",
+            "detail": "ALT(SGPT)"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "GAMMA_GTP",
+            "detail": "감마지티피(γ-GTP)"
+          },
+          {
+            "type": "IMPLAUSIBLE",
+            "code": "TOTAL_CHOLESTEROL",
+            "detail": "가능 범위 밖: 4.27"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HDL_CHOLESTEROL",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "IMPLAUSIBLE",
+            "code": "TRIGLYCERIDES",
+            "detail": "가능 범위 밖: 5.4"
+          },
+          {
+            "type": "IMPLAUSIBLE",
+            "code": "LDL_CHOLESTEROL",
+            "detail": "가능 범위 밖: 5.4"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "OTHER_NAME_VALUE_APART",
+            "code": "OTHER",
+            "detail": "건강검진 3개년 추이 보고서=4.22"
+          }
+        ],
+        "retryInput": [
+          "건강검진 3개년 추이 보고서",
+          "갑상선자극호르몬 μIU/mL - 4.22 4.27 0.4~4.5",
+          "시력: 좌 0.3 우 1.2 / 청력: 좌 비정상 우 비정상",
+          "상담 문의 1588-0000 (평일 09:00~18:00)"
+        ],
+        "retryItems": [
+          {
+            "code": "OTHER",
+            "rawName": "건강검진 3개년 추이 보고서",
+            "value": "4.22",
+            "unit": "μIU/mL",
+            "referenceRaw": "4.22 4.27 0.4~4.5",
+            "centerJudgment": "건강검진 3개년 추이 보고서"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "시력: 좌 0.3 우 1.2 / 청력: 좌 비정상 우 비정상",
+            "value": "0.3",
+            "unit": "없음",
+            "referenceRaw": "비정상",
+            "centerJudgment": "시력: 좌 0.3 우 1.2 / 청력: 좌 비정상 우 비정상"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "상담 문의 1588-0000 (평일 09:00~18:00)",
+            "value": "1588-0000",
+            "unit": "없음",
+            "referenceRaw": "없음",
+            "centerJudgment": "상담 문의 1588-0000 (평일 09:00~18:00)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "trend-004",
+      "cached": false,
+      "tp": 15,
+      "fp": 3,
+      "fn": 2,
+      "precision": 0.8333,
+      "recall": 0.8824,
+      "f1": 0.8571,
+      "firstPass": {
+        "tp": 14,
+        "fp": 2,
+        "fn": 3,
+        "precision": 0.875,
+        "recall": 0.8235,
+        "f1": 0.8485
+      },
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "pipeline": "validated-v2.3",
+        "latencyMs": 269186,
+        "promptTokens": 2897,
+        "completionTokens": 1700,
+        "attempts": 3,
+        "retriedSegments": 5,
+        "issues": {
+          "CONFLICT": 1,
+          "EMPTY": 1,
+          "IMPLAUSIBLE": 1,
+          "UNGROUNDED_FIELD": 4
+        }
+      },
+      "error": null,
+      "errors": [
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "건강검진 3개년 추이 보고서=건강검진 3개년 추이 보고서"
+        },
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "알부민 g/dL 3.8 4.1 4.8 3.5~5.2=3.8 4.1 4.8 3.5~5.2"
+        },
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "총빌리루빈 mg/dL - 1.3 1.1 0.2~1.2=- 1.3 1.1 0.2~1.2"
+        },
+        {
+          "type": "missing",
+          "code": "OTHER",
+          "expected": "알부민=4.8",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "OTHER",
+          "expected": "총빌리루빈=1.1",
+          "predicted": null
+        }
+      ],
+      "diagnostics": {
+        "firstPassItems": [
+          {
+            "code": "HEIGHT",
+            "rawName": "신장",
+            "value": "160.0",
+            "unit": "cm",
+            "referenceRaw": "171.0",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WEIGHT",
+            "rawName": "체중",
+            "value": "58.6",
+            "unit": "kg",
+            "referenceRaw": "67.0",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WAIST_CIRCUMFERENCE",
+            "rawName": "허리둘레",
+            "value": "67",
+            "unit": "cm",
+            "referenceRaw": "85 미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "BMI",
+            "rawName": "체질량지수",
+            "value": "22.9",
+            "unit": "kg/m²",
+            "referenceRaw": "18.5~24.9",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "SYSTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "102",
+            "unit": "mmHg",
+            "referenceRaw": "120/80  미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "DIASTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "62",
+            "unit": "mmHg",
+            "referenceRaw": "120/80  미만",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "요단백",
+            "value": "양성(1+)",
+            "unit": "null",
+            "referenceRaw": "음성",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "HEMOGLOBIN",
+            "rawName": "혈색소",
+            "value": "11.3",
+            "unit": "g/dL",
+            "referenceRaw": "12.0~15.5",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "공복혈당",
+            "value": "118",
+            "unit": "mg/dL",
+            "referenceRaw": "100  미만",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청   크레아티닌",
+            "value": "1.55",
+            "unit": "mg/dL",
+            "referenceRaw": "1.5 이하",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율",
+            "value": "44",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "AST",
+            "rawName": "AST",
+            "value": "32",
+            "unit": "U/L",
+            "referenceRaw": "40 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "ALT",
+            "rawName": "ALT",
+            "value": "44",
+            "unit": "U/L",
+            "referenceRaw": "35 이하",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피",
+            "value": "38",
+            "unit": "U/L",
+            "referenceRaw": "8~35",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "ALT",
+            "rawName": "알부민",
+            "value": "4.8",
+            "unit": "g/dL",
+            "referenceRaw": "3.5~5.2",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "TOTAL_CHOLESTEROL",
+            "rawName": "총빌리루빈",
+            "value": "-",
+            "unit": "mg/dL",
+            "referenceRaw": "0.2~1.2",
+            "centerJudgment": "null"
+          }
+        ],
+        "issues": [
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "DIASTOLIC_BP",
+            "detail": "centerJudgment=재검"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "unit=null"
+          },
+          {
+            "type": "CONFLICT",
+            "code": "ALT",
+            "detail": "같은 코드에 다른 값: 4.8"
+          },
+          {
+            "type": "IMPLAUSIBLE",
+            "code": "TOTAL_CHOLESTEROL",
+            "detail": "숫자가 아님: -"
+          },
+          {
+            "type": "EMPTY",
+            "code": "OTHER",
+            "detail": "code 또는 value 없음"
+          }
+        ],
+        "retryInput": [
+          "건강검진 3개년 추이 보고서",
+          "알부민 g/dL 3.8 4.1 4.8 3.5~5.2",
+          "총빌리루빈 mg/dL - 1.3 1.1 0.2~1.2",
+          "흉부 X선 소견: 정상 (판정: 정상)",
+          "상담 문의 1588-0000 (평일 09:00~18:00)"
+        ],
+        "retryItems": [
+          {
+            "code": "OTHER",
+            "rawName": "건강검진 3개년 추이 보고서",
+            "value": "건강검진 3개년 추이 보고서",
+            "unit": "없음",
+            "referenceRaw": "3개년 추이 보고서",
+            "centerJudgment": "건강검진 3개년 추이 보고서"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "알부민 g/dL 3.8 4.1 4.8 3.5~5.2",
+            "value": "3.8 4.1 4.8 3.5~5.2",
+            "unit": "g/dL",
+            "referenceRaw": "알부민 g/dL 3.8 4.1 4.8 3.5~5.2",
+            "centerJudgment": "알부민 g/dL 3.8 4.1 4.8 3.5~5.2"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "총빌리루빈 mg/dL - 1.3 1.1 0.2~1.2",
+            "value": "- 1.3 1.1 0.2~1.2",
+            "unit": "mg/dL",
+            "referenceRaw": "총빌리루빈 mg/dL - 1.3 1.1 0.2~1.2",
+            "centerJudgment": "총빌리루빈 mg/dL - 1.3 1.1 0.2~1.2"
+          },
+          {
+            "code": "CHEST_XRAY",
+            "rawName": "흉부 X선 소견: 정상 (판정: 정상)",
+            "value": "정상",
+            "unit": "없음",
+            "referenceRaw": "흉부 X선 소견: 정상 (판정: 정상)",
+            "centerJudgment": "흉부 X선 소견: 정상 (판정: 정상)"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "상담 문의 1588-0000 (평일 09:00~18:00)",
+            "value": "",
+            "unit": "",
+            "referenceRaw": "",
+            "centerJudgment": "상담 문의 1588-0000 (평일 09:00~18:00)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "trend-005",
+      "cached": false,
+      "tp": 18,
+      "fp": 2,
+      "fn": 4,
+      "precision": 0.9,
+      "recall": 0.8182,
+      "f1": 0.8571,
+      "firstPass": {
+        "tp": 17,
+        "fp": 1,
+        "fn": 5,
+        "precision": 0.9444,
+        "recall": 0.7727,
+        "f1": 0.85
+      },
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "pipeline": "validated-v2.3",
+        "latencyMs": 330449,
+        "promptTokens": 2360,
+        "completionTokens": 1539,
+        "attempts": 2,
+        "retriedSegments": 4,
+        "issues": {
+          "IMPLAUSIBLE": 1,
+          "OTHER_NAME_VALUE_APART": 1,
+          "UNGROUNDED_FIELD": 12
+        }
+      },
+      "error": null,
+      "errors": [
+        {
+          "type": "missing",
+          "code": "VISION_LEFT",
+          "expected": "0.5",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "VISION_RIGHT",
+          "expected": "0.9",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "HEARING_LEFT",
+          "expected": "정상",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "HEARING_RIGHT",
+          "expected": "정상",
+          "predicted": null
+        },
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "시력: 좌 0.5 우 0.9=0.5"
+        },
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "청력: 좌 정상 우 정상=정상"
+        }
+      ],
+      "diagnostics": {
+        "firstPassItems": [
+          {
+            "code": "HEIGHT",
+            "rawName": "신장",
+            "value": "166.5",
+            "unit": "cm",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WEIGHT",
+            "rawName": "체중",
+            "value": "58.5",
+            "unit": "kg",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WAIST_CIRCUMFERENCE",
+            "rawName": "허리둘레",
+            "value": "82",
+            "unit": "cm",
+            "referenceRaw": "90 미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "BMI",
+            "rawName": "체질량지수",
+            "value": "21.1",
+            "unit": "kg/m²",
+            "referenceRaw": "18.5~24.9",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "SYSTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "144",
+            "unit": "mmHg",
+            "referenceRaw": "120/80 미만",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "DIASTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "107",
+            "unit": "mmHg",
+            "referenceRaw": "120/80 미만",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "요단백",
+            "value": "음성",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEMOGLOBIN",
+            "rawName": "혈색소",
+            "value": "12.8",
+            "unit": "g/dL",
+            "referenceRaw": "13.0~16.5",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "공복혈당",
+            "value": "111",
+            "unit": "mg/dL",
+            "referenceRaw": "100 미만",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청 크레아티닌",
+            "value": "1.04",
+            "unit": "mg/dL",
+            "referenceRaw": "1.5 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율",
+            "value": "84",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "AST",
+            "rawName": "AST",
+            "value": "13",
+            "unit": "U/L",
+            "referenceRaw": "40 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "ALT",
+            "rawName": "ALT",
+            "value": "37",
+            "unit": "U/L",
+            "referenceRaw": "35 이하",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피",
+            "value": "50",
+            "unit": "U/L",
+            "referenceRaw": "11~63",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "ALT",
+            "rawName": "알부민",
+            "value": "-",
+            "unit": "g/dL",
+            "referenceRaw": "3.5~5.2",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "암태아성항원",
+            "value": "3.3",
+            "unit": "ng/mL",
+            "referenceRaw": "5.0 이하",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "총빌리루빈",
+            "value": "0.6",
+            "unit": "mg/dL",
+            "referenceRaw": "0.2~1.2",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "CHEST_XRAY",
+            "rawName": "흉부 X선",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          }
+        ],
+        "issues": [
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "IMPLAUSIBLE",
+            "code": "ALT",
+            "detail": "숫자가 아님: -"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "OTHER",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "OTHER",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "OTHER_NAME_VALUE_APART",
+            "code": "OTHER",
+            "detail": "건강검진 3개년 추이 보고서=4.7"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "OTHER",
+            "detail": "referenceRaw=0.5 0.9"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "OTHER",
+            "detail": "referenceRaw=정상 정상"
+          }
+        ],
+        "retryInput": [
+          "건강검진 3개년 추이 보고서",
+          "알부민 g/dL - 4.7 4.4 3.5~5.2",
+          "시력: 좌 0.5 우 0.9 / 청력: 좌 정상 우 정상",
+          "상담 문의 1588-0000 (평일 09:00~18:00)"
+        ],
+        "retryItems": [
+          {
+            "code": "OTHER",
+            "rawName": "건강검진 3개년 추이 보고서",
+            "value": "4.7",
+            "unit": "g/dL",
+            "referenceRaw": "4.7 4.4 3.5~5.2",
+            "centerJudgment": "건강검진 3개년 추이 보고서"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "알부민",
+            "value": "4.4",
+            "unit": "g/dL",
+            "referenceRaw": "4.4 3.5~5.2",
+            "centerJudgment": "알부민"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "시력: 좌 0.5 우 0.9",
+            "value": "0.5",
+            "unit": "없음",
+            "referenceRaw": "0.5 0.9",
+            "centerJudgment": "시력: 좌 0.5 우 0.9"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "청력: 좌 정상 우 정상",
+            "value": "정상",
+            "unit": "없음",
+            "referenceRaw": "정상 정상",
+            "centerJudgment": "청력: 좌 정상 우 정상"
+          }
+        ]
+      }
+    },
+    {
+      "id": "trend-006",
+      "cached": false,
+      "tp": 16,
+      "fp": 3,
+      "fn": 4,
+      "precision": 0.8421,
+      "recall": 0.8,
+      "f1": 0.8205,
+      "firstPass": {
+        "tp": 16,
+        "fp": 0,
+        "fn": 4,
+        "precision": 1.0,
+        "recall": 0.8,
+        "f1": 0.8889
+      },
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "pipeline": "validated-v2.3",
+        "latencyMs": 337652,
+        "promptTokens": 2271,
+        "completionTokens": 1468,
+        "attempts": 2,
+        "retriedSegments": 3,
+        "issues": {
+          "UNGROUNDED_FIELD": 3
+        }
+      },
+      "error": null,
+      "errors": [
+        {
+          "type": "missing",
+          "code": "VISION_LEFT",
+          "expected": "1.2",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "VISION_RIGHT",
+          "expected": "0.7",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "HEARING_LEFT",
+          "expected": "정상",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "HEARING_RIGHT",
+          "expected": "정상",
+          "predicted": null
+        },
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "건강검진 3개년 추이 보고서=건강검진 3개년 추이 보고서"
+        },
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "시력: 좌 1.2 우 0.7 / 청력: 좌 정상 우 정상=시력: 좌 1.2 우 0.7 / 청력: 좌 정상 우 정상"
+        },
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "상담 문의 1588-0000 (평일 09:00~18:00)=상담 문의 1588-0000 (평일 09:00~18:00)"
+        }
+      ],
+      "diagnostics": {
+        "firstPassItems": [
+          {
+            "code": "HEIGHT",
+            "rawName": "신장",
+            "value": "181.4",
+            "unit": "cm",
+            "referenceRaw": "155.3",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WEIGHT",
+            "rawName": "체중",
+            "value": "69.1",
+            "unit": "kg",
+            "referenceRaw": "72.6",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WAIST_CIRCUMFERENCE",
+            "rawName": "허리둘레",
+            "value": "77",
+            "unit": "cm",
+            "referenceRaw": "90 미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "BMI",
+            "rawName": "체질량지수",
+            "value": "21.0",
+            "unit": "kg/m²",
+            "referenceRaw": "18.5~24.9",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "SYSTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "117",
+            "unit": "mmHg",
+            "referenceRaw": "120/80  미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "DIASTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "72",
+            "unit": "mmHg",
+            "referenceRaw": "120/80  미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "요단백",
+            "value": "양성(1+)",
+            "unit": "양성(1+)",
+            "referenceRaw": "음성",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "HEMOGLOBIN",
+            "rawName": "혈색소",
+            "value": "14.9",
+            "unit": "g/dL",
+            "referenceRaw": "13.0~16.5",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "공복혈당",
+            "value": "115",
+            "unit": "mg/dL",
+            "referenceRaw": "100  미만",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청   크레아티닌",
+            "value": "0.90",
+            "unit": "mg/dL",
+            "referenceRaw": "1.5 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율",
+            "value": "89",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "AST",
+            "rawName": "AST",
+            "value": "22",
+            "unit": "U/L",
+            "referenceRaw": "40 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "ALT",
+            "rawName": "ALT",
+            "value": "18",
+            "unit": "U/L",
+            "referenceRaw": "35 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피",
+            "value": "167",
+            "unit": "U/L",
+            "referenceRaw": "11~63",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "암태아성항원",
+            "value": "1.3",
+            "unit": "ng/mL",
+            "referenceRaw": "5.0 이하",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "CHEST_XRAY",
+            "rawName": "흉부   X선",
+            "value": "정상",
+            "unit": "정상",
+            "referenceRaw": "정상",
+            "centerJudgment": "정상"
+          }
+        ],
+        "issues": [
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "OTHER",
+            "detail": "centerJudgment=재검"
+          }
+        ],
+        "retryInput": [
+          "건강검진 3개년 추이 보고서",
+          "시력: 좌 1.2 우 0.7 / 청력: 좌 정상 우 정상",
+          "상담 문의 1588-0000 (평일 09:00~18:00)"
+        ],
+        "retryItems": [
+          {
+            "code": "OTHER",
+            "rawName": "건강검진 3개년 추이 보고서",
+            "value": "건강검진 3개년 추이 보고서",
+            "unit": "없음",
+            "referenceRaw": "없음",
+            "centerJudgment": "건강검진 3개년 추이 보고서"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "시력: 좌 1.2 우 0.7 / 청력: 좌 정상 우 정상",
+            "value": "시력: 좌 1.2 우 0.7 / 청력: 좌 정상 우 정상",
+            "unit": "없음",
+            "referenceRaw": "없음",
+            "centerJudgment": "시력: 좌 1.2 우 0.7 / 청력: 좌 정상 우 정상"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "상담 문의 1588-0000 (평일 09:00~18:00)",
+            "value": "상담 문의 1588-0000 (평일 09:00~18:00)",
+            "unit": "없음",
+            "referenceRaw": "없음",
+            "centerJudgment": "상담 문의 1588-0000 (평일 09:00~18:00)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "trend-007",
+      "cached": false,
+      "tp": 15,
+      "fp": 5,
+      "fn": 6,
+      "precision": 0.75,
+      "recall": 0.7143,
+      "f1": 0.7317,
+      "firstPass": {
+        "tp": 15,
+        "fp": 6,
+        "fn": 6,
+        "precision": 0.7143,
+        "recall": 0.7143,
+        "f1": 0.7143
+      },
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "pipeline": "validated-v2.3",
+        "latencyMs": 431300,
+        "promptTokens": 2323,
+        "completionTokens": 1772,
+        "attempts": 2,
+        "retriedSegments": 3,
+        "issues": {
+          "RAW_NAME_NOT_IN_SOURCE": 4,
+          "UNGROUNDED_FIELD": 9,
+          "UNGROUNDED_VALUE": 4
+        }
+      },
+      "error": null,
+      "errors": [
+        {
+          "type": "missing",
+          "code": "VISION_LEFT",
+          "expected": "0.5",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "VISION_RIGHT",
+          "expected": "0.5",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "HEARING_LEFT",
+          "expected": "정상",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "HEARING_RIGHT",
+          "expected": "비정상",
+          "predicted": null
+        },
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "갑상선자극호르몬=-"
+        },
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "요산=-"
+        },
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "건강검진 3개년 추이 보고서=건강검진 3개년 추이 보고서"
+        },
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "시력: 좌 0.5 우 0.5 / 청력: 좌 정상 우 비정상=시력: 좌 0.5 우 0.5 / 청력: 좌 정상 우 비정상"
+        },
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "상담 문의 1588-0000 (평일 09:00~18:00)=상담 문의 1588-0000 (평일 09:00~18:00)"
+        },
+        {
+          "type": "missing",
+          "code": "OTHER",
+          "expected": "갑상선자극호르몬=2.20",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "OTHER",
+          "expected": "요산=4.0",
+          "predicted": null
+        }
+      ],
+      "diagnostics": {
+        "firstPassItems": [
+          {
+            "code": "HEIGHT",
+            "rawName": "신장",
+            "value": "165.9",
+            "unit": "cm",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "WEIGHT",
+            "rawName": "체중",
+            "value": "81.5",
+            "unit": "kg",
+            "referenceRaw": "null",
+            "centerJudgment": "주용"
+          },
+          {
+            "code": "WAIST_CIRCUMFERENCE",
+            "rawName": "허리둘레",
+            "value": "74",
+            "unit": "cm",
+            "referenceRaw": "85 미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "BMI",
+            "rawName": "체질량지수",
+            "value": "29.6",
+            "unit": "kg/m²",
+            "referenceRaw": "18.5~24.9",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "SYSTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "108",
+            "unit": "mmHg",
+            "referenceRaw": "120/80 미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "DIASTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "62",
+            "unit": "mmHg",
+            "referenceRaw": "120/80 미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "요단백",
+            "value": "약양성(±)",
+            "unit": "null",
+            "referenceRaw": "음성",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "HEMOGLOBIN",
+            "rawName": "혈색소",
+            "value": "13.9",
+            "unit": "g/dL",
+            "referenceRaw": "12.0~15.5",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "공복혈당",
+            "value": "136",
+            "unit": "mg/dL",
+            "referenceRaw": "100 미만",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청 크레아티닌",
+            "value": "1.34",
+            "unit": "mg/dL",
+            "referenceRaw": "1.5 이하",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율",
+            "value": "64",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "AST",
+            "rawName": "AST(SGOT)",
+            "value": "48",
+            "unit": "U/L",
+            "referenceRaw": "40 이하",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "ALT",
+            "rawName": "ALT(SGPT)",
+            "value": "40",
+            "unit": "U/L",
+            "referenceRaw": "35 이하",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피(γ-GTP)",
+            "value": "185",
+            "unit": "U/L",
+            "referenceRaw": "8~35",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "TOTAL_CHOLESTEROL",
+            "rawName": "총콜레스테롤",
+            "value": "null",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "HDL_CHOLESTEROL",
+            "rawName": "HDL 콜레스테롤",
+            "value": "null",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "TRIGLYCERIDES",
+            "rawName": "중성지방(TG)",
+            "value": "null",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "LDL_CHOLESTEROL",
+            "rawName": "LDL 콜레스테롤",
+            "value": "null",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "갑상선자극호르몬",
+            "value": "-",
+            "unit": "μIU/mL",
+            "referenceRaw": "0.4~4.5",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "요산",
+            "value": "-",
+            "unit": "mg/dL",
+            "referenceRaw": "3.5~7.2",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "CHEST_XRAY",
+            "rawName": "흉부방사선",
+            "value": "기타 질환 의심(소견서 참조)",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "재검"
+          }
+        ],
+        "issues": [
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "centerJudgment=주용"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "unit=null"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "AST",
+            "detail": "AST(SGOT)"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "ALT",
+            "detail": "ALT(SGPT)"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "GAMMA_GTP",
+            "detail": "감마지티피(γ-GTP)"
+          },
+          {
+            "type": "UNGROUNDED_VALUE",
+            "code": "TOTAL_CHOLESTEROL",
+            "detail": "null"
+          },
+          {
+            "type": "UNGROUNDED_VALUE",
+            "code": "HDL_CHOLESTEROL",
+            "detail": "null"
+          },
+          {
+            "type": "UNGROUNDED_VALUE",
+            "code": "TRIGLYCERIDES",
+            "detail": "null"
+          },
+          {
+            "type": "UNGROUNDED_VALUE",
+            "code": "LDL_CHOLESTEROL",
+            "detail": "null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "OTHER",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "OTHER",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "CHEST_XRAY",
+            "detail": "흉부방사선"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "referenceRaw=null"
+          }
+        ],
+        "retryInput": [
+          "건강검진 3개년 추이 보고서",
+          "시력: 좌 0.5 우 0.5 / 청력: 좌 정상 우 비정상",
+          "상담 문의 1588-0000 (평일 09:00~18:00)"
+        ],
+        "retryItems": [
+          {
+            "code": "OTHER",
+            "rawName": "건강검진 3개년 추이 보고서",
+            "value": "건강검진 3개년 추이 보고서",
+            "unit": "없음",
+            "referenceRaw": "없음",
+            "centerJudgment": "건강검진 3개년 추이 보고서"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "시력: 좌 0.5 우 0.5 / 청력: 좌 정상 우 비정상",
+            "value": "시력: 좌 0.5 우 0.5 / 청력: 좌 정상 우 비정상",
+            "unit": "없음",
+            "referenceRaw": "없음",
+            "centerJudgment": "시력: 좌 0.5 우 0.5 / 청력: 좌 정상 우 비정상"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "상담 문의 1588-0000 (평일 09:00~18:00)",
+            "value": "상담 문의 1588-0000 (평일 09:00~18:00)",
+            "unit": "없음",
+            "referenceRaw": "없음",
+            "centerJudgment": "상담 문의 1588-0000 (평일 09:00~18:00)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "trend-008",
+      "cached": false,
+      "tp": 18,
+      "fp": 3,
+      "fn": 4,
+      "precision": 0.8571,
+      "recall": 0.8182,
+      "f1": 0.8372,
+      "firstPass": {
+        "tp": 18,
+        "fp": 2,
+        "fn": 4,
+        "precision": 0.9,
+        "recall": 0.8182,
+        "f1": 0.8571
+      },
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "pipeline": "validated-v2.3",
+        "latencyMs": 346102,
+        "promptTokens": 3011,
+        "completionTokens": 1810,
+        "attempts": 3,
+        "retriedSegments": 6,
+        "issues": {
+          "CONFLICT": 1,
+          "IMPLAUSIBLE": 3,
+          "OTHER_NAME_VALUE_APART": 1,
+          "RAW_NAME_NOT_IN_SOURCE": 8,
+          "UNGROUNDED_FIELD": 11
+        }
+      },
+      "error": null,
+      "errors": [
+        {
+          "type": "missing",
+          "code": "HEIGHT",
+          "expected": "179.6",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "WEIGHT",
+          "expected": "74.8",
+          "predicted": null
+        },
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "알부민=5.4 4.8 4.4 3.5~5.2"
+        },
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "당화혈색소 %=5.6"
+        },
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "상담 문의=1588-0000 (평일 09:00~18:00)"
+        },
+        {
+          "type": "missing",
+          "code": "OTHER",
+          "expected": "알부민=4.4",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "OTHER",
+          "expected": "당화혈색소=6.0",
+          "predicted": null
+        }
+      ],
+      "diagnostics": {
+        "firstPassItems": [
+          {
+            "code": "WAIST_CIRCUMFERENCE",
+            "rawName": "허리둘레",
+            "value": "98",
+            "unit": "cm",
+            "referenceRaw": "90 미만",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "BMI",
+            "rawName": "체질량지수",
+            "value": "23.2",
+            "unit": "kg/m²",
+            "referenceRaw": "18.5~24.9",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "SYSTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "147",
+            "unit": "mmHg",
+            "referenceRaw": "120/80 미만",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "DIASTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "92",
+            "unit": "mmHg",
+            "referenceRaw": "120/80 미만",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "요단백",
+            "value": "약양성(±)",
+            "unit": "null",
+            "referenceRaw": "음성",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "HEMOGLOBIN",
+            "rawName": "혈색소",
+            "value": "13.5",
+            "unit": "g/dL",
+            "referenceRaw": "13.0~16.5",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "공복혈당",
+            "value": "93",
+            "unit": "mg/dL",
+            "referenceRaw": "100 미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청 크레아티닌",
+            "value": "1.48",
+            "unit": "mg/dL",
+            "referenceRaw": "1.5 이하",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율",
+            "value": "66",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "AST",
+            "rawName": "AST(SGOT)",
+            "value": "33",
+            "unit": "U/L",
+            "referenceRaw": "40 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "ALT",
+            "rawName": "ALT(SGPT)",
+            "value": "49",
+            "unit": "U/L",
+            "referenceRaw": "35 이하",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피(γ-GTP)",
+            "value": "95",
+            "unit": "U/L",
+            "referenceRaw": "11~63",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "ALT",
+            "rawName": "알부민",
+            "value": "4.4",
+            "unit": "g/dL",
+            "referenceRaw": "3.5~5.2",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "당화혈색소",
+            "value": "6.0",
+            "unit": "null",
+            "referenceRaw": "5.7 미만",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "암태아성항원",
+            "value": "3.8",
+            "unit": "ng/mL",
+            "referenceRaw": "5.0 이하",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "VISION_LEFT",
+            "rawName": "시력(좌)",
+            "value": "0.9",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "VISION_RIGHT",
+            "rawName": "시력(우)",
+            "value": "0.5",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEARING_LEFT",
+            "rawName": "청력(좌)",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEARING_RIGHT",
+            "rawName": "청력(우)",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "CHEST_XRAY",
+            "rawName": "흉부방사선",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "정상",
+            "centerJudgment": "정상"
+          }
+        ],
+        "issues": [
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "unit=null"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "AST",
+            "detail": "AST(SGOT)"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "ALT",
+            "detail": "ALT(SGPT)"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "GAMMA_GTP",
+            "detail": "감마지티피(γ-GTP)"
+          },
+          {
+            "type": "CONFLICT",
+            "code": "ALT",
+            "detail": "같은 코드에 다른 값: 4.4"
+          },
+          {
+            "type": "IMPLAUSIBLE",
+            "code": "FASTING_GLUCOSE",
+            "detail": "가능 범위 밖: 6.0"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "OTHER",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "VISION_LEFT",
+            "detail": "시력(좌)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_LEFT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_LEFT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "VISION_RIGHT",
+            "detail": "시력(우)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_RIGHT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_RIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "HEARING_LEFT",
+            "detail": "청력(좌)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_LEFT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_LEFT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "HEARING_RIGHT",
+            "detail": "청력(우)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_RIGHT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_RIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "CHEST_XRAY",
+            "detail": "흉부방사선"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "unit=null"
+          },
+          {
+            "type": "OTHER_NAME_VALUE_APART",
+            "code": "OTHER",
+            "detail": "건강검진 3개년 추이 보고서=169.1 191.4 179.6"
+          },
+          {
+            "type": "IMPLAUSIBLE",
+            "code": "HEIGHT",
+            "detail": "숫자가 아님: 169.1 191.4 179.6"
+          },
+          {
+            "type": "IMPLAUSIBLE",
+            "code": "WEIGHT",
+            "detail": "숫자가 아님: 79.9 69.7 74.8"
+          }
+        ],
+        "retryInput": [
+          "건강검진 3개년 추이 보고서",
+          "신장 cm 169.1 191.4 179.6",
+          "체중 kg 79.9 69.7 74.8",
+          "알부민 g/dL 5.4 4.8 4.4 3.5~5.2",
+          "당화혈색소 % 5.6 5.4 6.0 5.7 미만",
+          "상담 문의 1588-0000 (평일 09:00~18:00)"
+        ],
+        "retryItems": [
+          {
+            "code": "OTHER",
+            "rawName": "건강검진 3개년 추이 보고서",
+            "value": "169.1 191.4 179.6",
+            "unit": "없음",
+            "referenceRaw": "없음",
+            "centerJudgment": "건강검진 3개년 추이 보고서"
+          },
+          {
+            "code": "HEIGHT",
+            "rawName": "신장",
+            "value": "169.1 191.4 179.6",
+            "unit": "cm",
+            "referenceRaw": "cm",
+            "centerJudgment": "신장 cm"
+          },
+          {
+            "code": "WEIGHT",
+            "rawName": "체중",
+            "value": "79.9 69.7 74.8",
+            "unit": "kg",
+            "referenceRaw": "kg",
+            "centerJudgment": "체중 kg"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "알부민",
+            "value": "5.4 4.8 4.4 3.5~5.2",
+            "unit": "g/dL",
+            "referenceRaw": "g/dL",
+            "centerJudgment": "알부민 g/dL"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "당화혈색소 %",
+            "value": "5.6",
+            "unit": "",
+            "referenceRaw": "5.7 미만",
+            "centerJudgment": "당화혈색소 %"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "상담 문의",
+            "value": "1588-0000 (평일 09:00~18:00)",
+            "unit": "",
+            "referenceRaw": "",
+            "centerJudgment": "상담 문의"
+          }
+        ]
+      }
+    },
+    {
+      "id": "trend-009",
+      "cached": false,
+      "tp": 18,
+      "fp": 1,
+      "fn": 2,
+      "precision": 0.9474,
+      "recall": 0.9,
+      "f1": 0.9231,
+      "firstPass": {
+        "tp": 18,
+        "fp": 0,
+        "fn": 2,
+        "precision": 1.0,
+        "recall": 0.9,
+        "f1": 0.9474
+      },
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "pipeline": "validated-v2.3",
+        "latencyMs": 241062,
+        "promptTokens": 2268,
+        "completionTokens": 1414,
+        "attempts": 2,
+        "retriedSegments": 3,
+        "issues": {
+          "OTHER_NAME_VALUE_APART": 1,
+          "RAW_NAME_NOT_IN_SOURCE": 4,
+          "UNGROUNDED_FIELD": 16
+        }
+      },
+      "error": null,
+      "errors": [
+        {
+          "type": "missing",
+          "code": "WEIGHT",
+          "expected": "80.3",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "WAIST_CIRCUMFERENCE",
+          "expected": "78",
+          "predicted": null
+        },
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "상담 문의 1588-0000 (평일 09:00~18:00)=1588-0000 (평일 09:00~18:00)"
+        }
+      ],
+      "diagnostics": {
+        "firstPassItems": [
+          {
+            "code": "HEIGHT",
+            "rawName": "신장",
+            "value": "163.1",
+            "unit": "cm",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "BMI",
+            "rawName": "체질량지수",
+            "value": "30.2",
+            "unit": "kg/m²",
+            "referenceRaw": "18.5~24.9",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "SYSTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "137",
+            "unit": "mmHg",
+            "referenceRaw": "120/80 미만",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "DIASTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "80",
+            "unit": "mmHg",
+            "referenceRaw": "120/80 미만",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "요단백",
+            "value": "양성(2+)",
+            "unit": "null",
+            "referenceRaw": "음성",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "HEMOGLOBIN",
+            "rawName": "혈색소",
+            "value": "12.4",
+            "unit": "g/dL",
+            "referenceRaw": "12.0~15.5",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "공복혈당",
+            "value": "96",
+            "unit": "mg/dL",
+            "referenceRaw": "100 미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청 크레아티닌",
+            "value": "0.68",
+            "unit": "mg/dL",
+            "referenceRaw": "1.5 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율",
+            "value": "116",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "AST",
+            "rawName": "AST",
+            "value": "48",
+            "unit": "U/L",
+            "referenceRaw": "40 이하",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "ALT",
+            "rawName": "ALT",
+            "value": "52",
+            "unit": "U/L",
+            "referenceRaw": "35 이하",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피",
+            "value": "40",
+            "unit": "U/L",
+            "referenceRaw": "8~35",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "고감도 C반응단백",
+            "value": "3.8",
+            "unit": "mg/L",
+            "referenceRaw": "null",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "CHEST_XRAY",
+            "rawName": "흉부 X선",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "VISION_LEFT",
+            "rawName": "시력(좌)",
+            "value": "0.8",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "VISION_RIGHT",
+            "rawName": "시력(우)",
+            "value": "0.5",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEARING_LEFT",
+            "rawName": "청력(좌)",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEARING_RIGHT",
+            "rawName": "청력(우)",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          }
+        ],
+        "issues": [
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "centerJudgment=정상"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "DIASTOLIC_BP",
+            "detail": "centerJudgment=재검"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "OTHER",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "OTHER",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "VISION_LEFT",
+            "detail": "시력(좌)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_LEFT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_LEFT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "VISION_RIGHT",
+            "detail": "시력(우)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_RIGHT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_RIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "HEARING_LEFT",
+            "detail": "청력(좌)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_LEFT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_LEFT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "RAW_NAME_NOT_IN_SOURCE",
+            "code": "HEARING_RIGHT",
+            "detail": "청력(우)"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_RIGHT",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEARING_RIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "OTHER_NAME_VALUE_APART",
+            "code": "OTHER",
+            "detail": "건강검진 3개년 추이 보고서=66.1"
+          }
+        ],
+        "retryInput": [
+          "건강검진 3개년 추이 보고서",
+          "체중 kg 66.1 68.9 80.3",
+          "상담 문의 1588-0000 (평일 09:00~18:00)"
+        ],
+        "retryItems": [
+          {
+            "code": "OTHER",
+            "rawName": "건강검진 3개년 추이 보고서",
+            "value": "66.1",
+            "unit": "kg",
+            "referenceRaw": "66.1 68.9 80.3",
+            "centerJudgment": "건강검진 3개년 추이 보고서"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "상담 문의 1588-0000 (평일 09:00~18:00)",
+            "value": "1588-0000 (평일 09:00~18:00)",
+            "unit": "",
+            "referenceRaw": "",
+            "centerJudgment": "상담 문의 1588-0000 (평일 09:00~18:00)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "trend-010",
+      "cached": false,
+      "tp": 18,
+      "fp": 3,
+      "fn": 4,
+      "precision": 0.8571,
+      "recall": 0.8182,
+      "f1": 0.8372,
+      "firstPass": {
+        "tp": 18,
+        "fp": 0,
+        "fn": 4,
+        "precision": 1.0,
+        "recall": 0.8182,
+        "f1": 0.9
+      },
+      "metrics": {
+        "model": "qwen3:4b",
+        "promptVersion": "extraction-v1",
+        "pipeline": "validated-v2.3",
+        "latencyMs": 263886,
+        "promptTokens": 2343,
+        "completionTokens": 1580,
+        "attempts": 2,
+        "retriedSegments": 3,
+        "issues": {
+          "UNGROUNDED_FIELD": 11
+        }
+      },
+      "error": null,
+      "errors": [
+        {
+          "type": "missing",
+          "code": "VISION_LEFT",
+          "expected": "1.0",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "VISION_RIGHT",
+          "expected": "0.5",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "HEARING_LEFT",
+          "expected": "정상",
+          "predicted": null
+        },
+        {
+          "type": "missing",
+          "code": "HEARING_RIGHT",
+          "expected": "정상",
+          "predicted": null
+        },
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "건강검진 3개년 추이 보고서=건강검진 3개년 추이 보고서"
+        },
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "시력: 좌 1.0 우 0.5 / 청력: 좌 정상 우 정상=시력: 좌 1.0 우 0.5 / 청력: 좌 정상 우 정상"
+        },
+        {
+          "type": "extra",
+          "code": "OTHER",
+          "expected": null,
+          "predicted": "상담 문의 1588-0000 (평일 09:00~18:00)=상담 문의 1588-0000 (평일 09:00~18:00)"
+        }
+      ],
+      "diagnostics": {
+        "firstPassItems": [
+          {
+            "code": "HEIGHT",
+            "rawName": "신장",
+            "value": "165.5",
+            "unit": "cm",
+            "referenceRaw": "null",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "WEIGHT",
+            "rawName": "체중",
+            "value": "86.3",
+            "unit": "kg",
+            "referenceRaw": "null",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "WAIST_CIRCUMFERENCE",
+            "rawName": "허리둘레",
+            "value": "100",
+            "unit": "cm",
+            "referenceRaw": "90 미만",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "BMI",
+            "rawName": "체질량지수",
+            "value": "31.5",
+            "unit": "kg/m²",
+            "referenceRaw": "18.5~24.9",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "SYSTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "164",
+            "unit": "mmHg",
+            "referenceRaw": "120/80  미만",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "DIASTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "104",
+            "unit": "mmHg",
+            "referenceRaw": "120/80  미만",
+            "centerJudgment": "재검"
+          },
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "요단백",
+            "value": "음성",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "HEMOGLOBIN",
+            "rawName": "혈색소",
+            "value": "12.3",
+            "unit": "g/dL",
+            "referenceRaw": "13.0~16.5",
+            "centerJudgment": "주의"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "공복혈당",
+            "value": "98",
+            "unit": "mg/dL",
+            "referenceRaw": "100  미만",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청   크레아티닌",
+            "value": "1.01",
+            "unit": "mg/dL",
+            "referenceRaw": "1.5 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율",
+            "value": "94",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "AST",
+            "rawName": "AST",
+            "value": "23",
+            "unit": "U/L",
+            "referenceRaw": "40 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "ALT",
+            "rawName": "ALT",
+            "value": "30",
+            "unit": "U/L",
+            "referenceRaw": "35 이하",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피",
+            "value": "49",
+            "unit": "U/L",
+            "referenceRaw": "11~63",
+            "centerJudgment": "정상"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "암태아성항원",
+            "value": "0.9",
+            "unit": "ng/mL",
+            "referenceRaw": "5.0 이하",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "알부민",
+            "value": "4.2",
+            "unit": "g/dL",
+            "referenceRaw": "3.5~5.2",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "갑상선자극호르몬",
+            "value": "2.15",
+            "unit": "μIU/mL",
+            "referenceRaw": "0.4~4.5",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "CHEST_XRAY",
+            "rawName": "흉부   X선",
+            "value": "정상",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "정상"
+          }
+        ],
+        "issues": [
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "centerJudgment=재검"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "centerJudgment=재검"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "OTHER",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "OTHER",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "OTHER",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "referenceRaw=null"
+          }
+        ],
+        "retryInput": [
+          "건강검진 3개년 추이 보고서",
+          "시력: 좌 1.0 우 0.5 / 청력: 좌 정상 우 정상",
+          "상담 문의 1588-0000 (평일 09:00~18:00)"
+        ],
+        "retryItems": [
+          {
+            "code": "OTHER",
+            "rawName": "건강검진 3개년 추이 보고서",
+            "value": "건강검진 3개년 추이 보고서",
+            "unit": "없음",
+            "referenceRaw": "없음",
+            "centerJudgment": "건강검진 3개년 추이 보고서"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "시력: 좌 1.0 우 0.5 / 청력: 좌 정상 우 정상",
+            "value": "시력: 좌 1.0 우 0.5 / 청력: 좌 정상 우 정상",
+            "unit": "없음",
+            "referenceRaw": "없음",
+            "centerJudgment": "시력: 좌 1.0 우 0.5 / 청력: 좌 정상 우 정상"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "상담 문의 1588-0000 (평일 09:00~18:00)",
+            "value": "상담 문의 1588-0000 (평일 09:00~18:00)",
+            "unit": "없음",
+            "referenceRaw": "없음",
+            "centerJudgment": "상담 문의 1588-0000 (평일 09:00~18:00)"
+          }
+        ]
+      }
+    }
+  ]
+}
