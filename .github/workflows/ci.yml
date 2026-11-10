@@ -1,0 +1,45 @@
+# 단위 테스트 CI (ADR 0008 4절 1번)
+# 외부 의존(DB, Ollama, Anthropic API)이 없는 `./gradlew build`만 돌린다. .env와 비밀값은 쓰지 않는다.
+# 통합 테스트(@Tag("integration"))와 평가 스크립트는 로컬에서만 돌린다.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-test:
+    name: 컴파일 + 단위 테스트
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: gradle/actions/setup-gradle@v6
+
+      - name: ./gradlew build
+        run: ./gradlew build
+
+      - name: 실패하면 테스트 리포트 보관
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-reports
+          path: backend/**/build/reports/tests/
+          retention-days: 7
