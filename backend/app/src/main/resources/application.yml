@@ -11,7 +11,8 @@ spring:
   ai:
     # 모델 공급자 선택. 코드는 ChatModel/EmbeddingModel 인터페이스만 쓰므로 여기만 바꾸면 교체된다.
     model:
-      chat: ${AI_CHAT_PROVIDER:ollama}     # ollama | anthropic
+      chat: anthropic                      # 기본 Haiku 5.5 (ADR 0005). 로컬 모델은 오프라인 프로필로만 켠다 (application-offline.yml)
+                                           # 공급자만 바꾸면 자동 재시도·재요청 설정이 로컬 모델에 맞지 않는다 (2026-11-10 리뷰)
       embedding: ollama                    # 임베딩은 로컬 bge-m3 고정 (벡터 차원이 바뀌면 재적재 필요)
 
     ollama:
@@ -35,9 +36,9 @@ spring:
 
     # Spring AI 자동 재시도. 기본값(10회, 2초×5배씩 증가, 상한 없음)은 로컬 CPU 모델에 위험하다:
     # 시간 제한에 걸린 무거운 요청을 Ollama에 10번 다시 쌓는다 (2026-11-09 실측).
-    # 로컬은 재시도 없음(1). 일시적 과부하(429/5xx)가 있는 API 공급자를 쓸 때만 늘린다 (예: 3).
+    # 기본(API 공급자)은 3, 오프라인 모드(로컬 Ollama)는 재시도 없음(1, application-offline.yml).
     retry:
-      max-attempts: ${AI_RETRY_MAX_ATTEMPTS:1}
+      max-attempts: ${AI_RETRY_MAX_ATTEMPTS:3}
       backoff:
         max-interval: 30s
 
@@ -60,6 +61,8 @@ checkupai:
     first-pass-max-tokens: ${EXTRACTION_FIRST_PASS_MAX_TOKENS:2500}   # 정상 출력 1,400~1,800토큰(qwen3). 반복 루프 폭주 방지
     retry-max-tokens: ${EXTRACTION_RETRY_MAX_TOKENS:600}
     retry-batch-size: 4                          # 누락 조각이 많으면 4개씩 나눠 재요청 (v2.3)
+    retry-enabled: false                         # Haiku에는 재요청이 이득 없음 (ADR 0005). 오프라인 모드에서 켠다. 잘린 출력은 예외
+    model-settings: thinking=${ANTHROPIC_THINKING:disabled}   # 결과를 바꾸는 공급자 설정 요약 (평가 캐시 키). 위 thinking과 같은 값
 
 management:
   endpoints:

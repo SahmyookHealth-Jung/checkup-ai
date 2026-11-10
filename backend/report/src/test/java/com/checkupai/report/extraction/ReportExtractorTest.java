@@ -1,8 +1,11 @@
 package com.checkupai.report.extraction;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.checkupai.report.extraction.ExtractionProperties.Pipeline;
+import com.checkupai.report.extraction.ExtractionValidator.Issue;
+import com.checkupai.report.extraction.ExtractionValidator.IssueType;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -59,8 +62,65 @@ class ReportExtractorTest {
         assertThat(result.diagnostics().retryError()).isNotNull();
     }
 
+    @Test
+    @DisplayName("재요청을 끄면 1차 호출만 하고, 누락 조각은 진단 기록에만 남긴다 (ADR 0005)")
+    void recordsMissingSegmentsWithoutRetryWhenDisabled() {
+        var model = new ScriptedChatModel(
+                "{\"examType\":\"COMPREHENSIVE\",\"sex\":\"MALE\",\"age\":50,\"items\":[]}");
+
+        ExtractionResult result = extractor(model, false).extract(SOURCE, true);
+
+        assertThat(model.userMessages).hasSize(1);
+        assertThat(result.metrics().attempts()).isEqualTo(1);
+        assertThat(result.metrics().retriedSegments()).isZero();
+        assertThat(result.metrics().pipeline()).isEqualTo("validated-v2.4-noretry");
+        assertThat(result.diagnostics().retryInput()).contains("요산 5.4 mg/dL", "hs-CRP 1.6 mg/L");
+        assertThat(result.diagnostics().retryItems()).isNull();
+    }
+
+    @Test
+    @DisplayName("재요청을 꺼도 1차 출력이 상한에서 잘렸으면 잘린 뒷부분을 재요청으로 채운다 (ADR 0004 4절)")
+    void retriesTruncatedFirstPassEvenWhenRetryDisabled() {
+        var model = new ScriptedChatModel(
+                "{\"examType\":\"COMPREHENSIVE\",\"sex\":\"MALE\",\"age\":50,\"items\":["
+                        + "{\"code\":\"OTHER\",\"rawName\":\"요산\",\"value\":\"5.4\"},{\"code\":\"OTHER\",\"rawN",
+                "{\"items\":[{\"code\":\"OTHER\",\"rawName\":\"알부민\",\"value\":\"4.9\"}]}",
+                "{\"items\":[]}");
+
+        ExtractionResult result = extractor(model, false).extract(SOURCE, true);
+
+        assertThat(model.userMessages).hasSize(3);  // 1차 + 잘린 뒷부분 5조각을 4개·1개로 나눠 재요청
+        assertThat(result.report().items()).extracting(ReportItem::value).containsExactly("5.4", "4.9");
+        assertThat(result.diagnostics().issues()).extracting(Issue::type).contains(IssueType.TRUNCATED_OUTPUT);
+    }
+
+    @Test
+    @DisplayName("1차 응답을 결과지 형식으로 읽지 못하면 원인을 밝혀 실패한다 (NPE가 아니라)")
+    void failsClearlyWhenFirstPassIsEmpty() {
+        var model = new ScriptedChatModel("null");
+
+        assertThatThrownBy(() -> extractor(model).extract(SOURCE, true))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("1차 추출 응답");
+    }
+
+    @Test
+    @DisplayName("설정 요약에 출력 상한·묶음 크기·모델 공급자 설정이 들어가 평가 캐시가 설정 변경을 구분한다")
+    void settingsLabelDistinguishesResultChangingSettings() {
+        var haiku = new ExtractionProperties(Pipeline.VALIDATED, 2500, 600, 4, false, "thinking=disabled");
+        var adaptive = new ExtractionProperties(Pipeline.VALIDATED, 2500, 600, 4, false, "thinking=adaptive");
+
+        assertThat(haiku.settingsLabel())
+                .isEqualTo("firstPassMaxTokens=2500,retryMaxTokens=600,retryBatchSize=4,thinking=disabled")
+                .isNotEqualTo(adaptive.settingsLabel());
+    }
+
     private static ReportExtractor extractor(ChatModel model) {
-        var properties = new ExtractionProperties(Pipeline.VALIDATED, 2500, 600, 4);
+        return extractor(model, true);
+    }
+
+    private static ReportExtractor extractor(ChatModel model, boolean retryEnabled) {
+        var properties = new ExtractionProperties(Pipeline.VALIDATED, 2500, 600, 4, retryEnabled, "");
         return new ReportExtractor(ChatClient.builder(model), model, new ExtractionValidator(), properties);
     }
 

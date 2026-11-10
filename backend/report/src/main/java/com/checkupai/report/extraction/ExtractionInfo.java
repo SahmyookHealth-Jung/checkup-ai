@@ -5,7 +5,8 @@ package com.checkupai.report.extraction;
  *
  * @param model 채팅 모델 이름 (예: qwen3:4b)
  * @param promptVersion 프롬프트 버전 (예: extraction-v1)
- * @param pipeline 파이프라인 버전 (예: baseline, validated-v1)
+ * @param pipeline 파이프라인 버전 (예: baseline, validated-v2.4, validated-v2.4-noretry)
+ * @param settings 결과를 바꾸는 설정 요약 (출력 상한, 재요청 묶음 크기, 모델 공급자 설정). 캐시 키가 설정 변경을 구분하게 한다
  */
-public record ExtractionInfo(String model, String promptVersion, String pipeline) {
+public record ExtractionInfo(String model, String promptVersion, String pipeline, String settings) {
 }

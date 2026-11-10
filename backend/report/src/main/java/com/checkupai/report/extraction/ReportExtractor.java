@@ -86,7 +86,7 @@ public class ReportExtractor {
     }
 
     public ExtractionInfo info() {
-        return new ExtractionInfo(defaultModel, PROMPT_VERSION, properties.pipeline().label());
+        return new ExtractionInfo(defaultModel, PROMPT_VERSION, properties.pipelineLabel(), properties.settingsLabel());
     }
 
     public ExtractionResult extract(String reportText) {
@@ -101,6 +101,11 @@ public class ReportExtractor {
         CheckupReport firstPass = call(systemPrompt, USER_TEMPLATE, Map.of("report", reportText),
                 properties.firstPassMaxTokens(), CheckupReport.class, responses, issues);
         long firstPassMs = (System.nanoTime() - started) / 1_000_000;  // 모델 비교: "1차만" 조건의 지연
+        if (firstPass == null) {
+            // API 모델이 빈 응답이나 거절을 돌려주면 변환 결과가 null일 수 있다. NPE 대신 원인을 밝혀 실패시킨다
+            throw new IllegalStateException("1차 추출 응답을 결과지 형식으로 읽지 못했다 (빈 응답 또는 거절)");
+        }
+        boolean firstPassTruncated = issues.stream().anyMatch(issue -> issue.type() == IssueType.TRUNCATED_OUTPUT);
         if (properties.pipeline() == Pipeline.BASELINE) {
             var diagnostics = withDiagnostics
                     ? new ExtractionResult.Diagnostics(firstPass.items(), List.of(), null, null, null) : null;
@@ -115,7 +120,9 @@ public class ReportExtractor {
         List<ReportItem> retryItems = null;
         String retryError = null;
 
-        if (!segments.isEmpty()) {
+        // 재요청을 꺼도, 1차 출력이 상한에서 잘렸으면 잘린 뒷부분을 채우려고 재요청한다 (ADR 0004 4절의 복구 경로)
+        boolean retry = !segments.isEmpty() && (properties.retryEnabled() || firstPassTruncated);
+        if (retry) {
             String headerText = header.isEmpty() ? "(없음)" : String.join("\n", header);
             List<String> errors = new ArrayList<>();
             retryItems = new ArrayList<>();
@@ -144,7 +151,8 @@ public class ReportExtractor {
                 ? new ExtractionResult.Diagnostics(firstPass.items(), issues,
                         segments.isEmpty() ? null : concat(header, segments), retryItems, retryError)
                 : null;
-        return new ExtractionResult(report, metrics(started, firstPassMs, responses, segments.size(), issues), diagnostics);
+        return new ExtractionResult(report, metrics(started, firstPassMs, responses, retry ? segments.size() : 0, issues),
+                diagnostics);
     }
 
     private <T> T call(String system, String userTemplate, Map<String, Object> params, int maxTokens, Class<T> type,
@@ -189,7 +197,7 @@ public class ReportExtractor {
         issues.forEach(issue -> issueCounts.merge(issue.type().name(), 1, Integer::sum));
         Usage first = responses.isEmpty() || responses.getFirst() == null || responses.getFirst().getMetadata() == null
                 ? null : responses.getFirst().getMetadata().getUsage();
-        return new ExtractionResult.Metrics(model, PROMPT_VERSION, properties.pipeline().label(), latencyMs,
+        return new ExtractionResult.Metrics(model, PROMPT_VERSION, properties.pipelineLabel(), latencyMs,
                 promptTokens, completionTokens, responses.size(), retriedSegments, issueCounts, firstPassMs,
                 first == null ? null : first.getPromptTokens(), first == null ? null : first.getCompletionTokens());
     }

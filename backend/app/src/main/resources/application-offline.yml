@@ -1,0 +1,15 @@
+# 오프라인 모드 (ADR 0005): 데이터를 외부로 보낼 수 없는 환경. 로컬 Ollama 모델 + 검증 + 재요청.
+# 켜는 법: SPRING_PROFILES_ACTIVE=offline (예: SPRING_PROFILES_ACTIVE=offline eval/run_eval_resumable.sh full)
+# 이 맥(Intel CPU)에서는 보고서당 약 5분이 걸린다. 일상 개발이 아니라 로컬 경로 회귀 확인용으로 쓴다.
+spring:
+  ai:
+    model:
+      chat: ollama
+    # 로컬 CPU 모델은 자동 재시도를 하지 않는다. 시간 제한에 걸린 무거운 요청을 Ollama에 다시 쌓는다 (2026-11-09 실측)
+    retry:
+      max-attempts: 1
+
+checkupai:
+  extraction:
+    retry-enabled: true      # 작은 모델은 재요청으로 재현율이 오른다 (처음 보는 양식 0.834 -> 0.891)
+    model-settings: think=false   # 결과를 바꾸는 공급자 설정 요약 (평가 캐시 키). application.yml의 ollama think와 같은 값

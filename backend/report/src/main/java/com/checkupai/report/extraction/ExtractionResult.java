@@ -44,7 +44,7 @@ public record ExtractionResult(CheckupReport report, Metrics metrics, Diagnostic
      *
      * @param firstPassItems 1차 추출 원본 (검증 전)
      * @param issues 검증 문제 상세
-     * @param retryInput 재요청에 보낸 표 머리 줄과 누락 의심 조각
+     * @param retryInput 표 머리 줄과 누락 의심 조각. 재요청을 껐으면 보내지 않고 기록만 한다 (ADR 0005)
      * @param retryItems 재요청 응답 원본 (검증 전)
      * @param retryError 재요청이 실패했을 때의 오류 (실패해도 1차 결과는 반환한다)
      */

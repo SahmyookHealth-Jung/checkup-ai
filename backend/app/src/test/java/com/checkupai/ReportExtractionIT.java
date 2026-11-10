@@ -11,13 +11,16 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 /**
  * 추출 파이프라인 연결 확인 (짧은 입력). 정확도 평가는 eval/extraction 스크립트가 맡는다.
  * 실행 전제: PostgreSQL, Ollama, 채팅 모델(OLLAMA_CHAT_MODEL) pull 완료. CPU에서 1분 안팎 걸린다.
+ * 오프라인 프로필(로컬 모델)로 돈다. 기본 공급자(Haiku)는 유료 API라 통합 테스트에서 부르지 않는다 (ADR 0005).
  */
 @Tag("integration")
 @SpringBootTest
+@ActiveProfiles("offline")
 class ReportExtractionIT {
 
     @Autowired
