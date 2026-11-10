@@ -19,6 +19,9 @@ public record ExtractionResult(CheckupReport report, Metrics metrics, Diagnostic
      * @param attempts LLM 호출 횟수 (재요청 포함)
      * @param retriedSegments 누락 의심으로 다시 보낸 원문 조각 수
      * @param issues 검증에서 발견한 문제 유형별 건수
+     * @param firstPassLatencyMs 1차 호출까지의 지연. 모델 비교에서 "1차만" 조건의 지연·비용을 따로 보려고 남긴다
+     * @param firstPassPromptTokens 1차 호출의 입력 토큰
+     * @param firstPassCompletionTokens 1차 호출의 출력 토큰
      */
     public record Metrics(
             String model,
@@ -29,7 +32,10 @@ public record ExtractionResult(CheckupReport report, Metrics metrics, Diagnostic
             Integer completionTokens,
             int attempts,
             int retriedSegments,
-            Map<String, Integer> issues) {
+            Map<String, Integer> issues,
+            long firstPassLatencyMs,
+            Integer firstPassPromptTokens,
+            Integer firstPassCompletionTokens) {
     }
 
     /**

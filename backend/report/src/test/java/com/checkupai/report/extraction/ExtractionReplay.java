@@ -56,6 +56,7 @@ public final class ExtractionReplay {
             ValidationResult checked = validator.validate(first, text);
             List<Issue> issues = new ArrayList<>(checked.issues());
             CheckupReport result = checked.report();
+            List<ReportItem> validatedItems = result.items();  // "검증만, 재요청 없음" 조건 (모델 비교용)
             if (!checked.uncoveredSegments().isEmpty() && doc.retryItems() != null) {
                 ValidationResult merged = validator.validateAdditional(result, doc.retryItems(), text);
                 issues.addAll(merged.issues());
@@ -68,8 +69,8 @@ public final class ExtractionReplay {
                 retryInput.addAll(checked.uncoveredSegments());
             }
             List<String> savedRetryInput = doc.retryInput() == null ? List.of() : doc.retryInput();
-            mapper.writeValue(outDir.resolve(in.getFileName()).toFile(), new Output(doc.id(), result.items(), issues,
-                    retryInput, savedRetryInput, !retryInput.equals(savedRetryInput)));
+            mapper.writeValue(outDir.resolve(in.getFileName()).toFile(), new Output(doc.id(), result.items(),
+                    validatedItems, issues, retryInput, savedRetryInput, !retryInput.equals(savedRetryInput)));
         }
         System.out.println("재생 " + inputs.size() + "개 → " + outDir);
     }
@@ -82,11 +83,13 @@ public final class ExtractionReplay {
     }
 
     /**
+     * @param items 최종 항목 (검증 + 재요청)
+     * @param validatedItems 1차 출력을 검증만 한 항목 (재요청 전)
      * @param retryInput 현재 검증기로 만든 재요청 입력 (표 머리 줄 + 누락 조각, 누락이 없으면 빈 목록)
      * @param savedRetryInput 실제 실행에서 재요청한 조각
      * @param retryInputChanged 둘이 다르다: 이 보고서의 재생 결과는 근사치다
      */
-    record Output(String id, List<ReportItem> items, List<Issue> issues, List<String> retryInput,
-                  List<String> savedRetryInput, boolean retryInputChanged) {
+    record Output(String id, List<ReportItem> items, List<ReportItem> validatedItems, List<Issue> issues,
+                  List<String> retryInput, List<String> savedRetryInput, boolean retryInputChanged) {
     }
 }

@@ -100,10 +100,11 @@ public class ReportExtractor {
 
         CheckupReport firstPass = call(systemPrompt, USER_TEMPLATE, Map.of("report", reportText),
                 properties.firstPassMaxTokens(), CheckupReport.class, responses, issues);
+        long firstPassMs = (System.nanoTime() - started) / 1_000_000;  // 모델 비교: "1차만" 조건의 지연
         if (properties.pipeline() == Pipeline.BASELINE) {
             var diagnostics = withDiagnostics
                     ? new ExtractionResult.Diagnostics(firstPass.items(), List.of(), null, null, null) : null;
-            return new ExtractionResult(firstPass, metrics(started, responses, 0, List.of()), diagnostics);
+            return new ExtractionResult(firstPass, metrics(started, firstPassMs, responses, 0, List.of()), diagnostics);
         }
 
         ValidationResult validation = validator.validate(firstPass, reportText);
@@ -143,7 +144,7 @@ public class ReportExtractor {
                 ? new ExtractionResult.Diagnostics(firstPass.items(), issues,
                         segments.isEmpty() ? null : concat(header, segments), retryItems, retryError)
                 : null;
-        return new ExtractionResult(report, metrics(started, responses, segments.size(), issues), diagnostics);
+        return new ExtractionResult(report, metrics(started, firstPassMs, responses, segments.size(), issues), diagnostics);
     }
 
     private <T> T call(String system, String userTemplate, Map<String, Object> params, int maxTokens, Class<T> type,
@@ -167,8 +168,8 @@ public class ReportExtractor {
         return response.entity();
     }
 
-    private ExtractionResult.Metrics metrics(long started, List<ChatResponse> responses, int retriedSegments,
-                                             List<Issue> issues) {
+    private ExtractionResult.Metrics metrics(long started, long firstPassMs, List<ChatResponse> responses,
+                                             int retriedSegments, List<Issue> issues) {
         long latencyMs = (System.nanoTime() - started) / 1_000_000;
         String model = null;
         Integer promptTokens = null;
@@ -186,8 +187,11 @@ public class ReportExtractor {
         }
         Map<String, Integer> issueCounts = new TreeMap<>();
         issues.forEach(issue -> issueCounts.merge(issue.type().name(), 1, Integer::sum));
+        Usage first = responses.isEmpty() || responses.getFirst() == null || responses.getFirst().getMetadata() == null
+                ? null : responses.getFirst().getMetadata().getUsage();
         return new ExtractionResult.Metrics(model, PROMPT_VERSION, properties.pipeline().label(), latencyMs,
-                promptTokens, completionTokens, responses.size(), retriedSegments, issueCounts);
+                promptTokens, completionTokens, responses.size(), retriedSegments, issueCounts, firstPassMs,
+                first == null ? null : first.getPromptTokens(), first == null ? null : first.getCompletionTokens());
     }
 
     private static List<String> concat(List<String> header, List<String> segments) {
