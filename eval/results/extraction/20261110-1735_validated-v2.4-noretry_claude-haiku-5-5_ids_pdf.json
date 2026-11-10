@@ -1,0 +1,469 @@
+{
+  "summary": {
+    "runAt": "2026-11-10T17:35:01",
+    "model": "claude-haiku-5-5",
+    "promptVersion": "extraction-v1",
+    "pipeline": "validated-v2.4-noretry",
+    "settings": "firstPassMaxTokens=2500,retryMaxTokens=600,retryBatchSize=4,thinking=disabled",
+    "dataset": "v1",
+    "subset": "ids",
+    "format": "pdf",
+    "metric": "v2",
+    "documents": 1,
+    "failed": 0,
+    "itemF1": {
+      "tp": 22,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "firstPassF1": {
+      "tp": 22,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "byTemplate": {
+      "sum": {
+        "tp": 22,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    "fieldAccuracy": {
+      "unit": {
+        "accuracy": 1.0,
+        "total": 22,
+        "correct": 22,
+        "invented": 0,
+        "dropped": 0,
+        "wrong": 0
+      },
+      "referenceRaw": {
+        "accuracy": 1.0,
+        "total": 22,
+        "correct": 22,
+        "invented": 0,
+        "dropped": 0,
+        "wrong": 0
+      },
+      "centerJudgment": {
+        "accuracy": 1.0,
+        "total": 22,
+        "correct": 22,
+        "invented": 0,
+        "dropped": 0,
+        "wrong": 0
+      }
+    },
+    "firstPassFieldAccuracy": {
+      "unit": {
+        "accuracy": 1.0,
+        "total": 22,
+        "correct": 22,
+        "invented": 0,
+        "dropped": 0,
+        "wrong": 0
+      },
+      "referenceRaw": {
+        "accuracy": 1.0,
+        "total": 22,
+        "correct": 22,
+        "invented": 0,
+        "dropped": 0,
+        "wrong": 0
+      },
+      "centerJudgment": {
+        "accuracy": 1.0,
+        "total": 22,
+        "correct": 22,
+        "invented": 0,
+        "dropped": 0,
+        "wrong": 0
+      }
+    },
+    "fieldAccuracyByTemplate": {
+      "sum": {
+        "unit": 1.0,
+        "referenceRaw": 1.0,
+        "centerJudgment": 1.0
+      }
+    },
+    "avgLatencyMs": 6602,
+    "avgPromptTokens": 4147,
+    "avgCompletionTokens": 1434,
+    "totalAttempts": 1,
+    "totalRetriedSegments": 0,
+    "issueCounts": {
+      "UNGROUNDED_FIELD": 27
+    }
+  },
+  "documents": [
+    {
+      "id": "sum-001",
+      "cached": false,
+      "tp": 22,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "firstPass": {
+        "tp": 22,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "metrics": {
+        "model": "claude-haiku-5-5",
+        "promptVersion": "extraction-v1",
+        "pipeline": "validated-v2.4-noretry",
+        "latencyMs": 6602,
+        "promptTokens": 4147,
+        "completionTokens": 1434,
+        "attempts": 1,
+        "retriedSegments": 0,
+        "issues": {
+          "UNGROUNDED_FIELD": 27
+        },
+        "firstPassLatencyMs": 6561,
+        "firstPassPromptTokens": 4147,
+        "firstPassCompletionTokens": 1434
+      },
+      "error": null,
+      "errors": [],
+      "header": {
+        "examDate": "2026-10-26",
+        "examType": "UNKNOWN",
+        "sex": "FEMALE",
+        "age": 42
+      },
+      "diagnostics": {
+        "firstPassItems": [
+          {
+            "code": "HEIGHT",
+            "rawName": "Height",
+            "value": "150.6",
+            "unit": "cm",
+            "referenceRaw": "null",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "WEIGHT",
+            "rawName": "Weight",
+            "value": "55.6",
+            "unit": "kg",
+            "referenceRaw": "null",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "WAIST_CIRCUMFERENCE",
+            "rawName": "Waist",
+            "value": "69",
+            "unit": "cm",
+            "referenceRaw": "<85",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "BMI",
+            "rawName": "BMI",
+            "value": "24.5",
+            "unit": "kg/m²",
+            "referenceRaw": "18.5-24.9",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "SYSTOLIC_BP",
+            "rawName": "SBP",
+            "value": "103",
+            "unit": "mmHg",
+            "referenceRaw": "<120",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "DIASTOLIC_BP",
+            "rawName": "DBP",
+            "value": "71",
+            "unit": "mmHg",
+            "referenceRaw": "<80",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "U-Protein",
+            "value": "약양성(±)",
+            "unit": "null",
+            "referenceRaw": "음성",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "HEMOGLOBIN",
+            "rawName": "Hb",
+            "value": "10.4",
+            "unit": "g/dL",
+            "referenceRaw": "12.0-15.5",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "FBS",
+            "value": "183",
+            "unit": "mg/dL",
+            "referenceRaw": "<100",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "TOTAL_CHOLESTEROL",
+            "rawName": "T-Chol",
+            "value": "233",
+            "unit": "mg/dL",
+            "referenceRaw": "<200",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "HDL_CHOLESTEROL",
+            "rawName": "HDL-C",
+            "value": "67",
+            "unit": "mg/dL",
+            "referenceRaw": "≥60",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "TRIGLYCERIDES",
+            "rawName": "TG",
+            "value": "174",
+            "unit": "mg/dL",
+            "referenceRaw": "<150",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "LDL_CHOLESTEROL",
+            "rawName": "LDL-C",
+            "value": "94",
+            "unit": "mg/dL",
+            "referenceRaw": "<130",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "Cr",
+            "value": "1.12",
+            "unit": "mg/dL",
+            "referenceRaw": "≤1.5",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "eGFR",
+            "value": "109",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "≥60",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "AST",
+            "rawName": "SGOT(AST)",
+            "value": "32",
+            "unit": "U/L",
+            "referenceRaw": "≤40",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "ALT",
+            "rawName": "SGPT(ALT)",
+            "value": "105",
+            "unit": "U/L",
+            "referenceRaw": "≤35",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "r-GTP",
+            "value": "116",
+            "unit": "U/L",
+            "referenceRaw": "8-35",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "CHEST_XRAY",
+            "rawName": "Chest PA",
+            "value": "비활동성 폐결핵",
+            "unit": "null",
+            "referenceRaw": "null",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "HbA1c",
+            "value": "5.1",
+            "unit": "%",
+            "referenceRaw": "<5.7",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "CEA",
+            "value": "5.0",
+            "unit": "ng/mL",
+            "referenceRaw": "≤5.0",
+            "centerJudgment": "null"
+          },
+          {
+            "code": "OTHER",
+            "rawName": "Uric acid",
+            "value": "7.2",
+            "unit": "mg/dL",
+            "referenceRaw": "3.5-7.2",
+            "centerJudgment": "null"
+          }
+        ],
+        "issues": [
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WAIST_CIRCUMFERENCE",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "BMI",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "SYSTOLIC_BP",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "DIASTOLIC_BP",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "URINE_PROTEIN",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEMOGLOBIN",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "FASTING_GLUCOSE",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "TOTAL_CHOLESTEROL",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HDL_CHOLESTEROL",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "TRIGLYCERIDES",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "LDL_CHOLESTEROL",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "SERUM_CREATININE",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "EGFR",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "AST",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "ALT",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "GAMMA_GTP",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "unit=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "referenceRaw=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "CHEST_XRAY",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "OTHER",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "OTHER",
+            "detail": "centerJudgment=null"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "OTHER",
+            "detail": "centerJudgment=null"
+          }
+        ]
+      }
+    }
+  ]
+}

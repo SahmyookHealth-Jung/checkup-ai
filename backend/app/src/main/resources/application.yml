@@ -56,6 +56,13 @@ spring:
       read-timeout: 15m
 
 checkupai:
+  llm:
+    # 모델별 가격 (100만 토큰당 달러). LLM 호출 기록의 비용 계산에 쓴다 (ADR 0006).
+    # 출처: Anthropic 가격표 (claude-api 참고 자료, 2026-11-03 기준). Haiku 5.5는 입력 10만 토큰 이하 요청 가격이다
+    # (초과하면 입력 $0.50 / 출력 $2.50). 로컬 모델은 0. 콜론이 든 키는 대괄호로 감싼다.
+    pricing:
+      claude-haiku-5-5: { input: 0.10, output: 0.50 }
+      "[qwen3:4b]": { input: 0, output: 0 }
   extraction:
     pipeline: ${EXTRACTION_PIPELINE:validated}   # baseline | validated (ADR 0003)
     first-pass-max-tokens: ${EXTRACTION_FIRST_PASS_MAX_TOKENS:2500}   # 정상 출력 1,400~1,800토큰(qwen3). 반복 루프 폭주 방지

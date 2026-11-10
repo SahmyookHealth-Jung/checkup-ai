@@ -60,6 +60,13 @@ def _by_code(items: list[Measured]) -> dict[str, Measured]:
     return {m.code: m for m in items if m.code != "OTHER"}
 
 
+def _pii(name: str | None = None, birth: str | None = None, record: str | None = None) -> dict:
+    """문서에 찍힌 개인 식별정보 (모두 합성값). 외부 전송 전 식별정보 제거가 빠뜨리는 것이 없는지 재는 데 쓴다.
+    검진기관의 전화번호·주소는 개인 정보가 아니므로 넣지 않는다."""
+    pii = {"NAME": [name] if name else [], "BIRTH_DATE": [birth] if birth else [], "RECORD_NUMBER": [record] if record else []}
+    return {k: v for k, v in pii.items() if v}
+
+
 # ---- 템플릿 1: 공단 표준 서식형 ----
 
 GROUPS = {
@@ -104,7 +111,8 @@ def standard(rng: random.Random, subject: Subject, items: list[Measured], labels
         Para("추적 관찰이 필요한 항목: " + (", ".join(flagged) if flagged else "없음")
              + ". 자세한 내용은 담당 의사와 상담하시기 바랍니다."),
     ]
-    meta = {"distractors": [], "age_printed": True}
+    meta = {"distractors": [], "age_printed": True,
+            "pii": _pii(name=subject.masked_name, birth=f"{subject.birth_year}-**-**")}
     return blocks, _expected(subject, "GENERAL", expected, age_printed=True), meta
 
 
@@ -128,15 +136,17 @@ def clinic_summary(rng: random.Random, subject: Subject, items: list[Measured], 
         expected.append(_expected_item(m, name, unit=m.unit, reference=reference))
 
     sex_code = "M" if subject.sex == "MALE" else "F"
+    record = f"SYN-2026-{rng.randint(1000, 9999)}"  # 블록 목록 안에서 쓰던 것과 같은 순서로 뽑는다 (재생성 결과 동일)
     blocks: list[Block] = [
         Heading("가상의원 종합건강검진 결과 요약"),
         Para(SYNTHETIC_NOTICE),
-        Para(f"수검번호: SYN-2026-{rng.randint(1000, 9999)}    이름: {subject.masked_name} "
+        Para(f"수검번호: {record}    이름: {subject.masked_name} "
              f"({sex_code}/{subject.age})    검사일: {subject.exam_date.strftime('%Y.%m.%d')}"),
         Table(["검사명", "금회", "전회", "단위", "참고치"], rows),
         Para("※ 전회 결과는 직전 검진 기록입니다. 이상 소견은 담당 의사와 상담하시기 바랍니다."),
     ]
-    meta = {"distractors": ["previous_column"], "age_printed": True}
+    meta = {"distractors": ["previous_column"], "age_printed": True,
+            "pii": _pii(name=subject.masked_name, record=record)}
     return blocks, _expected(subject, "COMPREHENSIVE", expected, age_printed=True), meta
 
 
@@ -205,7 +215,8 @@ def narrative(rng: random.Random, subject: Subject, items: list[Measured], label
         Heading("의사 소견"),
         Para(comment),
     ]
-    meta = {"distractors": ["comment_previous_value"], "age_printed": False}
+    meta = {"distractors": ["comment_previous_value"], "age_printed": False,
+            "pii": _pii(name=subject.masked_name, birth=f"{subject.birth_year}-**-**")}
     return blocks, _expected(subject, "GENERAL", expected, age_printed=False), meta
 
 
@@ -268,10 +279,11 @@ def lab_report(rng: random.Random, subject: Subject, items: list[Measured], labe
     expected.append(_expected_item(xray, "흉부 X-ray", judgment=xray_judgment))
 
     sex_ko = "남" if subject.sex == "MALE" else "여"
+    record = f"SYN-{rng.randint(10000, 99999)}"  # 블록 목록 안에서 쓰던 것과 같은 순서로 뽑는다 (재생성 결과 동일)
     blocks: list[Block] = [
         Heading("가상병원 진단검사의학과 검사 결과 보고서"),
         Para(SYNTHETIC_NOTICE),
-        Para(f"등록번호: SYN-{rng.randint(10000, 99999)}    성별/나이: {sex_ko}/{subject.age}    "
+        Para(f"등록번호: {record}    성별/나이: {sex_ko}/{subject.age}    "
              f"채혈일: {subject.exam_date.strftime('%Y/%m/%d')}"),
         Heading("신체 계측 및 기본 검사"),
         Table(["항목", "결과", "항목", "결과"], summary_rows),
@@ -283,7 +295,7 @@ def lab_report(rng: random.Random, subject: Subject, items: list[Measured], labe
         Para("문의: 진단검사의학과 000-0000-0000"),
     ]
     meta = {"distractors": ["two_column_table", "pair_in_one_cell", "judgment_after_result", "lab_vocabulary",
-                            "non_result_numbers"], "age_printed": True}
+                            "non_result_numbers"], "age_printed": True, "pii": _pii(record=record)}
     return blocks, _expected(subject, "UNKNOWN", expected, age_printed=True), meta
 
 
@@ -350,10 +362,11 @@ def trend_report(rng: random.Random, subject: Subject, items: list[Measured], la
 
     sex_ko = "남" if subject.sex == "MALE" else "여"
     d = subject.exam_date
+    record = f"C-{rng.randint(100000, 999999)}"  # 블록 목록 안에서 쓰던 것과 같은 순서로 뽑는다 (재생성 결과 동일)
     blocks: list[Block] = [
         Heading("건강검진 3개년 추이 보고서"),
         Para(SYNTHETIC_NOTICE),
-        Para(f"고객번호 C-{rng.randint(100000, 999999)} / 성별 {sex_ko} / 나이 {subject.age}세 / "
+        Para(f"고객번호 {record} / 성별 {sex_ko} / 나이 {subject.age}세 / "
              f"검진일 {d.year}. {d.month}. {d.day}."),
         Heading("검사 결과 추이 (2024~2026)"),
         Table(["검사항목", "단위", "2024", "2025", "2026(이번)", "참고치", "판정"], rows),
@@ -364,7 +377,7 @@ def trend_report(rng: random.Random, subject: Subject, items: list[Measured], la
         Para("상담 문의 1588-0000 (평일 09:00~18:00)"),
     ]
     meta = {"distractors": ["three_year_columns", "unit_before_values", "senses_slash_line", "trend_vocabulary",
-                            "non_result_numbers"], "age_printed": True}
+                            "non_result_numbers"], "age_printed": True, "pii": _pii(record=record)}
     return blocks, _expected(subject, "UNKNOWN", expected, age_printed=True), meta
 
 
@@ -456,7 +469,7 @@ def guide_report(rng: random.Random, subject: Subject, items: list[Measured], la
         Para(f"{footer} · 2 / 2쪽"),
     ]
     meta = {"distractors": ["transposed_table", "unit_in_name", "leader_lines", "guide_vocabulary",
-                            "page_footer_numbers"], "age_printed": True}
+                            "page_footer_numbers"], "age_printed": True, "pii": _pii(name=subject.masked_name)}
     return blocks, _expected(subject, "UNKNOWN", expected, age_printed=True), meta
 
 

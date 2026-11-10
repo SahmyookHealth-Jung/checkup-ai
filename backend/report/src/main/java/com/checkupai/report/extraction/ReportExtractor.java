@@ -1,5 +1,6 @@
 package com.checkupai.report.extraction;
 
+import com.checkupai.core.llm.LlmCallContext;
 import com.checkupai.report.extraction.ExtractionProperties.Pipeline;
 import com.checkupai.report.extraction.ExtractionValidator.Issue;
 import com.checkupai.report.extraction.ExtractionValidator.IssueType;
@@ -49,6 +50,9 @@ public class ReportExtractor {
     private static final Logger log = LoggerFactory.getLogger(ReportExtractor.class);
 
     static final String PROMPT_VERSION = "extraction-v1";
+    /** 호출 기록에 남는 기능 이름 (core LlmCallLoggingAdvisor) */
+    private static final String FEATURE_FIRST_PASS = "report.extraction.first-pass";
+    private static final String FEATURE_RETRY = "report.extraction.retry";
 
     private static final String USER_TEMPLATE = """
             다음 검진 결과지에서 검사 결과를 추출하라.
@@ -98,7 +102,7 @@ public class ReportExtractor {
         List<ChatResponse> responses = new ArrayList<>();
         List<Issue> issues = new ArrayList<>();
 
-        CheckupReport firstPass = call(systemPrompt, USER_TEMPLATE, Map.of("report", reportText),
+        CheckupReport firstPass = call(FEATURE_FIRST_PASS, systemPrompt, USER_TEMPLATE, Map.of("report", reportText),
                 properties.firstPassMaxTokens(), CheckupReport.class, responses, issues);
         long firstPassMs = (System.nanoTime() - started) / 1_000_000;  // 모델 비교: "1차만" 조건의 지연
         if (firstPass == null) {
@@ -130,7 +134,7 @@ public class ReportExtractor {
             for (int from = 0; from < segments.size(); from += batchSize) {
                 List<String> batch = segments.subList(from, Math.min(from + batchSize, segments.size()));
                 try {
-                    ItemList retried = call(retryPrompt, RETRY_USER_TEMPLATE,
+                    ItemList retried = call(FEATURE_RETRY, retryPrompt, RETRY_USER_TEMPLATE,
                             Map.of("header", headerText, "segments", String.join("\n", batch)),
                             properties.retryMaxTokens(), ItemList.class, responses, issues);
                     List<ReportItem> items = retried == null || retried.items() == null ? List.of() : retried.items();
@@ -155,8 +159,8 @@ public class ReportExtractor {
                 diagnostics);
     }
 
-    private <T> T call(String system, String userTemplate, Map<String, Object> params, int maxTokens, Class<T> type,
-                       List<ChatResponse> responses, List<Issue> issues) {
+    private <T> T call(String feature, String system, String userTemplate, Map<String, Object> params, int maxTokens,
+                       Class<T> type, List<ChatResponse> responses, List<Issue> issues) {
         // 기준선은 재현용이므로 잘린 출력을 살리지 않는다
         StructuredOutputConverter<T> converter = properties.pipeline() == Pipeline.BASELINE
                 ? new BeanOutputConverter<>(type) : new SalvagingOutputConverter<>(type);
@@ -165,6 +169,7 @@ public class ReportExtractor {
                 .user(u -> u.text(userTemplate).params(params))
                 .options(ChatOptions.builder().maxTokens(maxTokens))
                 .advisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
+                .advisors(advisor -> advisor.param(LlmCallContext.FEATURE, feature))  // 호출 기록의 기능 이름 (ADR 0006)
                 .call()
                 .responseEntity(converter);
         responses.add(response.response());
