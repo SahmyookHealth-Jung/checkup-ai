@@ -24,14 +24,19 @@ public record ExplanationResult(List<ItemJudgment> judgments, List<ItemExplanati
     /**
      * @param sentences 검증을 통과한 문장. 비어 있으면 noEvidence
      * @param careAdvice 질환의심 항목의 진료 권고 (코드가 붙인 고정 문구), 그 밖에는 null
+     * @param evidenceChunkIds 이 항목에 허락된 근거 청크 id (검색 결과). 조건을 바꿨을 때 근거 목록이 바뀐 항목을 가려내는 데 쓴다
      */
     public record ItemExplanation(ItemCode code, String name, String value, String unit, Judgment judgment,
                                   String judgmentLabel, String criterion, String criterionSource,
-                                  List<Sentence> sentences, boolean noEvidence, String careAdvice) {
+                                  List<Sentence> sentences, boolean noEvidence, String careAdvice,
+                                  List<String> evidenceChunkIds) {
     }
 
+    /** 문장을 만든 쪽. LLM 문장은 인용·숫자 검증을 거친다. 코드 문구는 판정 결과와 판정기준표 행으로 조립한다 */
+    public enum Origin { LLM, CODE }
+
     /** @param citations 인용 번호 ({@link Citation#number()}) */
-    public record Sentence(String text, List<Integer> citations) {
+    public record Sentence(String text, List<Integer> citations, Origin origin) {
     }
 
     public record Citation(int number, String chunkId, String title, String publisher, String edition,
@@ -52,10 +57,12 @@ public record ExplanationResult(List<ItemJudgment> judgments, List<ItemExplanati
      * @param forbiddenHits 진단 단정·치료 지시 표현이 걸린 문장 수 (막지 않고 기록만)
      * @param llmError 해설 생성이 실패했으면 오류 종류
      * @param salvagedItems 출력이 상한에서 잘려 살린 항목 수 (잘리지 않았으면 -1)
+     * @param templatedItems 코드 문구로 답한 항목 수 (LLM 문장 수에는 넣지 않는다)
+     * @param itemFilter 항목 필터를 켰는지
      */
     public record Metrics(int targets, int targetsWithEvidence, int sentencesGenerated, int sentencesKept,
                           int invalidCitations, int uncitedSentences, int ungroundedNumberSentences,
                           int forbiddenHits, long retrievalMs, long llmMs, long totalMs, String llmError,
-                          int salvagedItems) {
+                          int salvagedItems, int templatedItems, boolean itemFilter) {
     }
 }

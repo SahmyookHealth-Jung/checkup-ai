@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import random
 import re
@@ -96,6 +97,7 @@ def main() -> None:
     out_file.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows), encoding="utf-8")
     manifest = {"name": args.name, "createdAt": datetime.now().isoformat(timespec="seconds"),
                 "baseline": baseline["runId"], "run": args.run, "seed": SEED, "rubric": RUBRIC_VERSION,
+                "chunksSha256": hashlib.sha256(CHUNKS.read_bytes()).hexdigest()[:16],  # 라벨링 화면에 넣은 원문의 청크 버전
                 "population": {name: sum(1 for s in population if s["stratum"] == name) for name in QUOTA},
                 "sampled": {name: sum(1 for r in rows if r["stratum"] == name) for name in QUOTA}}
     (OUT / f"{args.name}.manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",

@@ -79,6 +79,7 @@ def assess_report(criteria: dict, expected: dict, report: dict, needs_review: li
         "invalidCitations": m["invalidCitations"], "uncitedSentences": m["uncitedSentences"],
         "ungroundedNumberSentences": m["ungroundedNumberSentences"], "forbiddenHits": m["forbiddenHits"],
         "noEvidenceItems": sum(1 for it in explanation["items"] if it["noEvidence"]),
+        "templatedItems": m.get("templatedItems", 0),
         "llmError": m.get("llmError"), "salvaged": m.get("salvagedItems", -1) >= 0,
         "disclaimer": bool(explanation.get("disclaimer")),
         "expectedSuspect": sorted(suspect), "advised": sorted(advised),
@@ -105,6 +106,7 @@ def summarize(rows: list[dict]) -> dict:
             "ungroundedNumberSentences": total("ungroundedNumberSentences"), "forbiddenHits": total("forbiddenHits"),
             "noEvidenceItems": total("noEvidenceItems"),
             "llmErrors": sum(1 for r in rows if r["llmError"]), "salvaged": sum(1 for r in rows if r["salvaged"]),
+            "templatedItems": sum(r.get("templatedItems", 0) for r in rows),
         },
         "endToEnd": {
             "expectedSuspect": expected, "advisedCorrect": advised_correct,
@@ -123,8 +125,12 @@ def compact_output(explanation: dict) -> list[dict]:
     """채점기(5단계 3번)가 다시 읽을 해설 출력. 인용 번호를 청크 id로 바꾸고 근거 원문은 뺀다
     (포털 글은 공공누리 제4유형이라 저장소에 올리지 않는다. 원문은 청크 파일에서 id로 다시 찾는다)"""
     chunk_by_number = {c["number"]: c["chunkId"] for c in explanation.get("citations") or []}
+    # evidence: 이 항목에 허락된 근거 청크 id. 조건을 바꿨을 때 근거 목록이 바뀐 항목을 가려낸다 (ADR 0008 4절 4번)
+    # origin: LLM 문장인지 코드 문구인지 (5단계 이전 결과에는 없어서 LLM으로 본다)
     return [{"code": it["code"], "value": it["value"], "unit": it.get("unit"), "judgment": it["judgment"],
              "criterion": it.get("criterion"), "noEvidence": it["noEvidence"],
-             "sentences": [{"text": s["text"], "sources": [chunk_by_number[n] for n in s["citations"]]}
+             "evidence": it.get("evidenceChunkIds"),
+             "sentences": [{"text": s["text"], "sources": [chunk_by_number[n] for n in s["citations"]],
+                            "origin": s.get("origin") or "LLM"}
                            for s in it["sentences"]]}
             for it in explanation["items"]]

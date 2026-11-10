@@ -4,10 +4,12 @@ import com.checkupai.core.llm.LlmCallContext;
 import com.checkupai.report.explanation.ExplanationResult.Citation;
 import com.checkupai.report.explanation.ExplanationResult.ItemExplanation;
 import com.checkupai.report.explanation.ExplanationResult.ItemJudgment;
+import com.checkupai.report.explanation.ExplanationResult.Origin;
 import com.checkupai.report.explanation.ExplanationResult.ReviewNotice;
 import com.checkupai.report.explanation.ExplanationResult.Sentence;
 import com.checkupai.report.extraction.CheckupReport;
 import com.checkupai.report.extraction.ExtractionResult;
+import com.checkupai.report.extraction.ItemCode;
 import com.checkupai.report.extraction.ReportItem;
 import com.checkupai.report.extraction.SalvagingOutputConverter;
 import com.checkupai.report.retrieval.GuidelineSearch;
@@ -17,9 +19,11 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.ai.chat.client.AdvisorParams;
 import org.springframework.ai.chat.client.ChatClient;
@@ -37,12 +41,20 @@ import org.springframework.stereotype.Service;
  *       (식별정보 제거 Advisor가 근거 원문을 바꾸지 않게. 2026-11-10 적재 때 근거 1건이 제거 규칙에 걸렸다)</li>
  *   <li>검증: 인용·숫자 근거를 코드가 확인하고, 고지문과 진료 권고는 코드가 붙인다 ({@link ExplanationGuardrails})</li>
  * </ol>
+ * 5단계 개선 두 가지는 켜고 끌 수 있다 ({@link Options}, ADR 0008 4절 4번). 하나씩 짝비교하려고 기본값은 끔이다.
  */
 @Service
 public class ExplanationService {
 
     static final String FEATURE = "report.explanation";
     static final String PROMPT_VERSION = "explanation-v1";
+    /**
+     * 근거가 판정기준표 1행뿐인 항목 (ADR 0008 1절, 2026-11-10 기준선 분석). 코드 문구를 켜면 LLM 대신 코드가 답한다.
+     * 포털 글을 더하면 그 항목을 여기서 빼고 "코드 문구 → LLM 문장" 전후를 충실도로 잰다.
+     */
+    static final Set<ItemCode> CODE_TEMPLATE_ITEMS = EnumSet.of(ItemCode.BMI, ItemCode.WAIST_CIRCUMFERENCE,
+            ItemCode.HEMOGLOBIN, ItemCode.AST, ItemCode.ALT, ItemCode.GAMMA_GTP, ItemCode.URINE_PROTEIN,
+            ItemCode.SERUM_CREATININE, ItemCode.EGFR, ItemCode.CHEST_XRAY);
     private static final String USER_TEMPLATE = """
             아래 항목을 각각 설명해 주세요.
             {items}
@@ -64,11 +76,29 @@ public class ExplanationService {
         this.systemPrompt = loadPrompt("prompts/report-explanation-v1.st");
     }
 
-    /** 해설 대상 항목과 그 항목에 쓸 수 있는 근거 (근거 번호 → 근거 문단) */
-    private record Target(ReportItem item, CriteriaJudgment judgment, Map<String, RetrievedChunk> sources) {
+    /**
+     * 해설 조건 (ADR 0008 4절 4번). 평가 API는 요청마다 바꿔 짝비교한다.
+     *
+     * @param itemFilter 그 항목의 근거와 항목 코드가 없는 근거만 쓴다
+     * @param codeTemplates {@link #CODE_TEMPLATE_ITEMS}는 LLM 대신 코드 문구로 답한다
+     */
+    public record Options(boolean itemFilter, boolean codeTemplates) {
+    }
+
+    /** 해설 대상 항목과 그 항목에 쓸 수 있는 근거 (근거 번호 → 근거 문단). templated면 코드 문구로 답한다 */
+    private record Target(ReportItem item, CriteriaJudgment judgment, Map<String, RetrievedChunk> sources,
+                          boolean templated) {
+    }
+
+    public Options defaultOptions() {
+        return new Options(properties.itemFilter(), properties.codeTemplates());
     }
 
     public ExplanationResult explain(ExtractionResult extraction) {
+        return explain(extraction, defaultOptions());
+    }
+
+    public ExplanationResult explain(ExtractionResult extraction, Options options) {
         long started = System.nanoTime();
         CheckupReport report = extraction.report();
         List<ReportItem> reportItems = report == null || report.items() == null ? List.of() : report.items();
@@ -86,7 +116,8 @@ public class ExplanationService {
                     item.unit(), judgment.judgment(), judgment.judgment().label(), judgment.criterion(),
                     item.centerJudgment()));
             if (judgment.judgment() == Judgment.SUSPECT || judgment.judgment() == Judgment.NORMAL_B) {
-                targets.add(new Target(item, judgment, new LinkedHashMap<>()));
+                boolean templated = options.codeTemplates() && CODE_TEMPLATE_ITEMS.contains(item.code());
+                targets.add(new Target(item, judgment, new LinkedHashMap<>(), templated));
             }
         }
         targets.sort(Comparator.comparing(target -> target.judgment().judgment() == Judgment.SUSPECT ? 0 : 1));
@@ -94,13 +125,18 @@ public class ExplanationService {
             targets = new ArrayList<>(targets.subList(0, properties.maxItems()));
         }
 
-        // 3. 항목마다 근거를 검색한다. 같은 청크는 같은 번호(S1 등)를 쓴다
+        // 3. 항목마다 근거를 검색한다. 같은 청크는 같은 번호(S1 등)를 쓴다.
+        //    코드 문구 항목은 검색하지 않고 그 항목의 판정기준표 행만 근거로 둔다
         long retrievalStarted = System.nanoTime();
         Map<String, String> labelByChunkId = new LinkedHashMap<>();
         Map<String, RetrievedChunk> chunkByLabel = new LinkedHashMap<>();
         for (Target target : targets) {
+            String code = target.item().code().name();
             String query = target.item().code().koreanName() + " " + target.judgment().judgment().label();
-            for (RetrievedChunk chunk : search.relevant(search.search(query))) {
+            List<RetrievedChunk> found = target.templated()
+                    ? search.criteriaRow(code, query).stream().toList()
+                    : search.relevant(options.itemFilter() ? search.searchForItem(query, code) : search.search(query));
+            for (RetrievedChunk chunk : found) {
                 String label = labelByChunkId.computeIfAbsent(chunk.id(), id -> "S" + (labelByChunkId.size() + 1));
                 chunkByLabel.put(label, chunk);
                 target.sources().put(label, chunk);
@@ -108,8 +144,10 @@ public class ExplanationService {
         }
         long retrievalMs = (System.nanoTime() - retrievalStarted) / 1_000_000;
 
-        // 4. 근거가 있는 항목만 LLM에 보낸다
-        List<Target> withEvidence = targets.stream().filter(target -> !target.sources().isEmpty()).toList();
+        // 4. 근거가 있는 항목만 LLM에 보낸다 (코드 문구 항목은 보내지 않는다)
+        List<Target> withEvidence = targets.stream()
+                .filter(target -> !target.templated() && !target.sources().isEmpty())
+                .toList();
         ExplanationDraft draft = null;
         String llmError = null;
         int salvagedItems = -1;
@@ -119,7 +157,7 @@ public class ExplanationService {
             try {
                 // 출력이 상한에서 잘리면 완성된 항목까지만 살린다 (추출과 같은 변환기). 나머지 항목은 '근거 없음'이 된다
                 var converter = new SalvagingOutputConverter<>(ExplanationDraft.class);
-                draft = generate(withEvidence, chunkByLabel, converter);
+                draft = generate(withEvidence, converter);
                 salvagedItems = converter.salvagedItems();
             } catch (RuntimeException e) {
                 llmError = e.getClass().getSimpleName();  // 해설이 실패해도 판정·근거 없음·고지문은 돌려준다
@@ -139,8 +177,14 @@ public class ExplanationService {
         int uncited = 0;
         int ungrounded = 0;
         int forbidden = 0;
+        int templatedItems = 0;
         for (Target target : targets) {
             ReportItem item = target.item();
+            if (target.templated()) {
+                templatedItems++;
+                items.add(itemExplanation(target, templateSentences(target, citationNumbers)));
+                continue;
+            }
             Map<String, String> allowed = new LinkedHashMap<>();
             target.sources().forEach((label, chunk) -> allowed.put(label, chunk.text()));
             ExplanationDraft.ItemDraft itemDraft = draftByCode.get(item.code().name());
@@ -157,13 +201,9 @@ public class ExplanationService {
             List<Sentence> sentences = outcome.kept().stream()
                     .map(sentence -> new Sentence(sentence.text(), sentence.sources().stream()
                             .map(label -> citationNumbers.computeIfAbsent(label, l -> citationNumbers.size() + 1))
-                            .toList()))
+                            .toList(), Origin.LLM))
                     .toList();
-            boolean suspect = target.judgment().judgment() == Judgment.SUSPECT;
-            items.add(new ItemExplanation(item.code(), item.code().koreanName(), item.value(), item.unit(),
-                    target.judgment().judgment(), target.judgment().judgment().label(), target.judgment().criterion(),
-                    target.judgment().source(), sentences, sentences.isEmpty(),
-                    suspect ? ExplanationGuardrails.CARE_ADVICE : null));
+            items.add(itemExplanation(target, sentences));
         }
         List<Citation> citations = citationNumbers.entrySet().stream()
                 .map(entry -> citation(entry.getValue(), chunkByLabel.get(entry.getKey())))
@@ -174,13 +214,63 @@ public class ExplanationService {
                 .toList();
         var metrics = new ExplanationResult.Metrics(targets.size(), withEvidence.size(), generated, kept,
                 invalidCitations, uncited, ungrounded, forbidden, retrievalMs, llmMs,
-                (System.nanoTime() - started) / 1_000_000, llmError, salvagedItems);
+                (System.nanoTime() - started) / 1_000_000, llmError, salvagedItems, templatedItems,
+                options.itemFilter());
         return new ExplanationResult(judgments, items, needsReview, citations, ExplanationGuardrails.DISCLAIMER, metrics);
     }
 
-    private ExplanationDraft generate(List<Target> targets, Map<String, RetrievedChunk> chunkByLabel,
-                                      SalvagingOutputConverter<ExplanationDraft> converter) {
-        String sources = chunkByLabel.entrySet().stream()
+    private static ItemExplanation itemExplanation(Target target, List<Sentence> sentences) {
+        ReportItem item = target.item();
+        boolean suspect = target.judgment().judgment() == Judgment.SUSPECT;
+        return new ItemExplanation(item.code(), item.code().koreanName(), item.value(), item.unit(),
+                target.judgment().judgment(), target.judgment().judgment().label(), target.judgment().criterion(),
+                target.judgment().source(), sentences, sentences.isEmpty(),
+                suspect ? ExplanationGuardrails.CARE_ADVICE : null,
+                target.sources().values().stream().map(RetrievedChunk::id).toList());
+    }
+
+    /**
+     * 코드 문구 (ADR 0008 1절): "{항목} 결과값({값 단위})은 국가건강검진 판정기준의 {판정} 구간({기준})에 해당합니다."
+     * 출처는 그 항목의 판정기준표 행 하나다. 행을 못 찾으면 문장을 만들지 않는다 (근거 없음).
+     */
+    private static List<Sentence> templateSentences(Target target, Map<String, Integer> citationNumbers) {
+        if (target.sources().isEmpty()) {
+            return List.of();
+        }
+        String label = target.sources().keySet().iterator().next();
+        int number = citationNumbers.computeIfAbsent(label, l -> citationNumbers.size() + 1);
+        return List.of(new Sentence(templateText(target.item(), target.judgment()), List.of(number), Origin.CODE));
+    }
+
+    static String templateText(ReportItem item, CriteriaJudgment judgment) {
+        String value = item.value() + (item.unit() == null || item.unit().isBlank() ? "" : " " + item.unit());
+        String band = bandText(judgment.criterion(), judgment.judgment().label());
+        return item.code().koreanName() + " 결과값(" + value + ")은 국가건강검진 판정기준의 "
+                + judgment.judgment().label() + " 구간" + (band == null ? "" : "(" + band + ")") + "에 해당합니다.";
+    }
+
+    /**
+     * 판정기준표 행에서 그 판정 구간의 기준만 잘라 낸다.
+     * 예: "간장질환 · AST · U/L · 정상A 40 이하 / 정상B(경계) 41-50 / 질환의심 51 이상", "질환의심" → "51 이상"
+     */
+    static String bandText(String criterionRow, String judgmentLabel) {
+        if (criterionRow == null) {
+            return null;
+        }
+        String bands = criterionRow.substring(criterionRow.lastIndexOf(" · ") + 3);
+        for (String segment : bands.split(" / ")) {
+            if (segment.startsWith(judgmentLabel + " ")) {
+                return segment.substring(judgmentLabel.length() + 1).strip();
+            }
+        }
+        return null;
+    }
+
+    private ExplanationDraft generate(List<Target> targets, SalvagingOutputConverter<ExplanationDraft> converter) {
+        // LLM에 보낼 근거는 LLM이 해설할 항목의 근거뿐이다 (코드 문구 항목의 기준표 행은 보내지 않는다)
+        Map<String, RetrievedChunk> used = new LinkedHashMap<>();
+        targets.forEach(target -> used.putAll(target.sources()));
+        String sources = used.entrySet().stream()
                 .map(entry -> "[" + entry.getKey() + "] " + entry.getValue().text())
                 .collect(Collectors.joining("\n"));
         String items = targets.stream()

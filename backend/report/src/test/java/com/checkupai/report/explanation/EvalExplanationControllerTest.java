@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import com.checkupai.report.extraction.CheckupReport;
 import com.checkupai.report.extraction.ExtractionResult;
@@ -30,7 +31,7 @@ class EvalExplanationControllerTest {
     void disabledReturnsNotFound() {
         var controller = controller(false);
 
-        assertThatThrownBy(() -> controller.explain(extraction()))
+        assertThatThrownBy(() -> controller.explain(extraction(), null, null))
                 .isInstanceOfSatisfying(ResponseStatusException.class,
                         e -> assertThat(e.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND));
         assertThatThrownBy(controller::info).isInstanceOf(ResponseStatusException.class);
@@ -40,10 +41,13 @@ class EvalExplanationControllerTest {
     @Test
     @DisplayName("저장한 추출 결과의 report와 확인 필요 항목만 해설에 넘긴다")
     void passesReportAndNeedsReviewOnly() {
-        controller(true).explain(extraction());
+        when(service.defaultOptions()).thenReturn(new ExplanationService.Options(false, false));
+        controller(true).explain(extraction(), null, null);
 
         var captor = ArgumentCaptor.forClass(ExtractionResult.class);
-        verify(service).explain(captor.capture());
+        var options = ArgumentCaptor.forClass(ExplanationService.Options.class);
+        verify(service).explain(captor.capture(), options.capture());
+        assertThat(options.getValue()).isEqualTo(new ExplanationService.Options(false, false));
         ExtractionResult passed = captor.getValue();
         assertThat(passed.report().items()).extracting(ReportItem::code).containsExactly(ItemCode.FASTING_GLUCOSE);
         assertThat(passed.needsReview()).extracting(ReviewItem::code).containsExactly(ItemCode.AST);
@@ -54,10 +58,21 @@ class EvalExplanationControllerTest {
     @Test
     @DisplayName("report가 없으면 400")
     void rejectsMissingReport() {
-        assertThatThrownBy(() -> controller(true).explain(new ExtractionResult(null, null, null, null)))
+        assertThatThrownBy(() -> controller(true).explain(new ExtractionResult(null, null, null, null), null, null))
                 .isInstanceOfSatisfying(ResponseStatusException.class,
                         e -> assertThat(e.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST));
-        verify(service, org.mockito.Mockito.never()).explain(any());
+        verify(service, org.mockito.Mockito.never()).explain(any(), any());
+    }
+
+    @Test
+    @DisplayName("요청의 조건이 설정 기본값을 덮는다 (주지 않은 조건은 기본값)")
+    void requestOptionsOverrideDefaults() {
+        when(service.defaultOptions()).thenReturn(new ExplanationService.Options(false, true));
+        controller(true).explain(extraction(), true, null);
+
+        var options = ArgumentCaptor.forClass(ExplanationService.Options.class);
+        verify(service).explain(any(), options.capture());
+        assertThat(options.getValue()).isEqualTo(new ExplanationService.Options(true, true));
     }
 
     @Test
@@ -72,7 +87,7 @@ class EvalExplanationControllerTest {
     }
 
     private EvalExplanationController controller(boolean enabled) {
-        return new EvalExplanationController(service, new EvalProperties(enabled), new ExplanationProperties(8, 4000),
+        return new EvalExplanationController(service, new EvalProperties(enabled), new ExplanationProperties(8, 4000, false, false),
                 new GuidelineProperties("chunks.jsonl", 4, 0.5));
     }
 

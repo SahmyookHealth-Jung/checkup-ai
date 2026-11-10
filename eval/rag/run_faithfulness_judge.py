@@ -16,6 +16,7 @@ ANTHROPIC_API_KEY는 저장소 루트 .env에서 읽어 이 프로세스 환경�
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 from collections import Counter
@@ -43,6 +44,21 @@ def load_env_key() -> None:
     raise SystemExit("ANTHROPIC_API_KEY가 환경변수나 .env에 없다")
 
 
+def chunks_sha256() -> str:
+    """근거 청크 파일 해시 앞 16자 (평가 API의 chunksSha256과 같은 계산)"""
+    return hashlib.sha256(CHUNKS.read_bytes()).hexdigest()[:16]
+
+
+def check_chunks(expected: str | None, what: str) -> None:
+    """채점기는 채점 시점의 청크 파일에서 id로 원문을 찾는다. 대상이 만들어질 때의 청크와 다르면
+    같은 id에 다른 원문이 붙은 채로 조용히 채점된다 (Codex 리뷰, 2026-11-11). 그래서 해시가 다르면 멈춘다"""
+    if expected is None:
+        print(f"주의: {what}에 청크 해시가 없다 (5단계 4번 이전 기록). 청크 파일이 그때와 같다고 가정한다")
+    elif expected != chunks_sha256():
+        raise SystemExit(f"청크 파일이 다르다: {what}는 {expected}, 지금 파일은 {chunks_sha256()}. "
+                         "그때의 청크로 다시 만든 뒤(rag.build_chunks) 채점한다")
+
+
 def calibration_targets(name: str, chunks: dict) -> list[dict]:
     rows = [json.loads(line) for line in (EVAL_DIR / "calibration" / f"{name}.jsonl").read_text(encoding="utf-8").splitlines()]
     return [{"id": r["calId"], "stratum": r["stratum"], "item": r["item"], "text": r["text"],
@@ -60,7 +76,8 @@ def explanation_targets(path: Path, runs: list[int], chunks: dict) -> list[dict]
                     "judgmentLabel": JUDGMENT_LABELS.get(it["judgment"], it["judgment"]), "criterion": it.get("criterion")}
             for index, s in enumerate(it["sentences"], start=1):
                 targets.append({"id": f"r{report['run']}/{report['dataset']}/{report['id']}/{it['code']}/{index}",
-                                "stratum": stratum(it["code"], s["sources"], chunks), "item": item, "text": s["text"],
+                                "stratum": stratum(it["code"], s["sources"], chunks), "origin": s.get("origin", "LLM"),
+                                "item": item, "text": s["text"],
                                 "sources": [source(chunks, c) for c in s["sources"]]})
     return targets
 
@@ -123,13 +140,16 @@ def main() -> None:
     git = run_record.git_state()
     chunks = {row["id"]: row for row in (json.loads(line) for line in CHUNKS.read_text(encoding="utf-8").splitlines())}
     if args.calibration:
+        manifest = json.loads((EVAL_DIR / "calibration" / f"{args.calibration}.manifest.json").read_text(encoding="utf-8"))
+        check_chunks(manifest.get("chunksSha256"), f"보정셋 {args.calibration}")
         targets, dataset = calibration_targets(args.calibration, chunks), {"name": args.calibration, "source": "calibration"}
     else:
         runs = [int(r) for r in args.runs.split(",")]
         source_path = args.explanation if args.explanation.is_absolute() else EVAL_DIR / args.explanation
+        explanation_record = json.loads(source_path.read_text(encoding="utf-8"))
+        check_chunks(explanation_record["config"].get("chunksSha256"), f"해설 실행 {explanation_record['runId']}")
         targets = explanation_targets(source_path, runs, chunks)
-        dataset = {"name": json.loads(source_path.read_text(encoding="utf-8"))["runId"], "source": "explanation",
-                   "runs": runs}
+        dataset = {"name": explanation_record["runId"], "source": "explanation", "runs": runs}
     if args.limit:
         targets = targets[:args.limit]
     dataset["sentences"] = len(targets)
@@ -141,7 +161,8 @@ def main() -> None:
     details = []
     for t in targets:
         reps = [o for (job_t, _), o in zip(jobs, outcomes) if job_t is t]
-        details.append({"id": t["id"], "stratum": t["stratum"], "itemCode": t["item"]["code"], "text": t["text"],
+        details.append({"id": t["id"], "stratum": t["stratum"], "origin": t.get("origin", "LLM"),
+                        "itemCode": t["item"]["code"], "text": t["text"],
                         "sources": [s["id"] for s in t["sources"]], "repeats": reps})
     summary = summarize(details, args.repeats)
     print(json.dumps({k: v for k, v in summary.items() if k != "byStratum"}, ensure_ascii=False))
@@ -150,6 +171,7 @@ def main() -> None:
     out = run_record.save(
         run_id, "faithfulness", "faithfulness", label=args.label, dataset=dataset,
         config={"model": MODEL, "rubric": RUBRIC_VERSION, "prompt": PROMPT_VERSION, "setting": args.setting,
+                "chunksSha256": chunks_sha256(),
                 "settingDetail": SETTINGS[args.setting], "repeats": args.repeats},
         summary=summary,
         headline={"passRate": summary["passRate"], "treatmentPresent": summary["treatmentPresent"],

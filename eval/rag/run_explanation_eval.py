@@ -12,11 +12,17 @@ Haiku 출력은 실행마다 흔들리므로 같은 조건을 여러 번 돌려 
     .venv/bin/python -m rag.run_explanation_eval --label baseline                 # heldout 30개 x 2회
     .venv/bin/python -m rag.run_explanation_eval --frozen heldout30-v2.5 --runs 1 --ids heldout-v1/lab-001
     .venv/bin/python -m rag.run_explanation_eval --live --runs 3 --label v1-live   # 개발용 v1 10개
+    .venv/bin/python -m rag.run_explanation_eval --item-filter on --label item-filter   # 조건을 바꿔 짝비교 (고정 모드만)
+
+조건(ADR 0008 4절 4번)은 --item-filter, --code-templates로 요청마다 준다 (on/off, 주지 않으면 앱 설정 기본값).
+약물 문단 제외는 청크를 다시 만들고(rag.build_chunks --drop-drug-paragraphs) 앱에서 다시 적재한 뒤 잰다.
+기록의 config.chunksSha256으로 어떤 청크로 쟀는지 구분한다.
 """
 from __future__ import annotations
 
 import argparse
 import json
+import urllib.parse
 import urllib.request
 from pathlib import Path
 
@@ -39,7 +45,12 @@ def main() -> None:
     parser.add_argument("--ids", help="쉼표로 구분. 고정 모드는 '데이터셋/id', 실시간 모드는 'id'")
     parser.add_argument("--runs", type=int, default=2)
     parser.add_argument("--label", default="baseline", help="실행 이름 (예: baseline, item-filter)")
+    parser.add_argument("--item-filter", choices=["on", "off"])
+    parser.add_argument("--code-templates", choices=["on", "off"])
     args = parser.parse_args()
+    conditions = {k: v == "on" for k, v in (("itemFilter", args.item_filter), ("codeTemplates", args.code_templates)) if v}
+    if args.live and conditions:
+        raise SystemExit("조건은 고정 모드(/api/eval/explain)에서만 바꿀 수 있다")
     criteria = json.loads(CRITERIA.read_text(encoding="utf-8"))
     git = run_record.git_state()
     if git["dirty"]:
@@ -55,8 +66,11 @@ def main() -> None:
         dataset = {"name": args.frozen if not args.ids else f"{args.frozen}-ids", "source": "frozen", "reports": len(keys),
                    "extraction": {k: manifest["extraction"].get(k) for k in ("model", "promptVersion", "pipeline")}
                    | {"frozenAt": manifest["createdAt"], "commit": manifest["git"]["commit"], "meanF1": manifest["meanF1"]}}
-    config = {"model": _get(f"{args.api}/api/reports/extract/info").get("model"),
-              **_get(f"{args.api}/api/eval/explain/info"), "runs": args.runs}
+    info = _get(f"{args.api}/api/eval/explain/info")
+    config = {"model": _get(f"{args.api}/api/reports/extract/info").get("model"), **info,
+              **conditions, "runs": args.runs}  # 요청 조건이 기본값을 덮는다
+    explain_url = f"{args.api}/api/eval/explain" + (
+        "?" + urllib.parse.urlencode({k: str(v).lower() for k, v in conditions.items()}) if conditions else "")
 
     summaries, details = [], []
     for run in range(1, args.runs + 1):
@@ -69,7 +83,7 @@ def main() -> None:
             else:
                 dataset_name, report_id = key.split("/")
                 extraction = json.loads((frozen_dir / dataset_name / f"{report_id}.json").read_text(encoding="utf-8"))
-                explanation = _post(f"{args.api}/api/eval/explain", extraction)
+                explanation = _post(explain_url, extraction)
             expected = json.loads((DATA / dataset_name / f"{report_id}.expected.json").read_text(encoding="utf-8"))
             row = assess_report(criteria, expected, extraction["report"], extraction.get("needsReview") or [], explanation)
             rows.append(row)

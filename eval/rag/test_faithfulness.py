@@ -97,5 +97,70 @@ class AgreementTest(unittest.TestCase):
         self.assertEqual(report["disagreements"][0]["memo"], "애매")
 
 
+class DrugParagraphTest(unittest.TestCase):
+    """청킹 테스트 (ADR 0008 4절 4번의 3): 약 이름·계열·복용 지시가 든 문단은 빼고, 호르몬 설명의 인슐린은 남긴다"""
+
+    def test_drops_drug_paragraphs_and_keeps_hormone_insulin(self):
+        from rag.build_chunks import drop_drug_paragraphs
+        paragraphs = ["혈압약으로는 이뇨제, 베타차단제 등이 있습니다.", "스타틴을 복용하면 도움이 됩니다.",
+                      "인슐린 주사 치료가 필요할 수 있습니다.", "약을 임의로 중단하지 마세요.",
+                      "인슐린 분비가 줄어들면 혈당이 오릅니다.", "정기적으로 혈압을 측정합니다."]
+        kept, removed = drop_drug_paragraphs(paragraphs)
+        self.assertEqual(kept, ["인슐린 분비가 줄어들면 혈당이 오릅니다.", "정기적으로 혈압을 측정합니다."])
+        self.assertEqual(removed, 4)
+
+
+class CompareConditionsTest(unittest.TestCase):
+
+    def record(self, evidence_ast, origin="LLM"):
+        report = {"run": 1, "dataset": "d", "id": "r1", "expectedSuspect": ["AST"], "misses": [],
+                  "output": [{"code": "AST", "noEvidence": False, "evidence": evidence_ast,
+                              "sentences": [{"text": "s", "sources": evidence_ast[:1], "origin": origin}]},
+                             {"code": "ALT", "noEvidence": False, "evidence": ["row-alt"],
+                              "sentences": [{"text": "s", "sources": ["row-alt"], "origin": "LLM"}]}]}
+        return {"runId": "x", "details": [report]}
+
+    def test_changed_items_are_those_whose_evidence_or_origin_differs(self):
+        from rag.compare_conditions import changed_items, explanation_numbers
+        base = self.record(["row-ast", "row-tg"])
+        self.assertEqual(changed_items(base, self.record(["row-ast"])), {("d", "r1", "AST")})
+        self.assertEqual(changed_items(base, self.record(["row-ast", "row-tg"], origin="CODE")), {("d", "r1", "AST")})
+        self.assertEqual(changed_items(base, base), set())
+        numbers = explanation_numbers(self.record(["row-ast"], origin="CODE"), {("d", "r1", "AST")})
+        self.assertEqual((numbers[0]["items"], numbers[0]["codeTemplatedItems"], numbers[0]["careAdvice"]), (1, 1, "1/1"))
+
+
+class JudgePairTest(unittest.TestCase):
+
+    def test_judge_file_must_target_the_same_explanation_run(self):
+        from rag.compare_conditions import check_judge_pair
+        explanation = {"runId": "explain-A"}
+        check_judge_pair({"runId": "j1", "dataset": {"source": "explanation", "name": "explain-A"}}, explanation, "기준")
+        with self.assertRaises(SystemExit):
+            check_judge_pair({"runId": "j2", "dataset": {"source": "explanation", "name": "explain-B"}}, explanation, "기준")
+        with self.assertRaises(SystemExit):
+            check_judge_pair({"runId": "j3", "dataset": {"source": "calibration", "name": "explain-A"}}, explanation, "기준")
+
+
+class ChunkVersionTest(unittest.TestCase):
+
+    def test_judging_stops_when_chunk_file_differs(self):
+        from rag import run_faithfulness_judge as judge
+        judge.check_chunks(judge.chunks_sha256(), "같은 버전")  # 같으면 통과
+        judge.check_chunks(None, "옛 기록")  # 해시가 없으면 경고만
+        with self.assertRaises(SystemExit):
+            judge.check_chunks("0000000000000000", "다른 버전")
+
+
+class PackGroupsTest(unittest.TestCase):
+
+    def test_groups_join_to_the_same_text_as_before(self):
+        from rag.build_chunks import MAX_CHARS, _pack_groups
+        paragraphs = ["가" * 300, "나" * 300, "다" * 300, "라" * 50]
+        groups = _pack_groups(paragraphs)
+        self.assertEqual([len(g) for g in groups], [2, 2])
+        self.assertTrue(all(len(" ".join(g)) <= MAX_CHARS for g in groups))
+
+
 if __name__ == "__main__":
     unittest.main()

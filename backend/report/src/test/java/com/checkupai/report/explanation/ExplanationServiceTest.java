@@ -76,10 +76,65 @@ class ExplanationServiceTest {
         assertThat(result.disclaimer()).isNotBlank();
     }
 
+    @Test
+    @DisplayName("코드 문구를 켜면 기준표뿐인 항목은 LLM에 보내지 않고, 그 항목의 기준표 행을 인용한 고정 문장으로 답한다")
+    void codeTemplateAnswersWithoutModel() {
+        var model = new ScriptedChatModel("""
+                {"items":[{"itemCode":"FASTING_GLUCOSE","sentences":[
+                  {"text":"공복혈당 183 mg/dL은 126 이상 구간입니다.","sources":["S1"]}]}]}""");
+        var astRow = row("mohw-annex4-row-ast", "AST", "검사항목별 판정기준 — AST / 정상A: 40 이하 / 질환의심: 51 이상");
+        var glucoseRow = row("mohw-annex4-row-fasting-glucose", "FASTING_GLUCOSE", GLUCOSE_ROW.getText());
+        var service = service(model, List.of(glucoseRow, astRow));
+
+        ExplanationResult result = service.explain(extraction(
+                List.of(item(ItemCode.FASTING_GLUCOSE, "183", "mg/dL"), item(ItemCode.AST, "55", "U/L")), List.of()),
+                new ExplanationService.Options(true, true));
+
+        var ast = result.items().stream().filter(it -> it.code() == ItemCode.AST).findFirst().orElseThrow();
+        assertThat(ast.sentences()).singleElement().satisfies(s -> {
+            assertThat(s.text()).isEqualTo("AST(SGOT) 결과값(55 U/L)은 국가건강검진 판정기준의 질환의심 구간(51 이상)에 해당합니다.");
+            assertThat(s.origin()).isEqualTo(ExplanationResult.Origin.CODE);
+        });
+        assertThat(ast.evidenceChunkIds()).containsExactly("mohw-annex4-row-ast");
+        assertThat(ast.careAdvice()).isEqualTo(ExplanationGuardrails.CARE_ADVICE);
+        assertThat(result.metrics().templatedItems()).isEqualTo(1);
+        assertThat(result.metrics().sentencesGenerated()).isEqualTo(1);  // LLM 문장 수에 코드 문구는 넣지 않는다
+        assertThat(model.calls).isEqualTo(1);
+        assertThat(model.lastPrompt).doesNotContain("mohw-annex4-row-ast").doesNotContain("itemCode=AST")
+                .doesNotContain("51 이상");  // 코드 문구 항목과 그 근거는 LLM에 보내지 않는다
+    }
+
+    @Test
+    @DisplayName("판정기준표 행에서 그 판정 구간의 기준만 잘라 낸다")
+    void bandTextCutsOwnBand() {
+        assertThat(ExplanationService.bandText("간장질환 · AST · U/L · 정상A 40 이하 / 정상B(경계) 41-50 / 질환의심 51 이상",
+                "질환의심")).isEqualTo("51 이상");
+        assertThat(ExplanationService.bandText("비만 · BMI · kg/m2 · 정상A 18.5-24.9 / 정상B(경계) 25-29.9, 18.5 미만 / 질환의심 30 이상",
+                "정상B(경계)")).isEqualTo("25-29.9, 18.5 미만");
+        assertThat(ExplanationService.bandText("신장질환 · 요단백 · 정상A 음성(-) / 정상B(경계) 약양성(±) / 질환의심 양성(+1) 이상",
+                "질환의심")).isEqualTo("양성(+1) 이상");
+        assertThat(ExplanationService.bandText("x · 정상A 1 이하", "질환의심")).isNull();
+    }
+
+    @Test
+    @DisplayName("코드 문구 대상은 근거가 판정기준표 1행뿐인 10개 항목이다 (ADR 0008 1절)")
+    void codeTemplateItemsMatchAdr() {
+        assertThat(ExplanationService.CODE_TEMPLATE_ITEMS).containsExactlyInAnyOrder(ItemCode.BMI,
+                ItemCode.WAIST_CIRCUMFERENCE, ItemCode.HEMOGLOBIN, ItemCode.AST, ItemCode.ALT, ItemCode.GAMMA_GTP,
+                ItemCode.URINE_PROTEIN, ItemCode.SERUM_CREATININE, ItemCode.EGFR, ItemCode.CHEST_XRAY);
+    }
+
+    private static Document row(String id, String code, String text) {
+        return Document.builder().id(id).text(text).score(0.7)
+                .metadata(Map.of("title", "건강검진 실시기준", "publisher", "보건복지부", "section", "검사항목별 판정기준",
+                        "item_codes", List.of(code)))
+                .build();
+    }
+
     private static ExplanationService service(ChatModel model, List<Document> documents) {
         var properties = new GuidelineProperties("unused", 4, 0.5);
         return new ExplanationService(ChatClient.builder(model), new ScreeningCriteria(),
-                new GuidelineSearch(new FixedVectorStore(documents), properties), new ExplanationProperties(8, 4000));
+                new GuidelineSearch(new FixedVectorStore(documents), properties), new ExplanationProperties(8, 4000, false, false));
     }
 
     private static ExtractionResult extraction(List<ReportItem> items, List<ReviewItem> review) {
@@ -120,6 +175,7 @@ class ExplanationServiceTest {
     private static final class ScriptedChatModel implements ChatModel {
         private final String response;
         private int calls;
+        private String lastPrompt = "";
 
         ScriptedChatModel(String response) {
             this.response = response;
@@ -128,6 +184,7 @@ class ExplanationServiceTest {
         @Override
         public ChatResponse call(Prompt prompt) {
             calls++;
+            lastPrompt = prompt.getContents();
             return new ChatResponse(new ArrayList<>(List.of(new Generation(new AssistantMessage(response)))));
         }
     }

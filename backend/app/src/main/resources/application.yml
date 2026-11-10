@@ -76,6 +76,9 @@ checkupai:
   explanation:
     max-items: 8              # 해설할 항목 수 상한 (질환의심 먼저)
     max-tokens: 4000          # 2026-11-10: 8개 항목 해설이 2,000토큰에서 잘렸다
+    # 5단계 개선 (ADR 0008 4절 4번). 하나씩 짝비교한 뒤 채택하면 켠다. 평가 API는 요청마다 바꿀 수 있다
+    item-filter: ${EXPLANATION_ITEM_FILTER:false}        # 그 항목의 근거와 항목 코드가 없는 근거만 쓴다
+    code-templates: ${EXPLANATION_CODE_TEMPLATES:false}  # 근거가 기준표 1행뿐인 10개 항목은 코드 문구로 답한다
   eval:
     # 저장한 추출 결과로 해설만 돌리는 평가 API (ADR 0008). 추출 검증을 거치지 않은 값이 LLM에 가므로 공개 배포에서는 끈다
     endpoints-enabled: ${EVAL_ENDPOINTS_ENABLED:true}

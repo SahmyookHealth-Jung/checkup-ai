@@ -85,7 +85,7 @@ class CompactOutputTest(unittest.TestCase):
                         citations=[{"number": 1, "chunkId": "row-glucose", "text": "원문"},
                                    {"number": 2, "chunkId": "kdca-1", "text": "포털 원문"}])
         out = compact_output(x)
-        self.assertEqual(out[0]["sentences"], [{"text": "문장", "sources": ["kdca-1", "row-glucose"]}])
+        self.assertEqual(out[0]["sentences"], [{"text": "문장", "sources": ["kdca-1", "row-glucose"], "origin": "LLM"}])
         self.assertNotIn("원문", json.dumps(out, ensure_ascii=False))
 
 
