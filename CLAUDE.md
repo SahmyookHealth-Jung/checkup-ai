@@ -1,9 +1,9 @@
 # CLAUDE.md
 
-건강검진센터 AI 플랫폼 (AI 역량 포트폴리오). 전체 배경과 일정은 [docs/PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md)에 있다.
+건강검진센터 AI 플랫폼 (AI 역량 포트폴리오). 전체 배경과 진행 단계는 [docs/PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md)에 있다. 주 단위가 아니라 단계 순서대로 진행한다.
 
 - 기능 1 (진행 중): 건강검진 결과 해설 AI. 결과지 수치 추출(Structured Output), 공개 가이드라인 RAG, 출처 인용, 가드레일, 평가 자동화.
-- 기능 2 (7주차~): 관리자용 Text-to-SQL 통계 어시스턴트.
+- 기능 2 (7단계, 기능 1 다음): 관리자용 Text-to-SQL 통계 어시스턴트.
 
 ## 절대 규칙
 
@@ -48,10 +48,10 @@ checkup-ai/
 │   ├── gradle/libs.versions.toml   버전은 여기서만 관리
 │   ├── core/                공통 기반: AI 호출 관측·비용, 공통 가드레일, 예외
 │   ├── report/              기능 1: 결과지 추출 + RAG 해설
-│   ├── stats/               기능 2: Text-to-SQL (7주차에 추가)
+│   ├── stats/               기능 2: Text-to-SQL (7단계에 추가)
 │   └── app/                 실행 모듈: 조립, 설정(application.yml), Flyway 마이그레이션
 ├── eval/                    Python 평가 스크립트·평가셋 (응답 캐시는 gitignore)
-├── frontend/                React + Vite (6주차)
+├── frontend/                React + Vite (6단계)
 ├── data/guidelines/         공개 가이드라인 출처 목록 (원문은 raw/에 내려받고 gitignore)
 ├── data/synthetic/          합성 검진 결과지
 ├── docs/                    PROJECT_BRIEF, adr/, devlog
@@ -76,7 +76,7 @@ checkup-ai/
 - DB
   - 테이블과 컬럼은 snake_case로 짓는다.
   - 스키마는 Flyway(`app/src/main/resources/db/migration/V{n}__{설명}.sql`)로만 바꾼다.
-- LLM을 호출하는 모든 코드는 토큰, 비용, 지연시간을 기록한다. 기록 방식은 `core`에 둔다(1~2주차 구현 예정).
+- LLM을 호출하는 모든 코드는 토큰, 비용, 지연시간을 기록한다. 기록 방식은 `core`에 둔다(1~2단계에서 구현 예정).
 
 ## 의료 가드레일 원칙
 
