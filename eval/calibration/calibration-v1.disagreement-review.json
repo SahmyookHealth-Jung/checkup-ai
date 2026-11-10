@@ -1,0 +1,88 @@
+{
+  "set": "calibration-v1.disagreement-review",
+  "judgeRun": "20261111-0216_faithfulness_calibration-v1_off_calibration-v1.2",
+  "rubricVersion": "faithfulness-v1.2",
+  "exportedAt": "2026-11-10T17:22:42.212Z",
+  "answers": [
+    {
+      "calId": "cal-001",
+      "category": "human_missed",
+      "verdict": "agree"
+    },
+    {
+      "calId": "cal-005",
+      "category": "human_missed",
+      "verdict": "agree"
+    },
+    {
+      "calId": "cal-013",
+      "category": "human_missed",
+      "verdict": "agree"
+    },
+    {
+      "calId": "cal-014",
+      "category": "human_missed",
+      "verdict": "agree"
+    },
+    {
+      "calId": "cal-015",
+      "category": "human_missed",
+      "verdict": "agree"
+    },
+    {
+      "calId": "cal-019",
+      "category": "human_missed",
+      "verdict": "agree"
+    },
+    {
+      "calId": "cal-029",
+      "category": "human_missed",
+      "verdict": "agree"
+    },
+    {
+      "calId": "cal-041",
+      "category": "human_missed",
+      "verdict": "agree"
+    },
+    {
+      "calId": "cal-004",
+      "category": "appropriateness",
+      "verdict": "agree"
+    },
+    {
+      "calId": "cal-025",
+      "category": "appropriateness",
+      "verdict": "agree"
+    },
+    {
+      "calId": "cal-026",
+      "category": "appropriateness",
+      "verdict": "agree"
+    },
+    {
+      "calId": "cal-037",
+      "category": "rubric_judge_right",
+      "verdict": "agree"
+    },
+    {
+      "calId": "cal-040",
+      "category": "rubric_judge_right",
+      "verdict": "agree"
+    },
+    {
+      "calId": "cal-030",
+      "category": "judge_strict",
+      "verdict": "agree"
+    },
+    {
+      "calId": "cal-032",
+      "category": "judge_strict",
+      "verdict": "agree"
+    },
+    {
+      "calId": "cal-035",
+      "category": "rubric_gap",
+      "verdict": "agree"
+    }
+  ]
+}

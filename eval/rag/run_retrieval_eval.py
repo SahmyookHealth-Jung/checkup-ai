@@ -30,11 +30,13 @@ def main() -> None:
     parser.add_argument("--api", default="http://localhost:8080")
     parser.add_argument("--k", type=int, default=4)
     parser.add_argument("--label", default="baseline")
+    parser.add_argument("--item-filter", action="store_true", help="해설과 같은 항목 필터를 건다 (질의의 item_code)")
     args = parser.parse_args()
     queries = [json.loads(line) for line in QUERIES.read_text(encoding="utf-8").splitlines() if line.strip()]
     rows = []
     for q in queries:
-        url = f"{args.api}/api/guidelines/search?" + urllib.parse.urlencode({"q": q["query"], "k": args.k})
+        params = {"q": q["query"], "k": args.k} | ({"itemCode": q["item_code"]} if args.item_filter else {})
+        url = f"{args.api}/api/guidelines/search?" + urllib.parse.urlencode(params)
         with urllib.request.urlopen(url, timeout=60) as response:
             result = json.load(response)
         ids = [chunk["id"] for chunk in result["chunks"]]
@@ -60,7 +62,7 @@ def main() -> None:
     run_id = run_record.new_run_id("retrieval", f"k{args.k}_{args.label}")
     out = run_record.save(run_id, "retrieval", "rag", label=args.label,
                           dataset={"name": "retrieval-queries-v1", "source": QUERIES.name, "reports": n},
-                          config={"k": args.k}, summary=summary,
+                          config={"k": args.k, "itemFilter": args.item_filter}, summary=summary,
                           headline={k: summary[k] for k in (f"precisionAt{args.k}", "hitAt1", "mrr")}, details=rows)
     print(f"저장: {out.relative_to(EVAL_DIR)}")
 

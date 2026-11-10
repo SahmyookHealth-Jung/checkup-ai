@@ -34,9 +34,16 @@ public class GuidelineController {
         return loader.load();
     }
 
-    /** 검색 기준선 확인용 (검색 평가 스크립트 eval/rag/run_retrieval_eval.py가 쓴다) */
+    /**
+     * 검색 기준선 확인용 (검색 평가 스크립트 eval/rag/run_retrieval_eval.py가 쓴다).
+     * itemCode를 주면 해설과 같은 항목 필터를 건다 (ADR 0008 4절 4번의 1. 이때 k는 설정값이다)
+     */
     @GetMapping("/search")
-    public SearchResult search(@RequestParam("q") String query, @RequestParam(name = "k", required = false) Integer topK) {
+    public SearchResult search(@RequestParam("q") String query, @RequestParam(name = "k", required = false) Integer topK,
+                               @RequestParam(name = "itemCode", required = false) String itemCode) {
+        if (itemCode != null && !itemCode.isBlank()) {
+            return search.searchForItem(query, itemCode);
+        }
         return topK == null ? search.search(query) : search.search(query, topK);
     }
 }

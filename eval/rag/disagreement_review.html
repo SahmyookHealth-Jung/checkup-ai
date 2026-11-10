@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>불일치 분류 확인</title>
+<!-- 템플릿. build_disagreement_review.py가 __DATA__ 자리에 넣어 eval/.cache/labeling/에 화면을 만든다 (근거 원문이 들어가므로 커밋하지 않는다) -->
+<style>
+:root {
+  --bg: #f7f7f5; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6b66; --line: #e2e1dc;
+  --accent: #2f5bd3; --accent-ink: #ffffff; --soft: #eef2fc; --ok: #2d7a46; --quote: #f3f2ee; --human: #8a5a00; --judge: #2f5bd3;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161615; --panel: #1f1f1d; --ink: #ecebe6; --muted: #a09f98; --line: #34332f;
+    --accent: #7c9bf0; --accent-ink: #10131c; --soft: #232a3d; --ok: #6cc58a; --quote: #262623; --human: #e0b45c; --judge: #7c9bf0;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+header { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line); padding: 10px 16px; }
+.bar { max-width: 980px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.bar h1 { font-size: 16px; margin: 0; }
+.count { color: var(--muted); font-variant-numeric: tabular-nums; }
+.spacer { flex: 1; }
+button { font: inherit; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+button:disabled { opacity: .45; cursor: default; }
+.dots { max-width: 980px; margin: 8px auto 0; display: flex; flex-wrap: wrap; gap: 4px; }
+.dot { width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--line); background: var(--panel); padding: 0; font-size: 0; }
+.dot.done { background: var(--ok); border-color: var(--ok); }
+.dot.current { outline: 2px solid var(--accent); outline-offset: 1px; }
+main { max-width: 980px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; }
+section { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+.label { color: var(--muted); font-size: 13px; margin: 0 0 6px; }
+.item { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px 16px; }
+.item b { display: block; }
+.criterion { margin-top: 8px; color: var(--muted); font-size: 14px; }
+.sentence { font-size: 19px; line-height: 1.7; margin: 0; }
+.source { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 12px; }
+.source:first-of-type { border-top: 0; margin-top: 0; padding-top: 0; }
+.source .meta { font-size: 13px; color: var(--muted); }
+.source p { background: var(--quote); border-radius: 8px; padding: 10px 12px; margin: 6px 0 0; white-space: pre-wrap; }
+.versus { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.side { border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+.side h3 { margin: 0 0 6px; font-size: 15px; }
+.side.human h3 { color: var(--human); }
+.side.judge h3 { color: var(--judge); }
+.side ul { margin: 6px 0 0; padding-left: 18px; }
+.claude { background: var(--soft); border-radius: 10px; padding: 12px; }
+.claude b { display: block; margin-bottom: 4px; }
+.choices { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.choice { flex: 1 1 200px; text-align: left; border-radius: 10px; padding: 8px 12px; }
+.choice small { display: block; color: var(--muted); font-size: 12px; }
+.choice kbd { float: right; font-size: 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
+.choice[aria-pressed="true"] { background: var(--soft); border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+textarea { width: 100%; min-height: 48px; font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px; margin-top: 8px; }
+.nav { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.hint { color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <h1>불일치 분류 확인</h1>
+    <span class="count" id="count"></span>
+    <span class="spacer"></span>
+    <button class="primary" id="export">결과 내려받기</button>
+  </div>
+  <div class="dots" id="dots"></div>
+</header>
+<main>
+  <section>
+    <p class="hint">사람 라벨(지난번 고르신 것)과 채점기 판정이 갈린 문장입니다. 아래 파란 상자의 <b>Claude 분류</b>에 동의하시는지만 골라 주세요. 라벨을 고치는 것이 아니라 "왜 갈렸는가"를 확인하는 단계입니다.</p>
+  </section>
+  <section>
+    <p class="label" id="calid"></p>
+    <div class="item" id="item"></div>
+    <div class="criterion" id="criterion"></div>
+  </section>
+  <section>
+    <p class="label">해설 문장</p>
+    <p class="sentence" id="sentence"></p>
+  </section>
+  <section>
+    <p class="label">이 문장이 인용한 근거</p>
+    <div id="sources"></div>
+  </section>
+  <section>
+    <div class="versus">
+      <div class="side human"><h3 id="humanTitle"></h3><div id="humanBody"></div></div>
+      <div class="side judge"><h3 id="judgeTitle"></h3><div id="judgeBody"></div></div>
+    </div>
+  </section>
+  <section>
+    <div class="claude"><b id="catName"></b><span id="catDesc"></span></div>
+    <div class="choices" id="choices"></div>
+    <textarea id="memo" placeholder="동의하지 않거나 애매하면 이유를 한 줄 적어 주세요"></textarea>
+    <div class="nav">
+      <button id="prev">← 이전</button>
+      <button id="next">다음 →</button>
+    </div>
+    <p class="hint">단축키: 동의 1, 동의 안 함 2, 모르겠음 3, 이동 ←·→. 선택은 이 브라우저에 자동 저장됩니다.</p>
+  </section>
+</main>
+<script>
+const DATA = __DATA__;
+const STORE = "checkup-ai:" + DATA.set + ":" + DATA.judgeRun;
+const OPTIONS = [["agree", "동의", "이 분류가 맞다"], ["disagree", "동의 안 함", "갈린 이유가 다르다 (메모에 적기)"], ["unsure", "모르겠음", "판단하기 어렵다"]];
+let answers = {};
+try { answers = JSON.parse(localStorage.getItem(STORE) || "{}"); } catch (e) { answers = {}; }
+let index = 0;
+const $ = (id) => document.getElementById(id);
+const el = (tag, attrs = {}, ...children) => {
+  const node = document.createElement(tag);
+  Object.entries(attrs).forEach(([k, v]) => (k === "class" ? (node.className = v) : node.setAttribute(k, v)));
+  children.forEach((c) => node.append(c));
+  return node;
+};
+const save = () => { try { localStorage.setItem(STORE, JSON.stringify(answers)); } catch (e) {} };
+const name = (v) => DATA.supportLabels[v] || v;
+
+function render() {
+  const row = DATA.rows[index];
+  const answer = answers[row.calId] || {};
+  const done = DATA.rows.filter((r) => answers[r.calId] && answers[r.calId].verdict).length;
+  $("count").textContent = `${index + 1} / ${DATA.rows.length} · 완료 ${done}`;
+  $("calid").textContent = row.calId;
+  const it = row.item;
+  $("item").replaceChildren(
+    el("div", {}, el("span", { class: "label" }, "항목"), el("b", {}, it.name)),
+    el("div", {}, el("span", { class: "label" }, "결과값"), el("b", {}, it.value + (it.unit ? " " + it.unit : ""))),
+    el("div", {}, el("span", { class: "label" }, "성별"), el("b", {}, { MALE: "남", FEMALE: "여" }[it.sex] || "모름")),
+    el("div", {}, el("span", { class: "label" }, "판정"), el("b", {}, it.judgmentLabel)));
+  $("criterion").textContent = it.criterion ? "판정 기준: " + it.criterion : "";
+  $("sentence").textContent = row.text;
+  $("sources").replaceChildren(...row.sources.map((s, i) => el("div", { class: "source" },
+    el("div", { class: "meta" }, `[근거 ${i + 1}] ${s.publisher || ""} · ${s.section || ""} · ${s.id}`), el("p", {}, s.text))));
+  $("humanTitle").textContent = "사람 라벨: " + name(row.human.support);
+  $("humanBody").replaceChildren(el("div", { class: "hint" }, row.human.memo ? "메모: " + row.human.memo : "메모 없음"));
+  $("judgeTitle").textContent = "채점기: " + name(row.judge.support) + " (3회: " + row.judge.repeats.map(name).join(", ") + ")";
+  $("judgeBody").replaceChildren(el("div", {}, row.judge.reason),
+    ...(row.judge.unsupportedClaims.length ? [el("div", { class: "hint" }, "근거에 없다고 본 주장:"),
+      el("ul", {}, ...row.judge.unsupportedClaims.map((c) => el("li", {}, c)))] : []));
+  const cat = DATA.categories[row.category];
+  $("catName").textContent = "Claude 분류: " + cat.name;
+  $("catDesc").textContent = cat.desc;
+  $("choices").replaceChildren(...OPTIONS.map(([value, label, desc], i) => {
+    const b = el("button", { class: "choice", "aria-pressed": String(answer.verdict === value) }, el("kbd", {}, String(i + 1)), label, el("small", {}, desc));
+    b.addEventListener("click", () => choose(value));
+    return b;
+  }));
+  $("memo").value = answer.memo || "";
+  $("prev").disabled = index === 0;
+  $("next").disabled = index === DATA.rows.length - 1;
+  $("dots").replaceChildren(...DATA.rows.map((r, i) => {
+    const d = el("button", { class: "dot" + (answers[r.calId] && answers[r.calId].verdict ? " done" : "") + (i === index ? " current" : ""), title: r.calId, "aria-label": r.calId });
+    d.addEventListener("click", () => go(i));
+    return d;
+  }));
+}
+function choose(verdict) {
+  const id = DATA.rows[index].calId;
+  answers[id] = { ...(answers[id] || {}), verdict };
+  save(); render();
+}
+function go(i) { index = Math.max(0, Math.min(DATA.rows.length - 1, i)); render(); window.scrollTo(0, 0); }
+$("memo").addEventListener("input", (e) => {
+  const id = DATA.rows[index].calId;
+  answers[id] = { ...(answers[id] || {}), memo: e.target.value };
+  save();
+});
+$("prev").addEventListener("click", () => go(index - 1));
+$("next").addEventListener("click", () => go(index + 1));
+document.addEventListener("keydown", (e) => {
+  if (e.target.tagName === "TEXTAREA" || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key === "ArrowLeft") return go(index - 1);
+  if (e.key === "ArrowRight") return go(index + 1);
+  const i = ["1", "2", "3"].indexOf(e.key);
+  if (i >= 0) choose(OPTIONS[i][0]);
+});
+$("export").addEventListener("click", () => {
+  const out = { set: DATA.set, judgeRun: DATA.judgeRun, rubricVersion: DATA.rubricVersion, exportedAt: new Date().toISOString(),
+    answers: DATA.rows.map((r) => ({ calId: r.calId, category: r.category, ...(answers[r.calId] || {}) })) };
+  const a = el("a", { href: URL.createObjectURL(new Blob([JSON.stringify(out, null, 2)], { type: "application/json" })), download: DATA.set + ".json" });
+  document.body.append(a); a.click(); a.remove();
+});
+render();
+</script>
+</body>
+</html>
