@@ -329,6 +329,50 @@ class ExtractionValidatorTest {
         assertThat(result.uncoveredSegments()).containsExactly("TSH 3.88 4.18 μIU/mL 0.4-4.5");
     }
 
+    @Test
+    @DisplayName("줄 전체를 옮긴 항목은 버린다: 숫자 여러 개가 뭉친 값, 값이 들어 있는 OTHER 항목명 (heldout-v2 재요청 실측)")
+    void dropsItemsCopiedFromWholeLine() {
+        String trend = """
+                건강검진 3개년 추이 보고서
+                알부민 g/dL 3.8 4.1 4.8 3.5~5.2
+                시력: 좌 0.5 우 0.9 / 청력: 좌 정상 우 정상
+                상담 문의 1588-0000 (평일 09:00~18:00)
+                """;
+        CheckupReport report = new CheckupReport(null, CheckupReport.ExamType.COMPREHENSIVE, CheckupReport.Sex.MALE,
+                50, List.of(item(ItemCode.OTHER, "건강검진 3개년 추이 보고서", "건강검진 3개년 추이 보고서"),
+                        item(ItemCode.OTHER, "알부민", "3.8 4.1 4.8 3.5~5.2"),
+                        item(ItemCode.OTHER, "시력: 좌 0.5 우 0.9 / 청력: 좌 정상 우 정상", "0.5"),
+                        item(ItemCode.OTHER, "상담 문의 1588-0000 (평일 09:00~18:00)", "1588-0000"),
+                        item(ItemCode.VISION_LEFT, "시력: 좌 0.5 우 0.9", "0.5")));  // 표준 코드는 코드가 정체: 남긴다
+
+        ValidationResult result = validator.validate(report, trend);
+
+        assertThat(result.report().items()).extracting(ReportItem::code).containsExactly(ItemCode.VISION_LEFT);
+        assertThat(types(result)).containsExactly(IssueType.OTHER_NAME_HOLDS_VALUE, IssueType.BUNDLED_VALUES,
+                IssueType.OTHER_NAME_HOLDS_VALUE, IssueType.OTHER_NAME_HOLDS_VALUE);
+    }
+
+    @Test
+    @DisplayName("이름 속 숫자, 괄호 속 보조 수치, 공백 낀 범위는 줄을 옮긴 것으로 보지 않는다 (HbA1c, 25-OH 비타민D, 1+ (30), 0 - 2)")
+    void keepsNamesWithDigitsAndAnnotatedValues() {
+        String source = """
+                HbA1c    1    %
+                25-OH 비타민D    25    ng/mL
+                요단백    1+ (30)    mg/dL
+                적혈구(요침사)    0 - 2    /HPF
+                """;
+        CheckupReport report = new CheckupReport(null, CheckupReport.ExamType.COMPREHENSIVE, CheckupReport.Sex.MALE,
+                50, List.of(item(ItemCode.OTHER, "HbA1c", "1"),
+                        item(ItemCode.OTHER, "25-OH 비타민D", "25"),
+                        item(ItemCode.OTHER, "요단백", "1+ (30)"),
+                        item(ItemCode.OTHER, "적혈구(요침사)", "0 - 2")));
+
+        ValidationResult result = validator.validate(report, source);
+
+        assertThat(result.report().items()).hasSize(4);
+        assertThat(types(result)).doesNotContain(IssueType.BUNDLED_VALUES, IssueType.OTHER_NAME_HOLDS_VALUE);
+    }
+
     private ValidationResult validate(ReportItem... items) {
         CheckupReport report = new CheckupReport(null, CheckupReport.ExamType.COMPREHENSIVE,
                 CheckupReport.Sex.FEMALE, 42, List.of(items));

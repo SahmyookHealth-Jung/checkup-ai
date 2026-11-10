@@ -34,6 +34,9 @@ class SourceTextTest {
     void containsValue() {
         assertThat(SourceText.containsValue("FBS 183 185", "183")).isTrue();
         assertThat(SourceText.containsValue("FBS 183 185", "18")).isFalse();
+        assertThat(SourceText.containsValue("혈색소 18.3 g/dL", "18")).isFalse();      // 소수의 앞부분
+        assertThat(SourceText.containsValue("알부민 4.9 (3.5~5.2)", "5")).isFalse();   // 참고치 소수의 앞부분
+        assertThat(SourceText.containsValue("허리둘레는 82. 체중은", "82")).isTrue();  // 문장 끝 마침표
         assertThat(SourceText.containsValue("Chest PA 비활동성     폐결핵", "비활동성 폐결핵")).isTrue();
     }
 

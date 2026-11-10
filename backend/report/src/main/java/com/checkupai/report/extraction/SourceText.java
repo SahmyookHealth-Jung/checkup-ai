@@ -33,7 +33,8 @@ final class SourceText {
 
     /**
      * 값이 텍스트에 있는가.
-     * 숫자는 앞뒤가 다른 숫자와 붙어 있으면 안 된다 ("12"는 "112" 안에 있는 것으로 보지 않는다).
+     * 숫자는 다른 숫자의 일부이면 안 된다 ("12"는 "112" 안에, "18"은 "18.3" 안에, "5"는 "5.2" 안에 있는 것으로 보지 않는다).
+     * 2026-11-10 Fable 리뷰: 뒤쪽이 소수점이어도 통과해 "18.3"의 앞부분 "18"을 인정했다. 문장 끝 마침표("18.")는 인정한다.
      * 글자 값은 공백으로 나눈 조각이 모두 들어 있으면 있다고 본다 ("비활동성 폐결핵" 사이 공백이 달라도 된다).
      */
     static boolean containsValue(String text, String value) {
@@ -42,7 +43,7 @@ final class SourceText {
         }
         String trimmed = value.strip();
         if (isNumber(trimmed)) {
-            return Pattern.compile("(?<![\\d.])" + Pattern.quote(trimmed) + "(?![\\d])").matcher(text).find();
+            return Pattern.compile("(?<![\\d.])" + Pattern.quote(trimmed) + "(?!\\d|\\.\\d)").matcher(text).find();
         }
         String squashedText = squash(text);
         return Arrays.stream(WHITESPACE.split(trimmed)).allMatch(token -> squashedText.contains(token));

@@ -12,12 +12,13 @@ import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
 
 /**
- * 추출 결과를 원문과 대조해 고치고, 빠진 것으로 보이는 줄을 찾는다 (ADR 0003, 6단계).
+ * 추출 결과를 원문과 대조해 고치고, 빠진 것으로 보이는 줄을 찾는다 (ADR 0004, ADR 0003 4절의 구체화).
  *
  * <p>LLM을 부르지 않는 결정적(deterministic) 검사만 한다. 재요청 여부는 {@link ReportExtractor}가 정한다.
  * <ol>
  *   <li>중복 제거: 같은 코드·같은 값이 여러 번 나오면 하나만 남긴다 (기준선에서 관찰된 반복 오류)</li>
  *   <li>값 원문 대조: 원문에 없는 값은 버린다 (지어낸 값 차단)</li>
+ *   <li>항목 모양: 숫자 여러 개가 뭉친 값, 값이 들어 있는 OTHER 항목명은 버린다 (줄 전체를 옮긴 것)</li>
  *   <li>OTHER 항목: 항목명과 값이 같은 줄에 없으면 버린다 (다른 항목 값을 빌려 만든 가짜 항목 차단)</li>
  *   <li>숫자 항목 상식 검사: 숫자가 아니거나 생리적으로 불가능한 값은 버린다</li>
  *   <li>같은 코드(OTHER는 같은 항목명)에 다른 값이 여럿이면 처음 것만 남긴다</li>
@@ -67,6 +68,11 @@ public class ExtractionValidator {
     private static final Pattern PHONE = Pattern.compile("(?<!\\d)\\d{2,4}-\\d{3,4}-\\d{4}(?!\\d)");
     private static final Pattern IDENTIFIER = Pattern.compile("(?<![A-Za-z])[A-Za-z]{2,}-\\d[\\d-]*");
     private static final Pattern RESULT_WORD = Pattern.compile("음성|양성|정상|비정상");
+    private static final Pattern SPACES = Pattern.compile("\\s+");
+    /** 숫자만 있는 값 조각. 괄호로 감싼 숫자("1+ (30)"의 "(30)")도 하나로 센다. "1+"처럼 기호가 붙은 결과는 세지 않는다. */
+    private static final Pattern PLAIN_NUMBER = Pattern.compile("[(\\[]?[<>≤≥]?\\d+(\\.\\d+)?[)\\]]?");
+    /** 숫자 사이의 범위·분수 기호와 그 양옆 공백 ("0 - 2", "120 / 80") */
+    private static final Pattern NUMBER_CONNECTOR = Pattern.compile("(\\d)\\s*([-~/])\\s*(\\d)");
     private static final Pattern EMPTY_MARK = Pattern.compile("[-–—]+|없음|N/?A", Pattern.CASE_INSENSITIVE);
 
     /**
@@ -114,6 +120,21 @@ public class ExtractionValidator {
             }
             if (!SourceText.containsValue(source, item.value())) {
                 issues.add(new Issue(IssueType.UNGROUNDED_VALUE, item.code(), item.value()));
+                continue;
+            }
+            // 아래 두 검사는 결과지 양식과 무관한 "항목 하나"의 모양이다. 원문 대조를 통과해도 항목이 아니다.
+            // 2026-11-09 heldout-v2(처음 보는 5번째 양식): 재요청이 들여온 OTHER 항목 21개가 모두 쓸모없는 항목이었다.
+            // 줄 전체를 항목명으로 옮기면("시력: 좌 0.5 우 0.9", "상담 문의 1588-0000 ...") 항목명과 값이 늘 같은 줄에 있어
+            // OTHER 검사를 통과했고, 3개년 추이표 한 줄의 값을 통째로 옮긴 것("3.8 4.1 4.8 3.5~5.2")도 원문에 있었다.
+            if (bundlesValues(item.value())) {
+                // 여러 해·여러 열의 값이 뭉쳤다. 어느 것이 이번 결과인지 코드가 정할 수 없으므로 버린다.
+                issues.add(new Issue(IssueType.BUNDLED_VALUES, item.code(), item.rawName() + "=" + item.value()));
+                continue;
+            }
+            if (item.code() == ItemCode.OTHER && nameHoldsValue(item)) {
+                // OTHER는 항목명이 곧 항목의 정체다. 항목명 안에 값이 들어 있으면 이름이 아니라 줄을 옮긴 것이다.
+                // 표준 코드 항목은 코드가 정체이므로 항목명이 줄 전체여도 버리지 않는다.
+                issues.add(new Issue(IssueType.OTHER_NAME_HOLDS_VALUE, item.code(), item.rawName() + "=" + item.value()));
                 continue;
             }
             if (item.code() == ItemCode.OTHER && !nameAndValueOnSameLine(item, lines, report.age())) {
@@ -185,6 +206,30 @@ public class ExtractionValidator {
 
     private static boolean isNameFragment(String line, Integer age) {
         return !looksLikeResult(line, age) && !SourceText.isHeaderLine(line);
+    }
+
+    /**
+     * 공백으로 나눈 값 조각 중 숫자만 있는 조각이 2개 이상이다 ("4.6 4.4 4.3", "- 1.3 1.1 0.2~1.2").
+     * 범위·분수 기호(-, ~, /) 양옆의 숫자는 한 값으로 본다. 2026-11-10 Fable 리뷰: 요침사 "0 - 2", 혈압 "120 / 80"처럼
+     * PDF에서 기호 양옆에 공백이 끼면 숫자 2개로 세어 맞는 값을 버렸다.
+     */
+    private static boolean bundlesValues(String value) {
+        String joined = NUMBER_CONNECTOR.matcher(value.strip()).replaceAll("$1$2$3");
+        return SPACES.splitAsStream(joined).filter(token -> PLAIN_NUMBER.matcher(token).matches()).count() >= 2;
+    }
+
+    /**
+     * 항목명 안에 값이 독립된 낱말로 들어 있다. 앞뒤가 글자·숫자·점·하이픈이면 낱말의 일부로 보고 인정하지 않는다
+     * ("HbA1c"의 1, "25-OH 비타민D"의 25는 값이 아니라 이름의 일부다).
+     */
+    private static boolean nameHoldsValue(ReportItem item) {
+        if (item.rawName() == null || item.rawName().isBlank()) {
+            return false;
+        }
+        String value = SourceText.collapse(item.value());
+        return Pattern.compile("(?<![\\p{L}\\p{N}.-])" + Pattern.quote(value) + "(?![\\p{L}\\p{N}.-])")
+                .matcher(SourceText.collapse(item.rawName()))
+                .find();
     }
 
     private static String otherName(ReportItem item) {
@@ -350,8 +395,12 @@ public class ExtractionValidator {
     }
 
     public enum IssueType {
-        EMPTY, DUPLICATE, UNGROUNDED_VALUE, OTHER_NAME_VALUE_APART, IMPLAUSIBLE, CONFLICT, UNGROUNDED_FIELD,
-        MISPLACED_FIELD, RAW_NAME_NOT_IN_SOURCE,
+        EMPTY, DUPLICATE, UNGROUNDED_VALUE,
+        /** 값에 숫자 여러 개가 뭉쳐 있다 (여러 해·여러 열을 통째로 옮김) */
+        BUNDLED_VALUES,
+        /** OTHER 항목명 안에 값이 들어 있다 (항목명이 아니라 줄 전체를 옮김) */
+        OTHER_NAME_HOLDS_VALUE,
+        OTHER_NAME_VALUE_APART, IMPLAUSIBLE, CONFLICT, UNGROUNDED_FIELD, MISPLACED_FIELD, RAW_NAME_NOT_IN_SOURCE,
         /** 출력이 상한에서 잘려 JSON이 깨졌고, 완성된 항목까지만 살렸다 ({@link ReportExtractor}가 기록) */
         TRUNCATED_OUTPUT
     }
