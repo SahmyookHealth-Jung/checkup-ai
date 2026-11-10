@@ -11,9 +11,12 @@ import java.util.Map;
  * @param report 추출한 결과지
  * @param metrics 모델, 프롬프트·파이프라인 버전, 지연시간, 토큰, 검증 결과 (평가·비용 분석용)
  * @param diagnostics 원인 분석용 상세 기록. 요청에 diagnostics=true일 때만 채운다
+ * @param needsReview 확인 필요 항목: 원문에 있지만 가능 범위 밖이라 결과에 넣지 않은 값 (ADR 0007 1절).
+ *        화면은 원본 확인과 진료 권고를 고정 문구로 보여 준다
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record ExtractionResult(CheckupReport report, Metrics metrics, Diagnostics diagnostics) {
+public record ExtractionResult(CheckupReport report, Metrics metrics, Diagnostics diagnostics,
+                               List<ReviewItem> needsReview) {
 
     /**
      * @param attempts LLM 호출 횟수 (재요청 포함)

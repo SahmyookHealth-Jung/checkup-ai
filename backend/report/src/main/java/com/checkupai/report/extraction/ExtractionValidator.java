@@ -95,6 +95,7 @@ public class ExtractionValidator {
                                  String source) {
         List<String> lines = SourceText.lines(source);
         List<Issue> issues = new ArrayList<>();
+        List<ReviewItem> needsReview = new ArrayList<>();
         List<ReportItem> kept = new ArrayList<>(alreadyKept);
         Set<String> seen = new HashSet<>();
         Set<ItemCode> keptCodes = new HashSet<>();
@@ -146,6 +147,11 @@ public class ExtractionValidator {
             String implausible = implausible(item);
             if (implausible != null) {
                 issues.add(new Issue(IssueType.IMPLAUSIBLE, item.code(), implausible));
+                if (isOutOfRange(item)) {
+                    // 원문에 있는 범위 밖 수치는 버리지 않고 "확인 필요"로 남긴다 (ADR 0007 1절, 가드레일 원칙 3).
+                    // 숫자가 아닌 값(참고치를 값으로 옮긴 "<120" 등)은 읽기 오류가 분명하므로 남기지 않는다
+                    needsReview.add(new ReviewItem(item.code(), item.rawName(), item.value(), implausible));
+                }
                 continue;
             }
             if (item.code() != ItemCode.OTHER && !keptCodes.add(item.code())) {
@@ -168,7 +174,8 @@ public class ExtractionValidator {
         }
 
         CheckupReport cleaned = new CheckupReport(report.examDate(), report.examType(), report.sex(), report.age(), kept);
-        return new ValidationResult(cleaned, issues, uncoveredSegments(lines, kept, report.age(), report.examDate()));
+        return new ValidationResult(cleaned, issues, uncoveredSegments(lines, kept, report.age(), report.examDate()),
+                List.copyOf(needsReview));
     }
 
     /**
@@ -234,6 +241,12 @@ public class ExtractionValidator {
 
     private static String otherName(ReportItem item) {
         return SourceText.squash(item.rawName() == null ? "" : item.rawName());
+    }
+
+    /** 숫자이지만 생리적으로 가능한 범위 밖이다 (implausible의 두 경우 중 하나) */
+    private static boolean isOutOfRange(ReportItem item) {
+        return item.code().kind() == ItemCode.ValueKind.NUMERIC && SourceText.isNumber(item.value())
+                && PLAUSIBLE.containsKey(item.code());
     }
 
     private static String implausible(ReportItem item) {
@@ -414,7 +427,9 @@ public class ExtractionValidator {
      * @param report 고친 결과 (버린 항목 제외, 근거 없는 필드는 null)
      * @param issues 발견한 문제
      * @param uncoveredSegments 누락이 의심되는 원문 조각 (쉼표로 나눈 줄 조각)
+     * @param needsReview 원문에 있지만 가능 범위 밖이라 결과에 넣지 않은 항목 (확인 필요, ADR 0007)
      */
-    public record ValidationResult(CheckupReport report, List<Issue> issues, List<String> uncoveredSegments) {
+    public record ValidationResult(CheckupReport report, List<Issue> issues, List<String> uncoveredSegments,
+                                   List<ReviewItem> needsReview) {
     }
 }

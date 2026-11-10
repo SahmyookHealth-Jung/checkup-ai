@@ -58,6 +58,26 @@ class ExtractionValidatorTest {
 
         assertThat(result.report().items()).isEmpty();
         assertThat(types(result)).containsOnly(IssueType.IMPLAUSIBLE);
+        // 범위 밖 숫자는 "확인 필요"로 남기고, 숫자가 아닌 값(참고치를 옮긴 것)은 남기지 않는다 (ADR 0007 1절)
+        assertThat(result.needsReview()).extracting(ReviewItem::code, ReviewItem::value)
+                .containsExactly(tuple(ItemCode.HEMOGLOBIN, "183"));
+    }
+
+    @Test
+    @DisplayName("원문에 있는 범위 밖 수치(공복혈당 1120)는 결과에서 빼되 버리지 않고 확인 필요 항목으로 남긴다")
+    void keepsOutOfRangeValueForReview() {
+        String source = "공복혈당 | 1120 | mg/dL | 100 미만";
+        CheckupReport report = new CheckupReport(null, CheckupReport.ExamType.GENERAL, CheckupReport.Sex.MALE, 50,
+                List.of(item(ItemCode.FASTING_GLUCOSE, "공복혈당", "1120")));
+
+        ValidationResult result = validator.validate(report, source);
+
+        assertThat(result.report().items()).isEmpty();
+        assertThat(result.needsReview()).singleElement().satisfies(review -> {
+            assertThat(review.code()).isEqualTo(ItemCode.FASTING_GLUCOSE);
+            assertThat(review.value()).isEqualTo("1120");
+            assertThat(review.reason()).contains("가능 범위 밖");
+        });
     }
 
     @Test

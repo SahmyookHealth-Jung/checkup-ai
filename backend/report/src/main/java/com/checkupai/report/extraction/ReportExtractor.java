@@ -113,11 +113,13 @@ public class ReportExtractor {
         if (properties.pipeline() == Pipeline.BASELINE) {
             var diagnostics = withDiagnostics
                     ? new ExtractionResult.Diagnostics(firstPass.items(), List.of(), null, null, null) : null;
-            return new ExtractionResult(firstPass, metrics(started, firstPassMs, responses, 0, List.of()), diagnostics);
+            return new ExtractionResult(firstPass, metrics(started, firstPassMs, responses, 0, List.of()), diagnostics,
+                    List.of());
         }
 
         ValidationResult validation = validator.validate(firstPass, reportText);
         issues.addAll(validation.issues());
+        List<ReviewItem> needsReview = new ArrayList<>(validation.needsReview());
         CheckupReport report = validation.report();
         List<String> segments = validation.uncoveredSegments();
         List<String> header = SourceText.headerLines(reportText);
@@ -149,6 +151,10 @@ public class ReportExtractor {
                     retryItems.addAll(items);
                     ValidationResult merged = validator.validateAdditional(report, items, reportText);
                     issues.addAll(merged.issues());
+                    merged.needsReview().stream()  // 재요청이 같은 범위 밖 값을 다시 뽑아도 한 번만 남긴다
+                            .filter(review -> needsReview.stream().noneMatch(seen -> seen.code() == review.code()
+                                    && SourceText.squash(seen.value()).equals(SourceText.squash(review.value()))))
+                            .forEach(needsReview::add);
                     report = merged.report();
                 } catch (RuntimeException e) {
                     // 재요청 실패(시간 초과, 살릴 항목 없이 잘린 출력 등)는 치명적이지 않다. 그 묶음만 건너뛴다
@@ -164,7 +170,7 @@ public class ReportExtractor {
                         segments.isEmpty() ? null : concat(header, segments), retryItems, retryError)
                 : null;
         return new ExtractionResult(report, metrics(started, firstPassMs, responses, retry ? segments.size() : 0, issues),
-                diagnostics);
+                diagnostics, List.copyOf(needsReview));
     }
 
     private <T> T call(String feature, String system, String userTemplate, Map<String, Object> params, int maxTokens,
