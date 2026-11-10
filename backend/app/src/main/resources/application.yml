@@ -76,6 +76,9 @@ checkupai:
   explanation:
     max-items: 8              # 해설할 항목 수 상한 (질환의심 먼저)
     max-tokens: 4000          # 2026-11-10: 8개 항목 해설이 2,000토큰에서 잘렸다
+  eval:
+    # 저장한 추출 결과로 해설만 돌리는 평가 API (ADR 0008). 추출 검증을 거치지 않은 값이 LLM에 가므로 공개 배포에서는 끈다
+    endpoints-enabled: ${EVAL_ENDPOINTS_ENABLED:true}
   demo:
     # 화면의 합성 샘플 결과지 폴더 (PDF는 gitignore, 생성기로 다시 만든다). 공개 데모는 샘플만 쓴다 (ADR 0007 7절)
     samples-dir: ${DEMO_SAMPLES_DIR:../../data/synthetic/extraction/v1}

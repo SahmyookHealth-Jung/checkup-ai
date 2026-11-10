@@ -42,8 +42,12 @@ cd backend && ./gradlew build              # 컴파일 + 단위 테스트 (외�
 ./gradlew :report:piiLeakCheck --args="<데이터 폴더> ..."   # 합성 결과지 식별정보 잔존율 (모델 호출 없음)
 (cd ../eval && .venv/bin/python -m rag.build_chunks)        # 해설 근거 청크 만들기 → 앱에서 POST /api/guidelines/reload
 (cd ../eval && .venv/bin/python -m rag.run_retrieval_eval)  # 검색 평가 (앱이 떠 있어야 함)
-(cd ../eval && .venv/bin/python -m rag.run_explanation_eval) # 해설 평가 (Haiku 호출, 30회 약 $0.08)
+(cd ../eval && .venv/bin/python -m rag.freeze_extractions)  # heldout 30개 추출을 eval/frozen/에 고정 (Haiku 30회, 캐시 있으면 0회)
+(cd ../eval && .venv/bin/python -m rag.run_explanation_eval --label <이름>)  # 고정한 추출로 해설만 30개 x 2회 (Haiku 60회 약 $0.10)
+(cd ../eval && .venv/bin/python -m unittest discover -s rag -t .)            # 평가 지표 단위 테스트
 ```
+
+평가 결과는 `eval/results/<종류>/<runId>.json`(공통 형식, `eval/run_record.py`)으로 남고 `eval/results/index.jsonl`에 한 줄씩 쌓인다. 비교 수치는 커밋한 코드로만 잰다(기록의 `git.dirty`가 false).
 
 Gradle이 실행·테스트 환경변수로 저장소 루트의 `.env`를 읽어 넣는다(`buildSrc`의 컨벤션 플러그인).
 

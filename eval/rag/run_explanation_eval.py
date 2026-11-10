@@ -1,120 +1,110 @@
-"""해설 평가 (ADR 0007 9절의 측정 2·3·4). 5단계 개선과 비교할 기준선이다.
+"""해설 평가 (ADR 0007 9절, ADR 0008 3절의 지표 묶음). 지표 정의는 explanation_metrics.py에 있다.
 
-합성 샘플 결과지마다 /api/demo/samples/{id}/explain을 부른다 (추출 + 판정 + 검색 + 해설, Haiku 호출 2회).
-Haiku는 출력이 실행마다 흔들리므로 같은 보고서를 여러 번 돌려 범위로 본다.
+입력은 두 가지다.
+- 고정한 추출 (기본, ADR 0008 4절 2번): eval/frozen/<이름>/의 추출 결과를 /api/eval/explain에 보낸다.
+  해설만 돌린다 (보고서당 Haiku 1회). 조건을 바꿔 짝비교할 때 추출의 흔들림이 섞이지 않는다.
+- 실시간 (--live): 데모 API로 추출부터 다시 한다 (보고서당 Haiku 2회). 4단계 수치(개발용 v1 10개)와 같은 방식이다.
 
-지표
-- 해설 검증: 문장 통과율(검증을 통과한 문장 / LLM이 낸 문장), 잘못된 인용 수, 근거 없는 숫자로 버린 문장 수,
-  인용 없는 문장 수, 진단 단정·치료 지시 표현 수(막지 않고 기록만), 근거 없음 항목 수, 생성 실패·잘림 수
-- 진료 권고 재현율: 정답 값을 같은 판정기준(backend/report/.../criteria/*.json)으로 판정했을 때 질환의심인 항목 중,
-  해설에 진료 권고가 붙은 비율 (추출 오류·대상 상한까지 포함한 끝에서 끝까지의 값). 권고 정밀도도 함께 본다
-- 고지문 포함률, 지연 (검색·생성·전체)
+Haiku 출력은 실행마다 흔들리므로 같은 조건을 여러 번 돌려 범위로 본다 (기본 2회).
+결과는 eval/results/rag/<runId>.json에 공통 형식으로 남기고 eval/results/index.jsonl에 한 줄을 더한다 (run_record.py).
 
-사용법 (eval/ 폴더에서, 앱이 떠 있어야 한다): .venv/bin/python -m rag.run_explanation_eval [--runs 3] [--ids std-001,...]
+사용법 (eval/ 폴더에서, 앱이 떠 있어야 한다):
+    .venv/bin/python -m rag.run_explanation_eval --label baseline                 # heldout 30개 x 2회
+    .venv/bin/python -m rag.run_explanation_eval --frozen heldout30-v2.5 --runs 1 --ids heldout-v1/lab-001
+    .venv/bin/python -m rag.run_explanation_eval --live --runs 3 --label v1-live   # 개발용 v1 10개
 """
 from __future__ import annotations
 
 import argparse
 import json
-import re
 import urllib.request
-from datetime import datetime
 from pathlib import Path
 
-EVAL_DIR = Path(__file__).resolve().parent.parent
-ROOT = EVAL_DIR.parent
-DATA = ROOT / "data" / "synthetic" / "extraction" / "v1"
+import run_record
+from rag.explanation_metrics import assess_report, compact_output, summarize
+from run_record import EVAL_DIR, ROOT
+
+DATA = ROOT / "data" / "synthetic" / "extraction"
+FROZEN = EVAL_DIR / "frozen"
 CRITERIA = ROOT / "backend" / "report" / "src" / "main" / "resources" / "criteria" / "general-screening-2026-6.json"
-RESULTS = EVAL_DIR / "results" / "rag"
-DEFAULT_IDS = "std-001,std-002,std-003,std-004,sum-001,sum-002,sum-003,nar-001,nar-002,nar-003"
-NUMBER = re.compile(r"[-+]?\d+(\.\d+)?")
-
-
-def judge(criteria: dict, code: str, value: str, sex: str | None) -> str:
-    """ScreeningCriteria(Java)와 같은 규칙. 정답 값의 판정을 독립적으로 계산한다"""
-    item = criteria["items"].get(code)
-    if item is None or value is None:
-        return "NOT_JUDGED"
-    if item.get("textBands"):
-        for band in item["textBands"]:
-            if re.search(band["pattern"], value.strip()):
-                return band["judgment"]
-        return "NOT_JUDGED"
-    if not NUMBER.fullmatch(value.strip()):
-        return "NOT_JUDGED"
-    bands = item["bands"] if "bands" in item else (item["bySex"].get(sex) if sex else None)
-    if bands is None:
-        return "NOT_JUDGED"
-    x = float(value)
-    for band in bands:
-        if (band.get("min") is None or x >= band["min"]) and (band.get("minExclusive") is None or x > band["minExclusive"]) \
-                and (band.get("max") is None or x < band["max"]) and (band.get("maxInclusive") is None or x <= band["maxInclusive"]):
-            return band["judgment"]
-    return "NOT_JUDGED"
+LIVE_IDS = "std-001,std-002,std-003,std-004,sum-001,sum-002,sum-003,nar-001,nar-002,nar-003"
+HEADLINE_RANGES = (("endToEnd", "careAdviceRecall"), ("explanationLlm", "sentencePassRate"))
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--api", default="http://localhost:8080")
-    parser.add_argument("--runs", type=int, default=3)
-    parser.add_argument("--ids", default=DEFAULT_IDS)
+    parser.add_argument("--frozen", default="heldout30-v2.5", help="eval/frozen/ 아래 고정한 추출 이름")
+    parser.add_argument("--live", action="store_true", help="고정한 추출 대신 데모 API로 추출부터 (개발용 v1)")
+    parser.add_argument("--ids", help="쉼표로 구분. 고정 모드는 '데이터셋/id', 실시간 모드는 'id'")
+    parser.add_argument("--runs", type=int, default=2)
+    parser.add_argument("--label", default="baseline", help="실행 이름 (예: baseline, item-filter)")
     args = parser.parse_args()
     criteria = json.loads(CRITERIA.read_text(encoding="utf-8"))
-    ids = args.ids.split(",")
-    runs = []
+    git = run_record.git_state()
+    if git["dirty"]:
+        print("주의: 커밋하지 않은 변경이 있다. 기록에 dirty=true로 남는다 (비교 수치로 쓰지 않는다)")
+
+    if args.live:
+        keys = (args.ids or LIVE_IDS).split(",")
+        dataset = {"name": "v1-dev10" if not args.ids else "v1-ids", "source": "live", "reports": len(keys)}
+    else:
+        frozen_dir = FROZEN / args.frozen
+        manifest = json.loads((frozen_dir / "manifest.json").read_text(encoding="utf-8"))
+        keys = args.ids.split(",") if args.ids else [f"{d['dataset']}/{d['id']}" for d in manifest["documents"]]
+        dataset = {"name": args.frozen if not args.ids else f"{args.frozen}-ids", "source": "frozen", "reports": len(keys),
+                   "extraction": {k: manifest["extraction"].get(k) for k in ("model", "promptVersion", "pipeline")}
+                   | {"frozenAt": manifest["createdAt"], "commit": manifest["git"]["commit"], "meanF1": manifest["meanF1"]}}
+    config = {"model": _get(f"{args.api}/api/reports/extract/info").get("model"),
+              **_get(f"{args.api}/api/eval/explain/info"), "runs": args.runs}
+
+    summaries, details = [], []
     for run in range(1, args.runs + 1):
-        totals = {k: 0 for k in ("reports", "targets", "generated", "kept", "invalidCitations", "uncited", "ungrounded",
-                                 "forbidden", "noEvidence", "llmErrors", "salvaged", "disclaimer", "expectedSuspect",
-                                 "advisedCorrect", "advised", "retrievalMs", "llmMs", "totalMs")}
-        for report_id in ids:
-            expected = json.loads((DATA / f"{report_id}.expected.json").read_text(encoding="utf-8"))
-            request = urllib.request.Request(f"{args.api}/api/demo/samples/{report_id}/explain", method="POST")
-            with urllib.request.urlopen(request, timeout=300) as response:
-                x = json.load(response)["explanation"]
-            m = x["metrics"]
-            expected_suspect = {it["code"] for it in expected["items"]
-                                if it["code"] != "OTHER" and judge(criteria, it["code"], it["value"], expected.get("sex")) == "SUSPECT"}
-            advised = {it["code"] for it in x["items"] if it.get("careAdvice")}
-            totals["reports"] += 1
-            totals["targets"] += m["targets"]
-            totals["generated"] += m["sentencesGenerated"]
-            totals["kept"] += m["sentencesKept"]
-            totals["invalidCitations"] += m["invalidCitations"]
-            totals["uncited"] += m["uncitedSentences"]
-            totals["ungrounded"] += m["ungroundedNumberSentences"]
-            totals["forbidden"] += m["forbiddenHits"]
-            totals["noEvidence"] += sum(1 for it in x["items"] if it["noEvidence"])
-            totals["llmErrors"] += 1 if m.get("llmError") else 0
-            totals["salvaged"] += 1 if m.get("salvagedItems", -1) >= 0 else 0
-            totals["disclaimer"] += 1 if x.get("disclaimer") else 0
-            totals["expectedSuspect"] += len(expected_suspect)
-            totals["advisedCorrect"] += len(expected_suspect & advised)
-            totals["advised"] += len(advised)
-            for key in ("retrievalMs", "llmMs", "totalMs"):
-                totals[key] += m[key]
-            print(f"[{run}] {report_id}: 대상 {m['targets']} | 문장 {m['sentencesKept']}/{m['sentencesGenerated']} | "
-                  f"권고 {len(expected_suspect & advised)}/{len(expected_suspect)} (권고 {len(advised)}) | "
-                  f"근거 없음 {sum(1 for it in x['items'] if it['noEvidence'])} | 금지 {m['forbiddenHits']} | "
-                  f"{m['totalMs'] / 1000:.1f}초" + (f" | 실패 {m['llmError']}" if m.get("llmError") else ""))
-        n = totals["reports"]
-        summary = {
-            "run": run, "reports": n,
-            "sentencePassRate": round(totals["kept"] / totals["generated"], 3) if totals["generated"] else None,
-            "invalidCitations": totals["invalidCitations"], "uncitedSentences": totals["uncited"],
-            "ungroundedNumberSentences": totals["ungrounded"], "forbiddenHits": totals["forbidden"],
-            "noEvidenceItems": totals["noEvidence"], "llmErrors": totals["llmErrors"], "salvaged": totals["salvaged"],
-            "careAdviceRecall": round(totals["advisedCorrect"] / totals["expectedSuspect"], 3) if totals["expectedSuspect"] else None,
-            "careAdvicePrecision": round(totals["advisedCorrect"] / totals["advised"], 3) if totals["advised"] else None,
-            "expectedSuspectItems": totals["expectedSuspect"], "disclaimerRate": round(totals["disclaimer"] / n, 3),
-            "avgTargets": round(totals["targets"] / n, 1), "avgRetrievalMs": round(totals["retrievalMs"] / n),
-            "avgLlmMs": round(totals["llmMs"] / n), "avgTotalMs": round(totals["totalMs"] / n),
-        }
-        runs.append(summary)
+        rows = []
+        for key in keys:
+            if args.live:
+                dataset_name, report_id = "v1", key
+                response = _post(f"{args.api}/api/demo/samples/{report_id}/explain", None)
+                extraction, explanation = response["extraction"], response["explanation"]
+            else:
+                dataset_name, report_id = key.split("/")
+                extraction = json.loads((frozen_dir / dataset_name / f"{report_id}.json").read_text(encoding="utf-8"))
+                explanation = _post(f"{args.api}/api/eval/explain", extraction)
+            expected = json.loads((DATA / dataset_name / f"{report_id}.expected.json").read_text(encoding="utf-8"))
+            row = assess_report(criteria, expected, extraction["report"], extraction.get("needsReview") or [], explanation)
+            rows.append(row)
+            details.append({"run": run, "dataset": dataset_name, "id": report_id, **row,
+                            "output": compact_output(explanation)})
+            print(f"[{run}] {key}: 대상 {row['targets']} | 문장 {row['sentencesKept']}/{row['sentencesGenerated']} | "
+                  f"권고 {len(row['expectedSuspect']) - len(row['misses'])}/{len(row['expectedSuspect'])}"
+                  + (" (놓침: " + ", ".join(f"{m['code']}={m['cause']}" for m in row["misses"]) + ")" if row["misses"] else "")
+                  + f" | 근거 없음 {row['noEvidenceItems']} | 금지 {row['forbiddenHits']} | {row['totalMs'] / 1000:.1f}초"
+                  + (f" | 실패 {row['llmError']}" if row["llmError"] else ""), flush=True)
+        summary = {"run": run, **summarize(rows)}
+        summaries.append(summary)
         print(json.dumps(summary, ensure_ascii=False))
-    RESULTS.mkdir(parents=True, exist_ok=True)
-    out = RESULTS / f"{datetime.now():%Y%m%d-%H%M}_explanation_runs{args.runs}.json"
-    out.write_text(json.dumps({"ids": ids, "runs": runs}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    ranges = {f"{group}.{key}": [min(s[group][key] for s in summaries), max(s[group][key] for s in summaries)]
+              for group, key in HEADLINE_RANGES}
+    headline = ranges | {"forbiddenHits": sum(s["explanationLlm"]["forbiddenHits"] for s in summaries),
+                         "llmErrors": sum(s["explanationLlm"]["llmErrors"] for s in summaries)}
+    run_id = run_record.new_run_id("explanation", f"{dataset['name']}_{args.label}")
+    out = run_record.save(run_id, "explanation", "rag", label=args.label, dataset=dataset, config=config,
+                          summary={"runs": summaries, "ranges": ranges}, headline=headline, details=details, git=git)
+    print(f"범위 ({args.runs}회): {json.dumps(ranges, ensure_ascii=False)}")
     print(f"저장: {out.relative_to(EVAL_DIR)}")
+
+
+def _get(url: str) -> dict:
+    with urllib.request.urlopen(url, timeout=10) as response:
+        return json.load(response)
+
+
+def _post(url: str, body: dict | None) -> dict:
+    data = None if body is None else json.dumps(body, ensure_ascii=False).encode("utf-8")
+    request = urllib.request.Request(url, data=data, method="POST", headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(request, timeout=300) as response:
+        return json.load(response)
 
 
 if __name__ == "__main__":
