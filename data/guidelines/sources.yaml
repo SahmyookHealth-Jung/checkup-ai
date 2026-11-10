@@ -1,0 +1,53 @@
+# 해설 근거 문서 목록 (ADR 0007 2절). 원문은 raw/에 두고 gitignore한다. 이 목록으로 다시 받을 수 있다.
+# 수집일의 원문 해시를 남겨, 나중에 원문이 바뀌었는지 확인한다(고시 개정, 포털 업데이트).
+#
+# 이용 조건
+# - 고시: 저작권법 제7조(보호받지 못하는 저작물)에 따라 자유롭게 쓴다. 출처는 표시한다.
+# - 국가건강정보포털: 공공누리 제4유형(출처표시+상업적 이용금지+변경금지). 비영리 포트폴리오에서 출처를 표시하고,
+#   근거로 보여 주는 문단은 원문을 바꾸지 않는다. 해설 문장은 우리가 쓴 문장이고 인용으로 근거를 밝힌다.
+
+- id: mohw-2026-6-annex4
+  title: "건강검진 실시기준 [별표 4] 일반건강검진 및 의료급여생애전환기검진 결과 판정기준 (별첨: 검사항목별 판정기준)"
+  publisher: 보건복지부
+  edition: "보건복지부고시 제2026-6호 (2026-01-07)"
+  url: "https://www.nhis.or.kr/lm/lmxsrv/law/lawFullContent.do?SEQ=80"
+  download: "POST https://www.nhis.or.kr/lm/lmxsrv/fileDown.do (FILE_SEQ=2314738, FILE_TYPE=attach)"
+  license: "고시 - 저작권법 제7조 보호받지 못하는 저작물"
+  file: raw/mohw-2026-6-annex4-general-screening-criteria.hwpx
+  format: hwpx
+  collected: 2026-11-10
+  sha256: ea3776e772e905bd5930fa41571a839fef5abc171f7a31e361fc43ac640e6db3
+  use: "판정 구분(정상A·정상B·질환의심·유질환자) 정의와 검사항목별 판정기준 표. 위험 판정 기준 데이터의 출처"
+
+- id: kdca-6765
+  title: "고혈압"
+  publisher: "질병관리청 국가건강정보포털"
+  edition: "등록 2025-08-01, 업데이트 2026-10-21"
+  url: "https://health.kdca.go.kr/healthinfo/biz/health/gnrlzHealthInfo/gnrlzHealthInfo/gnrlzHealthInfoView.do?cntnts_sn=6765"
+  license: "공공누리 제4유형 (출처표시+상업적 이용금지+변경금지)"
+  file: raw/kdca-6765.html
+  format: html
+  collected: 2026-11-10
+  sha256: e90369e57a9c8de4defaae47607b9f51cb3d706e02e78e10bc336bd433f6096e
+
+- id: kdca-5305
+  title: "당뇨병"
+  publisher: "질병관리청 국가건강정보포털"
+  edition: "등록 2020-08-30, 업데이트 2026-10-23"
+  url: "https://health.kdca.go.kr/healthinfo/biz/health/gnrlzHealthInfo/gnrlzHealthInfo/gnrlzHealthInfoView.do?cntnts_sn=5305"
+  license: "공공누리 제4유형 (출처표시+상업적 이용금지+변경금지)"
+  file: raw/kdca-5305.html
+  format: html
+  collected: 2026-11-10
+  sha256: 593b0f0139616432d829b92ac5244f15e33636b35e8c8a56dccc24f354fa1b06
+
+- id: kdca-6715
+  title: "이상지질혈증"
+  publisher: "질병관리청 국가건강정보포털"
+  edition: "등록 2025-05-08, 업데이트 2026-08-19"
+  url: "https://health.kdca.go.kr/healthinfo/biz/health/gnrlzHealthInfo/gnrlzHealthInfo/gnrlzHealthInfoView.do?cntnts_sn=6715"
+  license: "공공누리 제4유형 (출처표시+상업적 이용금지+변경금지)"
+  file: raw/kdca-6715.html
+  format: html
+  collected: 2026-11-10
+  sha256: 2bb7ba1ed857f858421ff8f2c4be531e8b459d575ce4f4010ce45dd942342fb4
