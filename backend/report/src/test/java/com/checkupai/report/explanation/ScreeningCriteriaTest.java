@@ -55,10 +55,18 @@ class ScreeningCriteriaTest {
     void doesNotJudgeOutsideTheTable() {
         assertThat(criteria.judge(ItemCode.HEMOGLOBIN, "16.6", MALE).judgment()).isEqualTo(Judgment.NOT_JUDGED);
         assertThat(criteria.judge(ItemCode.GAMMA_GTP, "10", MALE).judgment()).isEqualTo(Judgment.NOT_JUDGED);
-        assertThat(criteria.judge(ItemCode.WAIST_CIRCUMFERENCE, "95", UNKNOWN).judgment()).isEqualTo(Judgment.NOT_JUDGED);
+        assertThat(criteria.judge(ItemCode.HEMOGLOBIN, "11.0", UNKNOWN).judgment()).isEqualTo(Judgment.NOT_JUDGED);  // 남 질환의심, 여 정상B
         assertThat(criteria.judge(ItemCode.FASTING_GLUCOSE, "<100", MALE).judgment()).isEqualTo(Judgment.NOT_JUDGED);
         assertThat(criteria.judge(ItemCode.VISION_LEFT, "1.0", MALE).judgment()).isEqualTo(Judgment.NOT_JUDGED);
         assertThat(criteria.judge(ItemCode.OTHER, "5.4", MALE).judgment()).isEqualTo(Judgment.NOT_JUDGED);
+    }
+
+    @Test
+    @DisplayName("성별을 몰라도 두 성별 기준의 판정이 같으면 그 판정을 쓴다 (추출이 성별을 놓쳐도 위험 수치를 놓치지 않게)")
+    void judgesWithoutSexWhenBothSexesAgree() {
+        assertThat(criteria.judge(ItemCode.GAMMA_GTP, "196", UNKNOWN).judgment()).isEqualTo(Judgment.SUSPECT);
+        assertThat(criteria.judge(ItemCode.WAIST_CIRCUMFERENCE, "95", UNKNOWN).judgment()).isEqualTo(Judgment.SUSPECT);
+        assertThat(criteria.judge(ItemCode.WAIST_CIRCUMFERENCE, "80", null).judgment()).isEqualTo(Judgment.NORMAL_A);
     }
 
     @Test

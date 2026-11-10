@@ -65,12 +65,25 @@ public class ScreeningCriteria {
         if (!NUMBER.matcher(value).matches()) {
             return Judgment.NOT_JUDGED;
         }
-        List<Band> bands = criteria.bySex() == null ? criteria.bands()
-                : sex == null ? null : criteria.bySex().get(sex.name());
-        if (bands == null) {
-            return Judgment.NOT_JUDGED;  // 성별 기준인데 성별을 모른다
-        }
         double number = Double.parseDouble(value);
+        if (criteria.bySex() == null) {
+            return judgeBands(criteria.bands(), number);
+        }
+        List<Band> bands = sex == null ? null : criteria.bySex().get(sex.name());
+        if (bands != null) {
+            return judgeBands(bands, number);
+        }
+        // 성별 기준인데 성별을 모른다. 두 성별 기준의 판정이 같으면 그 판정을 쓰고, 다르면 판정하지 않는다.
+        // 2026-11-10 해설 평가: 추출이 성별을 놓친 보고서에서 감마지티피 196(남녀 모두 질환의심)의 진료 권고가 빠졌다
+        Judgment male = judgeBands(criteria.bySex().get("MALE"), number);
+        Judgment female = judgeBands(criteria.bySex().get("FEMALE"), number);
+        return male == female ? male : Judgment.NOT_JUDGED;
+    }
+
+    private static Judgment judgeBands(List<Band> bands, double number) {
+        if (bands == null) {
+            return Judgment.NOT_JUDGED;
+        }
         return bands.stream()
                 .filter(band -> band.contains(number))
                 .map(Band::judgment)

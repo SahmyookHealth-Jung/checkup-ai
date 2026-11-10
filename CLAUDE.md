@@ -2,7 +2,7 @@
 
 건강검진센터 AI 플랫폼 (AI 역량 포트폴리오). 전체 배경과 진행 단계는 [docs/PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md)에 있다. 주 단위가 아니라 단계 순서대로 진행한다.
 
-- 기능 1 (진행 중): 건강검진 결과 해설 AI. 결과지 수치 추출(Structured Output), 공개 가이드라인 RAG, 출처 인용, 가드레일, 평가 자동화.
+- 기능 1 (진행 중): 건강검진 결과 해설 AI. 결과지 수치 추출(Structured Output), 공개 가이드라인 RAG, 출처 인용, 가드레일, 평가 자동화. 화면은 http://localhost:8080 (합성 샘플 데모).
 - 기능 2 (7단계, 6단계 뒤에 할지 결정): 관리자용 Text-to-SQL 통계 어시스턴트.
 
 ## 절대 규칙
@@ -40,6 +40,9 @@ cd backend && ./gradlew build              # 컴파일 + 단위 테스트 (외�
 ./gradlew :app:bootRun                     # 앱 실행 → http://localhost:8080/actuator/health
 ./gradlew :report:replay --args="<입력> <출력>"   # 재생 비교: 저장된 LLM 출력에 현재 검증기 적용 (eval/extraction/replay.py)
 ./gradlew :report:piiLeakCheck --args="<데이터 폴더> ..."   # 합성 결과지 식별정보 잔존율 (모델 호출 없음)
+(cd ../eval && .venv/bin/python -m rag.build_chunks)        # 해설 근거 청크 만들기 → 앱에서 POST /api/guidelines/reload
+(cd ../eval && .venv/bin/python -m rag.run_retrieval_eval)  # 검색 평가 (앱이 떠 있어야 함)
+(cd ../eval && .venv/bin/python -m rag.run_explanation_eval) # 해설 평가 (Haiku 호출, 30회 약 $0.08)
 ```
 
 Gradle이 실행·테스트 환경변수로 저장소 루트의 `.env`를 읽어 넣는다(`buildSrc`의 컨벤션 플러그인).
