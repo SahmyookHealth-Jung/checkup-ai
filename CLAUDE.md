@@ -24,6 +24,9 @@
 ## 개발 환경 (주의할 점)
 
 - 머신은 **Intel Mac**이다(i7-8850H, 16GB, Apple Silicon 아님). Ollama는 GPU 없이 CPU로만 돈다. 로컬 채팅 모델은 소형급만 현실적이다.
+- **채팅 모델 기본값은 Claude Haiku 5.5**다(ADR 0005). 키는 `.env`의 `ANTHROPIC_API_KEY`. 합성 데이터만 보낸다.
+  - 오프라인 모드(로컬 qwen3:4b + 재요청): `SPRING_PROFILES_ACTIVE=offline`. 이 맥에서는 보고서당 약 5분이라 회귀 확인용으로만 쓴다.
+  - 임베딩(bge-m3)은 두 모드 모두 로컬 Ollama다.
 - 셸 기본 `java`는 JDK 24다. 프로젝트는 Gradle toolchain으로 **Java 21**을 고정한다.
 - 로컬 PostgreSQL 17(EDB 설치판)이 5432를 쓰고 있다. 그래서 프로젝트 DB는 **5433**을 쓴다.
 - Spring AI는 **2.x**다. 인터넷 예제 대부분은 1.x 기준이라 설정 키와 API가 다를 수 있다. 예: 임베딩 모델 키가 `spring.ai.ollama.embedding.options.model`에서 `spring.ai.ollama.embedding.model`로 바뀌었다. 새 설정을 쓰기 전에 jar 안의 `spring-configuration-metadata.json`이나 공식 문서로 확인한다.
