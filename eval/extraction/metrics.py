@@ -6,7 +6,9 @@
 
 매칭 규칙
 - OTHER가 아닌 항목은 code로 1:1 매칭한다. 값이 같으면 정답(TP). 다르면 잘못 뽑음(FP)과 빠뜨림(FN)을 하나씩 센다.
-- OTHER 항목은 code만으로 구분이 안 되므로 값으로 매칭한다.
+- OTHER 항목은 code만으로 구분이 안 되므로 값과 항목명으로 매칭한다 (지표 v2, 2026-11-10 사용자 결정).
+  항목명은 공백·대소문자를 무시하고 한쪽이 다른 쪽을 포함하거나, 생성기 명세(item_spec.yaml)의 같은 항목 별칭
+  (이름·약어: 당화혈색소/HbA1c)이면 같다고 본다. v1은 값만 봐서, 값이 우연히 같은 가짜 항목도 정답으로 셌다.
 - 값 비교: 공백 제거 후 문자열 비교. 둘 다 숫자면 수치로 비교한다("26.0"과 "26"은 같다).
 
 보조 지표: 필드 정확도 (2026-11-09 추가, 사용자 결정)
@@ -18,9 +20,37 @@ from __future__ import annotations
 
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
+from pathlib import Path
 
+import yaml
+
+METRIC_VERSION = "v2"  # v1: OTHER를 값만으로 매칭 / v2: 값 + 항목명 (2026-11-10)
+SPEC_PATH = Path(__file__).resolve().parent.parent / "synth" / "item_spec.yaml"
 FIELDS = ("unit", "referenceRaw", "centerJudgment")
 EMPTY_MARKS = {"", "-", "–", "—", "null", "none", "없음", "n/a", "na"}
+
+
+def _squash(text) -> str:
+    return "".join(str(text or "").split()).lower()
+
+
+def _load_other_aliases() -> list[set[str]]:
+    with SPEC_PATH.open(encoding="utf-8") as f:
+        spec = yaml.safe_load(f)
+    return [{_squash(o["name"]), _squash(o["abbr"])} for o in spec.get("other_items", [])]
+
+
+OTHER_ALIASES = _load_other_aliases()
+
+
+def same_other_name(expected_name, predicted_name) -> bool:
+    """OTHER 항목명이 같은 검사를 가리키는가. 한쪽이 다른 쪽을 포함하거나 같은 항목의 별칭이면 같다."""
+    a, b = _squash(expected_name), _squash(predicted_name)
+    if not a or not b:
+        return False
+    if a in b or b in a:
+        return True
+    return any(any(alias in a for alias in group) and any(alias in b for alias in group) for group in OTHER_ALIASES)
 
 
 def normalize_value(value) -> str | None:
@@ -102,11 +132,12 @@ def score_document(expected_items: list[dict], predicted_items: list[dict]) -> S
             score.fp += 1
             error("extra", code, predicted=item.get("value"))
 
-    # 2) OTHER 항목: 값으로 매칭
+    # 2) OTHER 항목: 값과 항목명으로 매칭 (지표 v2)
     unmatched = [it for it in expected_items if it["code"] == "OTHER"]
     for item in (it for it in predicted_items if it.get("code") == "OTHER"):
         value = normalize_value(item.get("value"))
-        hit = next((e for e in unmatched if normalize_value(e["value"]) == value), None)
+        hit = next((e for e in unmatched if normalize_value(e["value"]) == value
+                    and same_other_name(e.get("rawName"), item.get("rawName"))), None)
         if hit is not None:
             score.tp += 1
             score.matches.append((hit, item))

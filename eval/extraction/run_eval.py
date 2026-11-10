@@ -23,7 +23,7 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 
-from .metrics import Score, score_document, score_failed_document, score_fields
+from .metrics import METRIC_VERSION, Score, score_document, score_failed_document, score_fields
 
 EVAL_DIR = Path(__file__).resolve().parent.parent
 CACHE_DIR = EVAL_DIR / ".cache" / "extraction"
@@ -123,6 +123,7 @@ def _save(args, info: dict, ids: list[str], total: Score, first_total: Score, pe
         "dataset": args.data.name,
         "subset": args.subset,
         "format": args.format,
+        "metric": METRIC_VERSION,  # v1: OTHER를 값만으로 매칭, v2: 값 + 항목명 (metrics.py)
         "documents": len(ids),
         "failed": sum(1 for d in documents if d["error"]),
         "itemF1": total.summary(),
@@ -163,7 +164,7 @@ def _save(args, info: dict, ids: list[str], total: Score, first_total: Score, pe
                       for v in summary["fieldAccuracy"].values())
     subset = f"{args.subset}({len(ids)})" if not dataset else f"{args.data.name} {args.subset}({len(ids)})"
     with history.open("a", encoding="utf-8") as f:
-        f.write(f"| {summary['runAt']} | {info.get('pipeline')} | {info.get('model')} | {info.get('promptVersion')} "
+        f.write(f"| {summary['runAt']} | {info.get('pipeline')} (지표 {METRIC_VERSION}) | {info.get('model')} | {info.get('promptVersion')} "
                 f"| {subset} | {args.format} | **{f1['f1']:.3f}** | {f1['precision']:.3f} "
                 f"| {f1['recall']:.3f} | {summary['failed']} | {latency} "
                 f"| {summary['avgPromptTokens']}/{summary['avgCompletionTokens']} "

@@ -35,11 +35,23 @@ class ScoreDocumentTest(unittest.TestCase):
         score = score_document([item("AST", "23")], [item("AST", "30"), item("AST", "23")])
         self.assertEqual((score.tp, score.fp, score.fn), (1, 1, 0))
 
-    def test_other_items_match_by_value(self):
+    def test_other_items_match_by_value_and_name_alias(self):
+        # 당화혈색소와 HbA1c는 명세상 같은 항목의 별칭이다
         expected = [item("OTHER", "7.9", "요산"), item("OTHER", "5.1", "HbA1c")]
         predicted = [item("OTHER", "5.1", "당화혈색소"), item("OTHER", "1.2", "TSH")]
         score = score_document(expected, predicted)
         self.assertEqual((score.tp, score.fp, score.fn), (1, 1, 1))
+
+    def test_other_item_with_same_value_but_different_name_is_wrong(self):
+        # 지표 v2: 값이 우연히 같은 가짜 항목(꼬리말 "가상로"=4.9)은 정답이 아니다
+        expected = [item("OTHER", "4.9", "알부민")]
+        score = score_document(expected, [item("OTHER", "4.9", "가상로")])
+        self.assertEqual((score.tp, score.fp, score.fn), (0, 1, 1))
+
+    def test_other_name_matches_when_one_contains_the_other(self):
+        expected = [item("OTHER", "3.38", "갑상선자극호르몬")]
+        score = score_document(expected, [item("OTHER", "3.38", "TSH (갑상선 자극호르몬)")])
+        self.assertEqual((score.tp, score.fp, score.fn), (1, 0, 0))
 
     def test_known_item_labelled_other_is_miss_and_extra(self):
         score = score_document([item("FASTING_GLUCOSE", "112")], [item("OTHER", "112", "FBS")])
