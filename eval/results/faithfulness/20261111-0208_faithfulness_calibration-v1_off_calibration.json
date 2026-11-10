@@ -1,0 +1,5859 @@
+{
+  "schema": "checkup-ai/eval-run@1",
+  "runId": "20261111-0208_faithfulness_calibration-v1_off_calibration",
+  "kind": "faithfulness",
+  "label": "calibration",
+  "createdAt": "2026-11-11T02:08:49",
+  "git": {
+    "commit": "2d57b5e",
+    "dirty": false
+  },
+  "dataset": {
+    "name": "calibration-v1",
+    "source": "calibration",
+    "sentences": 50
+  },
+  "config": {
+    "model": "claude-sonnet-5-5",
+    "rubric": "faithfulness-v1.1",
+    "prompt": "judge-v2",
+    "setting": "off",
+    "chunksSha256": "a981c329fe2ae795",
+    "settingDetail": {
+      "thinking": {
+        "type": "between_tools"
+      },
+      "output_config": {},
+      "max_tokens": 2000
+    },
+    "repeats": 3
+  },
+  "summary": {
+    "calls": 150,
+    "judged": 150,
+    "errors": 0,
+    "support": {
+      "unsupported": 20,
+      "partial": 49,
+      "supported": 81
+    },
+    "supportRaw": {
+      "unsupported": 20,
+      "partial": 49,
+      "supported": 81
+    },
+    "passRate": 0.527,
+    "passed": 79,
+    "bandWrong": 0,
+    "treatmentPresent": 2,
+    "quoteVerifyFailed": 0,
+    "selfConsistency": {
+      "support": 0.88,
+      "band": 0.9,
+      "treatment": 0.96
+    },
+    "byStratum": {
+      "neighbor_band": {
+        "judged": 30,
+        "pass": 24,
+        "support": {
+          "supported": 24,
+          "partial": 6
+        }
+      },
+      "other_item_only": {
+        "judged": 60,
+        "pass": 16,
+        "support": {
+          "unsupported": 20,
+          "partial": 22,
+          "supported": 18
+        }
+      },
+      "rest": {
+        "judged": 60,
+        "pass": 39,
+        "support": {
+          "partial": 21,
+          "supported": 39
+        }
+      }
+    },
+    "costUsd": 0.6792,
+    "avgCostUsd": 0.00453,
+    "avgLatencyMs": 3036,
+    "avgTokens": {
+      "input_tokens": 543,
+      "output_tokens": 302,
+      "cache_creation_input_tokens": 68,
+      "cache_read_input_tokens": 2487
+    },
+    "fromCache": 0
+  },
+  "details": [
+    {
+      "id": "cal-001",
+      "stratum": "other_item_only",
+      "origin": "LLM",
+      "itemCode": "HEMOGLOBIN",
+      "text": "정상B(경계)는 건강에 큰 이상이 없으나 식생활습관 등 자가관리와 예방조치가 필요하다는 뜻이며, 판정 기준을 함께 확인해 보시기 바랍니다.",
+      "sources": [
+        "mohw-annex4-row-triglycerides",
+        "mohw-annex4-row-blood-pressure"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 572,
+            "output_tokens": 305,
+            "cache_creation_input_tokens": 2555,
+            "cache_read_input_tokens": 0
+          },
+          "costUsd": 0.010582,
+          "latencyMs": 4024,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "unsupported",
+            "supportRaw": "unsupported",
+            "quoteVerified": true,
+            "quotes": [],
+            "unsupportedClaims": [
+              "정상B(경계)는 건강에 큰 이상이 없으나 식생활습관 등 자가관리와 예방조치가 필요하다는 뜻이라는 설명",
+              "판정 기준을 함께 확인해 보시기 바란다는 안내"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용한 근거는 중성지방과 혈압의 판정 수치 기준표일 뿐이며, 정상B(경계)의 의미나 자가관리·예방조치가 필요하다는 내용은 어디에도 없다.",
+              "band": "문장은 항목 정보의 판정인 정상B(경계)를 그대로 언급하며, 이는 결과값 11.3 g/dL(여 10.0-11.9)과 맞는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 572,
+            "output_tokens": 305,
+            "cache_creation_input_tokens": 2555,
+            "cache_read_input_tokens": 0
+          },
+          "costUsd": 0.010582,
+          "latencyMs": 3957,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "unsupported",
+            "supportRaw": "unsupported",
+            "quoteVerified": true,
+            "quotes": [],
+            "unsupportedClaims": [
+              "정상B(경계)는 건강에 큰 이상이 없으나 식생활습관 등 자가관리와 예방조치가 필요하다는 뜻이다"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용한 근거 1·2는 각각 중성지방, 혈압의 판정 기준표일 뿐이며, 정상B(경계)의 의미(건강에 큰 이상은 없으나 자가관리·예방조치 필요)를 설명하는 내용이 없다.",
+              "band": "문장은 '정상B(경계)'라는 구간 이름만 언급하며, 이는 항목 정보의 판정(정상B 경계, 여성 11.3 g/dL은 10.0-11.9 구간)과 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 572,
+            "output_tokens": 289,
+            "cache_creation_input_tokens": 2555,
+            "cache_read_input_tokens": 0
+          },
+          "costUsd": 0.010422,
+          "latencyMs": 3857,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "unsupported",
+            "supportRaw": "unsupported",
+            "quoteVerified": true,
+            "quotes": [],
+            "unsupportedClaims": [
+              "정상B(경계)는 건강에 큰 이상이 없으나 식생활습관 등 자가관리와 예방조치가 필요하다는 뜻이다",
+              "판정 기준을 함께 확인해 보시기 바란다"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용한 근거 1·2는 중성지방과 혈압의 판정 기준표일 뿐이며, 정상B(경계)의 의미나 자가관리·예방조치가 필요하다는 내용은 어디에도 없다.",
+              "band": "문장은 정상B(경계)의 일반적 의미만 말할 뿐 구체적인 기준 수치나 구간 범위를 제시하지 않는다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-002",
+      "stratum": "other_item_only",
+      "origin": "LLM",
+      "itemCode": "ALT",
+      "text": "질환의심 판정은 진료와 검사 등이 필요하다는 뜻이므로, 결과를 의료진과 상의해 확인해 보시는 것이 좋습니다.",
+      "sources": [
+        "mohw-annex4-def-suspect-chronic"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 333,
+            "output_tokens": 312,
+            "cache_creation_input_tokens": 2555,
+            "cache_read_input_tokens": 0
+          },
+          "costUsd": 0.010174,
+          "latencyMs": 4097,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "일반건강검진 결과 고혈압, 당뇨병, 이상지질혈증이 의심되어 진료와 검사 등이 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "'의료진과 상의해 확인해 보시는 것이 좋다'는 조언은 근거 문단에 없음"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거에서 질환의심이 '진료와 검사 등이 필요한 자'를 뜻한다는 점은 확인되지만, 의료진과 상의하라는 조언은 근거에 없는 내용이다.",
+              "band": "문장은 '질환의심 판정'이라는 구간 이름만 언급할 뿐 구체적인 구간 범위나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 333,
+            "output_tokens": 274,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003661,
+          "latencyMs": 2834,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "질환의심: 일반건강검진 결과 고혈압, 당뇨병, 이상지질혈증이 의심되어 진료와 검사 등이 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거 문단에서 질환의심은 진료와 검사 등이 필요한 경우라고 확인되며, 의료진과 상의하라는 권유는 그 뜻을 풀어 쓴 것이다.",
+              "band": "문장이 말한 '질환의심' 판정은 항목 정보의 판정(질환의심, ALT 84 U/L, 기준 46 이상)과 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 333,
+            "output_tokens": 277,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003691,
+          "latencyMs": 2806,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "질환의심: 일반건강검진 결과 고혈압, 당뇨병, 이상지질혈증이 의심되어 진료와 검사 등이 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거에서 질환의심 판정이 '진료와 검사 등이 필요한 자'를 뜻한다고 확인되며, 의료진과 상의하라는 권유는 그 내용의 말 바꿈 수준이다.",
+              "band": "문장이 말한 '질환의심' 판정은 항목 정보의 판정(질환의심, ALT 84 U/L ≥ 46)과 일치한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-003",
+      "stratum": "neighbor_band",
+      "origin": "LLM",
+      "itemCode": "FASTING_GLUCOSE",
+      "text": "공복혈당 결과는 109 mg/dL이며, 국가건강검진 기준에서 정상B(경계)에 해당합니다. 정상A는 100 mg/dL 미만, 정상B(경계)는 100-125 mg/dL, 질환의심은 126 mg/dL 이상입니다.",
+      "sources": [
+        "mohw-annex4-row-fasting-glucose"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 390,
+            "output_tokens": 354,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004575,
+          "latencyMs": 3120,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 100 미만 / 정상B(경계): 100-125 / 질환의심: 126 이상",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "검사항목: 공복 혈당 / 단위: mg/dL",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 기준 수치(정상A 100 미만, 정상B 100-125, 질환의심 126 이상)가 인용한 근거 1의 판정기준표에서 그대로 확인된다. 결과값 109 및 정상B 해당 여부는 항목 정보에서 오는 내용이며, 기준 구간 설명 자체는 근거와 일치한다.",
+              "band": "결과값 109 mg/dL은 100-125 구간으로 정상B(경계)이며, 문장이 말한 세 구간 기준 수치도 항목 정보의 판정 기준과 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 390,
+            "output_tokens": 292,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003955,
+          "latencyMs": 2936,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 100 미만 / 정상B(경계): 100-125 / 질환의심: 126 이상",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장이 말한 구간 기준(정상A 100 미만, 정상B 100-125, 질환의심 126 이상)이 근거 1의 판정기준표에서 그대로 확인된다. 결과값 109와 정상B 해당 여부는 항목 정보와 기준 범위의 적용이다.",
+              "band": "109 mg/dL은 정상B(경계) 범위 100-125에 속하며, 문장이 제시한 모든 기준 수치가 항목 정보의 판정 기준과 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 390,
+            "output_tokens": 341,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004445,
+          "latencyMs": 3068,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 100 미만 / 정상B(경계): 100-125 / 질환의심: 126 이상",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "공복혈당 결과가 109 mg/dL이라는 값",
+              "109 mg/dL이 정상B(경계)에 해당한다는 개인 결과 판정"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "판정 구간별 기준 수치(100 미만/100-125/126 이상)는 근거 1에서 확인되지만, 결과값 109 mg/dL과 그 값이 정상B에 해당한다는 적용은 인용한 근거에 없고 항목 정보에서 온 내용이다.",
+              "band": "109 mg/dL는 정상B(경계) 100-125 구간에 해당하며, 문장이 말한 세 구간의 기준 수치도 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-004",
+      "stratum": "neighbor_band",
+      "origin": "LLM",
+      "itemCode": "SYSTOLIC_BP",
+      "text": "고혈압은 수축기혈압 140 mmHg 이상 또는 이완기혈압 90 mmHg 이상인 경우를 말하며, 정상혈압은 수축기 120 mmHg 미만, 이완기 80 mmHg 미만입니다.",
+      "sources": [
+        "kdca-6765-overview-1"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 414,
+            "output_tokens": 312,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004203,
+          "latencyMs": 2694,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "수축기혈압 140 mmHg 이상, 또는 이완기혈압 90 mmHg 이상인 경우를 말합니다",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "수축기혈압과 이완기혈압이 각각 120 mmHg 미만, 80 mmHg 미만일 때 정상혈압이라고 합니다",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 고혈압 기준과 정상혈압 기준이 인용한 근거에서 그대로 확인된다.",
+              "band": "고혈압 140 이상, 정상혈압 120 미만이라는 기준 수치가 항목 정보의 판정 기준(정상A 120 미만, 질환의심 140 이상)과 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 414,
+            "output_tokens": 338,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004463,
+          "latencyMs": 2858,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "수축기혈압 140 mmHg 이상, 또는 이완기혈압 90 mmHg 이상인 경우를 말합니다",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "수축기혈압과 이완기혈압이 각각 120 mmHg 미만, 80 mmHg 미만일 때 정상혈압이라고 합니다",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "고혈압 기준(140/90 이상)과 정상혈압 기준(120/80 미만)이 근거 문단에 그대로 나와 문장의 모든 주장이 확인된다.",
+              "band": "문장이 말한 기준 수치(수축기 140 이상 고혈압, 120 미만 정상)는 항목 정보의 질환의심 140 이상, 정상A 120 미만 기준과 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 414,
+            "output_tokens": 348,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004563,
+          "latencyMs": 3135,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "수축기혈압 140 mmHg 이상, 또는 이완기혈압 90 mmHg 이상인 경우를 말합니다",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "수축기혈압과 이완기혈압이 각각 120 mmHg 미만, 80 mmHg 미만일 때 정상혈압이라고 합니다",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "고혈압 기준(140/90 이상)과 정상혈압 기준(120/80 미만)이 인용한 근거에서 그대로 확인된다.",
+              "band": "문장이 말한 수축기 140 이상(고혈압/질환의심)과 120 미만(정상)은 항목 정보의 판정 기준과 일치한다. 결과값 129의 구간은 직접 언급하지 않았지만 기준 수치 자체는 맞다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-005",
+      "stratum": "other_item_only",
+      "origin": "LLM",
+      "itemCode": "BMI",
+      "text": "체질량지수 외에 허리둘레도 함께 살펴보면 체중 관리 방향을 더 잘 이해하는 데 도움이 됩니다.",
+      "sources": [
+        "mohw-annex4-row-triglycerides",
+        "mohw-annex4-row-waist"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 495,
+            "output_tokens": 264,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003886,
+          "latencyMs": 3830,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 2,
+                "quote": "목표질환: 비만 / 검사항목: 허리둘레",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "허리둘레를 함께 살펴보면 체중 관리 방향을 더 잘 이해하는 데 도움이 된다는 주장"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거 2에는 허리둘레가 비만 목표질환의 검사항목이라는 기준만 있고, 체질량지수와 함께 보면 체중 관리 방향 이해에 도움이 된다는 내용은 없다.",
+              "band": "문장이 판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 495,
+            "output_tokens": 268,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003926,
+          "latencyMs": 4097,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 2,
+                "quote": "목표질환: 비만 / 검사항목: 허리둘레",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "허리둘레를 함께 살펴보면 체중 관리 방향을 더 잘 이해하는 데 도움이 된다는 주장"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거 2는 허리둘레가 비만 목표질환의 검사항목임을 보여줄 뿐, 허리둘레를 함께 보면 체중 관리 방향 이해에 도움이 된다는 내용은 근거에 없다.",
+              "band": "문장은 판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 495,
+            "output_tokens": 266,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003906,
+          "latencyMs": 3514,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 2,
+                "quote": "목표질환: 비만 / 검사항목: 허리둘레",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "허리둘레를 함께 살펴보면 체중 관리 방향을 더 잘 이해하는 데 도움이 된다는 주장"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거 2는 허리둘레가 비만 목표질환의 검사항목임을 보여 주지만, 허리둘레를 함께 보면 체중 관리 방향 이해에 도움이 된다는 내용은 근거에 없다.",
+              "band": "문장이 판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-006",
+      "stratum": "rest",
+      "origin": "LLM",
+      "itemCode": "HDL_CHOLESTEROL",
+      "text": "수치가 기준보다 낮아 의료기관에서 추가 진료와 검사가 필요한지 확인해 보시는 것이 좋습니다.",
+      "sources": [
+        "mohw-annex4-row-ldl",
+        "mohw-annex4-def-suspect-chronic"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 529,
+            "output_tokens": 331,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004624,
+          "latencyMs": 3043,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 2,
+                "quote": "일반건강검진 결과 고혈압, 당뇨병, 이상지질혈증이 의심되어 진료와 검사 등이 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "수치가 기준보다 낮다는 점(HDL 기준은 인용한 근거에 없음; 근거 1은 LDL 기준표)"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "진료와 검사가 필요한지 확인하라는 부분은 근거 2의 질환의심 정의에서 확인되지만, 'HDL 수치가 기준보다 낮다'는 내용은 LDL 기준표인 근거 1에서 확인되지 않는다.",
+              "band": "판정 구간 이름이나 구체적인 기준 수치를 말하지 않고 '기준보다 낮아'라고만 했다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 529,
+            "output_tokens": 325,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004563,
+          "latencyMs": 3129,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 2,
+                "quote": "일반건강검진 결과 고혈압, 당뇨병, 이상지질혈증이 의심되어 진료와 검사 등이 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "수치가 기준보다 낮다는 내용 (인용한 근거 1은 LDL 콜레스테롤 기준표이며 HDL 기준이 아니다)"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "진료와 검사가 필요하다는 부분은 근거 2의 질환의심 정의에서 확인되지만, 수치가 기준보다 낮다는 부분은 인용한 근거(LDL 기준표)에서 확인되지 않는다.",
+              "band": "구간 이름이나 구체적 기준 수치를 말하지 않고 '기준보다 낮다'고만 했다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 529,
+            "output_tokens": 383,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005143,
+          "latencyMs": 3464,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 2,
+                "quote": "일반건강검진 결과 고혈압, 당뇨병, 이상지질혈증이 의심되어 진료와 검사 등이 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "수치가 기준보다 낮다는 것 (인용한 근거 1은 HDL이 아닌 LDL 기준표이며 HDL 기준 수치는 근거에 없음)"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "질환의심 시 진료와 검사가 필요하다는 부분은 근거 2에서 확인되지만, '수치가 기준보다 낮다'는 내용은 HDL 기준이 없는 LDL 기준표(근거 1)로는 확인되지 않는다.",
+              "band": "'기준보다 낮다'는 표현은 HDL 34가 질환의심 기준(40 미만)보다 낮다는 항목 정보와 일치하며 구체적 구간명이나 수치는 말하지 않아 틀린 내용이 없다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-007",
+      "stratum": "neighbor_band",
+      "origin": "LLM",
+      "itemCode": "DIASTOLIC_BP",
+      "text": "근거 문서는 소금 섭취 줄이기, 규칙적 운동, 금연과 절주 같은 생활습관 개선이 모든 환자에게 필요하다고 설명합니다.",
+      "sources": [
+        "kdca-6765-summary-1"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 919,
+            "output_tokens": 297,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005064,
+          "latencyMs": 2622,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "소금 섭취 줄이기, 규칙적 운동, 금연·절주 같은 생활습관 개선은 혈압약 한 알에 버금가는 효과가 있으므로 모든 환자에게 필수적입니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용한 근거에 소금 섭취 줄이기, 규칙적 운동, 금연·절주 같은 생활습관 개선이 모든 환자에게 필수적이라고 명시되어 있어 문장의 내용이 그대로 확인된다.",
+              "band": "문장은 판정 구간이나 기준 수치를 말하지 않고 생활습관 개선의 필요성만 설명한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 919,
+            "output_tokens": 282,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004914,
+          "latencyMs": 2594,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "소금 섭취 줄이기, 규칙적 운동, 금연·절주 같은 생활습관 개선은 혈압약 한 알에 버금가는 효과가 있으므로 모든 환자에게 필수적입니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용한 근거에 소금 섭취 줄이기, 규칙적 운동, 금연·절주 같은 생활습관 개선이 모든 환자에게 필수적이라고 직접 명시되어 있어 문장의 내용이 그대로 확인된다.",
+              "band": "문장이 판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 919,
+            "output_tokens": 280,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004894,
+          "latencyMs": 2583,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "소금 섭취 줄이기, 규칙적 운동, 금연·절주 같은 생활습관 개선은 혈압약 한 알에 버금가는 효과가 있으므로 모든 환자에게 필수적입니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거 문단에 소금 섭취 줄이기, 규칙적 운동, 금연·절주 등 생활습관 개선이 모든 환자에게 필수적이라고 직접 명시되어 있어 문장의 모든 주장이 확인된다.",
+              "band": "문장은 판정 구간이나 기준 수치를 언급하지 않는다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-008",
+      "stratum": "other_item_only",
+      "origin": "LLM",
+      "itemCode": "LDL_CHOLESTEROL",
+      "text": "당뇨병이 있는 경우 LDL 콜레스테롤 목표치가 더 낮게 설정되므로, 의료진과 함께 목표치를 상의해 보시는 것이 좋습니다.",
+      "sources": [
+        "kdca-5305-prevention-4"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 854,
+            "output_tokens": 409,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.006053,
+          "latencyMs": 3254,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "심한 고중성지방혈증으로 췌장염의 위험이 있는 경우를 제외하고 심혈관질환이 없는 대부분의 당뇨병 환자에서 가장 중요한 이상지질혈증 치료 목표는 LDL 콜레스테롤을 100 mg/dL 미만으로 낮추는 것입니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "의료진과 함께 목표치를 상의해 보시는 것이 좋다는 조언"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "당뇨병 환자의 LDL 목표가 100 mg/dL 미만으로 더 낮다는 점은 근거에서 확인되지만, 의료진과 목표치를 상의하라는 권유는 근거 문단에 없다.",
+              "band": "문장은 구간 이름이나 수치를 직접 말하지 않지만, 당뇨병 동반 시 목표가 더 낮다는 내용은 항목 정보의 판정 기준(당뇨병 동반 시 100 미만)과 맞는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 854,
+            "output_tokens": 375,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005713,
+          "latencyMs": 3137,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "심한 고중성지방혈증으로 췌장염의 위험이 있는 경우를 제외하고 심혈관질환이 없는 대부분의 당뇨병 환자에서 가장 중요한 이상지질혈증 치료 목표는 LDL 콜레스테롤을 100 mg/dL 미만으로 낮추는 것입니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "의료진과 함께 목표치를 상의해 보시는 것이 좋다는 조언"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "당뇨병 환자의 LDL 목표치가 100 mg/dL 미만으로 더 낮다는 점은 근거에서 확인되지만, 의료진과 상의를 권하는 부분은 근거에 없다.",
+              "band": "당뇨병 동반 시 LDL 100 미만이라는 기준(일반 130 미만보다 낮음)은 항목 정보의 판정 기준과 맞는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 854,
+            "output_tokens": 404,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.006004,
+          "latencyMs": 3217,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "심한 고중성지방혈증으로 췌장염의 위험이 있는 경우를 제외하고 심혈관질환이 없는 대부분의 당뇨병 환자에서 가장 중요한 이상지질혈증 치료 목표는 LDL 콜레스테롤을 100 mg/dL 미만으로 낮추는 것입니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "의료진과 함께 목표치를 상의해 보시는 것이 좋다는 조언"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "당뇨병 환자의 LDL 목표치가 100 mg/dL 미만(더 낮음)이라는 내용은 근거에서 확인되지만, 의료진과 상의하라는 조언은 근거 문단에 없다.",
+              "band": "문장은 구간 이름을 직접 말하지 않고 당뇨병 동반 시 더 낮은 목표치라는 기준을 언급하며, 이는 항목 정보의 '당뇨병 동반 시 100 미만'과 맞다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-009",
+      "stratum": "rest",
+      "origin": "LLM",
+      "itemCode": "BMI",
+      "text": "정상A는 18.5~24.9, 정상B(경계)는 25~29.9 및 18.5 미만으로 정해져 있어, 이번 결과는 그보다 높은 구간입니다.",
+      "sources": [
+        "mohw-annex4-row-bmi"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 373,
+            "output_tokens": 313,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004131,
+          "latencyMs": 3182,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 18.5-24.9 / 정상B(경계): 25-29.9, 18.5 미만 / 질환의심: 30 이상",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "정상A와 정상B(경계)의 기준 수치가 근거 문단에 그대로 있다. '그보다 높은 구간'은 31.9가 질환의심(30 이상)에 해당함을 뜻해 근거와 어긋나지 않는다.",
+              "band": "정상A 18.5~24.9, 정상B 25~29.9 및 18.5 미만이라는 기준 수치가 항목 정보와 일치하고, 결과값 31.9는 이 두 구간보다 높은 질환의심 구간이므로 맞다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 373,
+            "output_tokens": 305,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004052,
+          "latencyMs": 2865,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 18.5-24.9 / 정상B(경계): 25-29.9, 18.5 미만 / 질환의심: 30 이상",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "정상A 18.5~24.9와 정상B(경계) 25~29.9 및 18.5 미만 기준은 근거에서 직접 확인된다. 결과가 그보다 높은 구간이라는 말은 근거의 질환의심 30 이상과 모순되지 않는다.",
+              "band": "정상A와 정상B(경계) 기준 수치가 항목 정보와 일치하고, 결과값 31.9는 정상B 상한(29.9)보다 높은 구간(질환의심)이라 맞다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 373,
+            "output_tokens": 311,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004111,
+          "latencyMs": 2902,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 18.5-24.9 / 정상B(경계): 25-29.9, 18.5 미만 / 질환의심: 30 이상",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "정상A와 정상B(경계)의 기준 수치가 근거 문단에 그대로 나와 있고, '그보다 높은 구간'은 정상B 위의 질환의심 구간(30 이상)과 일치하는 내용이다.",
+              "band": "정상A 18.5~24.9, 정상B(경계) 25~29.9 및 18.5 미만이라는 기준이 항목 정보와 일치하며, 결과값 31.9는 이 구간들보다 높아 질환의심 구간에 해당하므로 맞다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-010",
+      "stratum": "rest",
+      "origin": "LLM",
+      "itemCode": "URINE_PROTEIN",
+      "text": "정상B(경계)는 건강에 이상이 없으나 식생활습관, 환경개선 등 자가관리와 예방조치가 필요하다는 뜻입니다.",
+      "sources": [
+        "mohw-annex4-def-normal-b"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 319,
+            "output_tokens": 241,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003304,
+          "latencyMs": 2998,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상B(경계): 일반건강검진 및 의료급여생애전환기검진 결과 건강에 이상이 없으나 식생활습관, 환경개선 등 자가관리 및 예방조치가 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 정상B(경계) 정의가 근거 1의 판정 구분 설명과 직접 일치한다.",
+              "band": "정상B(경계)는 항목 정보의 판정(정상B 경계, 약양성 ±)과 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 319,
+            "output_tokens": 271,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003603,
+          "latencyMs": 2909,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상B(경계): 일반건강검진 및 의료급여생애전환기검진 결과 건강에 이상이 없으나 식생활습관, 환경개선 등 자가관리 및 예방조치가 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 정상B(경계) 정의가 근거 1의 판정 구분 설명과 말만 바꿔 동일하게 확인된다.",
+              "band": "정상B(경계)는 항목 정보의 판정(정상B 경계)과 일치하며, 구간 이름만 말하고 기준 수치는 언급하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 319,
+            "output_tokens": 260,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003494,
+          "latencyMs": 2834,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상B(경계): 일반건강검진 및 의료급여생애전환기검진 결과 건강에 이상이 없으나 식생활습관, 환경개선 등 자가관리 및 예방조치가 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 정상B(경계) 정의가 근거 1의 판정 구분 설명과 말 바꿈 수준으로 일치한다.",
+              "band": "문장이 말한 정상B(경계) 구간은 항목 정보의 판정(정상B 경계, 약양성 ±)과 맞는다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-011",
+      "stratum": "neighbor_band",
+      "origin": "LLM",
+      "itemCode": "FASTING_GLUCOSE",
+      "text": "공복혈당 결과는 123 mg/dL이며, 국가건강검진 기준상 정상B(경계) 구간에 해당합니다. 이 구간은 100~125 mg/dL입니다.",
+      "sources": [
+        "mohw-annex4-row-fasting-glucose"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 354,
+            "output_tokens": 273,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003694,
+          "latencyMs": 3467,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상B(경계): 100-125",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "공복혈당 결과가 123 mg/dL이라는 개인 결과값은 인용한 근거에서 확인되지 않음"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "정상B(경계) 구간이 100~125 mg/dL이라는 기준은 근거에서 확인되지만, 123 mg/dL이라는 결과값은 근거 문단에 없다.",
+              "band": "123 mg/dL은 정상B(경계) 100-125 범위에 속하며, 문장이 말한 구간과 기준 수치(100~125)가 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 354,
+            "output_tokens": 274,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003704,
+          "latencyMs": 3118,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상B(경계): 100-125",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "검사항목: 공복 혈당",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "정상B(경계) 구간이 100-125 mg/dL이라는 문장의 내용은 인용한 근거에서 직접 확인된다. 결과값 123 mg/dL은 항목 정보에서 온 것으로 근거 주장과 충돌하지 않는다.",
+              "band": "결과값 123은 정상B(경계) 구간 100-125에 속하며, 문장이 말한 구간명과 기준 수치가 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 354,
+            "output_tokens": 240,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003364,
+          "latencyMs": 2861,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상B(경계): 100-125",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "정상B(경계) 구간이 100-125 mg/dL이라는 내용이 근거 1에서 직접 확인된다. 결과값 123 mg/dL이 이 구간에 속한다는 것은 단순 비교이며 새로운 주장이 아니다.",
+              "band": "결과값 123 mg/dL, 판정 정상B(경계), 구간 100~125 mg/dL이 항목 정보와 모두 일치한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-012",
+      "stratum": "neighbor_band",
+      "origin": "LLM",
+      "itemCode": "FASTING_GLUCOSE",
+      "text": "경계 구간은 건강에 이상이 없더라도 식생활습관 등 자가관리와 예방조치가 필요한 단계입니다.",
+      "sources": [
+        "mohw-annex4-def-normal-b"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 320,
+            "output_tokens": 317,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004065,
+          "latencyMs": 3089,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상B(경계): 일반건강검진 및 의료급여생애전환기검진 결과 건강에 이상이 없으나 식생활습관, 환경개선 등 자가관리 및 예방조치가 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 내용(경계 구간은 건강에 이상은 없으나 식생활습관 등 자가관리와 예방조치가 필요한 단계)이 인용한 근거 1의 정상B(경계) 정의와 말 바꿈 수준으로 일치한다.",
+              "band": "문장이 말한 '경계 구간'은 항목 정보의 판정 정상B(경계)와 일치한다 (결과값 109는 경계 구간 100-125에 해당)."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 320,
+            "output_tokens": 294,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003835,
+          "latencyMs": 2865,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상B(경계): 일반건강검진 및 의료급여생애전환기검진 결과 건강에 이상이 없으나 식생활습관, 환경개선 등 자가관리 및 예방조치가 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 모든 내용(건강에 이상 없으나 식생활습관 등 자가관리와 예방조치 필요)이 근거 1의 정상B(경계) 정의에서 그대로 확인된다.",
+              "band": "'경계 구간'은 항목 정보의 판정 정상B(경계)와 일치하며, 구간 이름 외에 다른 기준 수치는 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 320,
+            "output_tokens": 213,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003025,
+          "latencyMs": 2354,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "건강에 이상이 없으나 식생활습관, 환경개선 등 자가관리 및 예방조치가 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 모든 내용이 근거 1의 정상B(경계) 판정 구분 정의에서 직접 확인된다.",
+              "band": "문장이 말하는 '경계 구간'은 항목 정보의 판정 정상B(경계)와 일치한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-013",
+      "stratum": "other_item_only",
+      "origin": "LLM",
+      "itemCode": "GAMMA_GTP",
+      "text": "판정 기준은 성별에 따라 다르므로, 결과가 경계 구간에 있을 때는 생활습관을 점검하고 필요시 의료진과 상의해 보시기 바랍니다.",
+      "sources": [
+        "mohw-annex4-row-blood-pressure"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 412,
+            "output_tokens": 313,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004209,
+          "latencyMs": 3093,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "unsupported",
+            "supportRaw": "unsupported",
+            "quoteVerified": true,
+            "quotes": [],
+            "unsupportedClaims": [
+              "판정 기준이 성별에 따라 다르다",
+              "경계 구간에서 생활습관을 점검하라",
+              "필요시 의료진과 상의하라"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용한 근거는 혈압 판정기준표뿐이며, 성별에 따른 기준 차이나 경계 구간 시 생활습관 점검·의료진 상의에 대한 내용이 없다. 성별 구분은 항목 정보에만 있고 근거 문단에서는 확인되지 않는다.",
+              "band": "결과값 38 U/L은 여성 기준 정상B(경계) 36-45 구간이며, 문장이 말한 '경계 구간'과 '성별에 따라 기준이 다르다'는 항목 정보와 맞다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 412,
+            "output_tokens": 321,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004289,
+          "latencyMs": 3056,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "unsupported",
+            "supportRaw": "unsupported",
+            "quoteVerified": true,
+            "quotes": [],
+            "unsupportedClaims": [
+              "판정 기준은 성별에 따라 다르다",
+              "결과가 경계 구간에 있을 때 생활습관을 점검하고 필요시 의료진과 상의하라는 조언"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용한 근거는 혈압(고혈압) 판정기준표이며 성별에 따른 기준 차이나 경계 구간 시 생활습관 점검·의료진 상의에 대한 내용이 전혀 없다. 문장의 핵심 주장이 근거에서 확인되지 않는다.",
+              "band": "여성 γ-GTP 38 U/L는 정상B(경계) 36-45 구간이며, 문장이 말한 '경계 구간'과 '성별에 따라 기준이 다름'이 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 412,
+            "output_tokens": 270,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003779,
+          "latencyMs": 2787,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "unsupported",
+            "supportRaw": "unsupported",
+            "quoteVerified": true,
+            "quotes": [],
+            "unsupportedClaims": [
+              "판정 기준은 성별에 따라 다르다",
+              "경계 구간에서는 생활습관을 점검하라",
+              "필요시 의료진과 상의하라"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용한 근거는 혈압의 판정기준표뿐이며, 성별에 따른 기준 차이나 생활습관 점검, 의료진 상의에 관한 내용이 없다. 근거 문단에서 확인되는 주장이 없다.",
+              "band": "문장은 경계 구간이라고 말하며, 결과값 38 U/L(여성 정상B 36-45)과 판정 정상B(경계)에 부합한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-014",
+      "stratum": "other_item_only",
+      "origin": "LLM",
+      "itemCode": "GAMMA_GTP",
+      "text": "간장질환은 신질환, 췌장염 등 다른 질환과 연관되는 경우도 있어, 필요 시 관련 질환의 확인도 함께 이루어질 수 있습니다.",
+      "sources": [
+        "kdca-6715-prognosis-2"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 361,
+            "output_tokens": 389,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004868,
+          "latencyMs": 3583,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "신질환, 간질환, 췌장염 등 기저 질환과 연관된 경우에는 해당 질환의 치료도 함께 이루어져야 합니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "간장질환이 신질환, 췌장염과 연관된다는 내용 (근거는 이상지질혈증이 신질환·간질환·췌장염 등 기저 질환과 연관된다는 내용)",
+              "관련 질환의 '확인'이 필요 시 함께 이루어질 수 있다는 내용 (근거는 '치료'가 함께 이루어져야 한다고 서술)"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거는 이상지질혈증과 기저 질환의 연관을 말하는데, 문장은 간장질환을 주어로 바꾸어 신질환·췌장염과의 연관을 주장하며 근거에 없는 내용이 섞여 있다.",
+              "band": "판정 구간이나 기준 수치를 언급하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 361,
+            "output_tokens": 427,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005248,
+          "latencyMs": 3584,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "신질환, 간질환, 췌장염 등 기저 질환과 연관된 경우에는 해당 질환의 치료도 함께 이루어져야 합니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "간장질환이 신질환, 췌장염 등과 연관된다는 주장 (근거는 이상지질혈증이 신질환·간질환·췌장염 등 기저 질환과 연관될 수 있다는 내용)",
+              "필요 시 관련 질환의 '확인'이 이루어질 수 있다는 내용 (근거는 '치료'가 함께 이루어져야 한다고 말함)"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거는 이상지질혈증이 신질환·간질환·췌장염 등 기저 질환과 연관될 때 그 질환 치료도 함께 필요하다는 내용인데, 문장은 간장질환 중심으로 연관 관계를 말하고 '확인'으로 바꿔 서술해 주체와 내용이 일부 어긋난다.",
+              "band": "판정 구간이나 기준 수치를 언급하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 361,
+            "output_tokens": 375,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004727,
+          "latencyMs": 3583,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "신질환, 간질환, 췌장염 등 기저 질환과 연관된 경우에는 해당 질환의 치료도 함께 이루어져야 합니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "간장질환이 신질환, 췌장염 등과 연관된다는 주장 (근거는 이상지질혈증이 신질환·간질환·췌장염과 연관된다는 내용)",
+              "필요 시 관련 질환의 '확인'이 이루어질 수 있다는 내용 (근거는 '치료'를 말함)"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거는 이상지질혈증이 기저 질환과 연관될 때 해당 질환 치료도 필요하다는 내용인데, 문장은 이를 간장질환의 연관 질환 및 '확인'으로 바꿔 말해 일부만 일치한다.",
+              "band": "문장이 판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-015",
+      "stratum": "other_item_only",
+      "origin": "LLM",
+      "itemCode": "BMI",
+      "text": "체질량지수와 함께 허리둘레도 확인하면 체형을 더 잘 이해하는 데 도움이 됩니다.",
+      "sources": [
+        "mohw-annex4-row-waist"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 353,
+            "output_tokens": 296,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003921,
+          "latencyMs": 2878,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "검사항목: 허리둘레",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "체질량지수와 함께 허리둘레를 확인하면 체형을 더 잘 이해하는 데 도움이 된다는 주장 (근거에는 허리둘레 판정기준만 있고 BMI와의 관계나 체형 이해에 대한 언급이 없음)"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거 문단은 허리둘레의 판정 기준표일 뿐이며, 두 지표를 함께 보면 체형 이해에 도움이 된다는 조언은 근거에서 확인되지 않는다.",
+              "band": "문장은 판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 353,
+            "output_tokens": 292,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003881,
+          "latencyMs": 2786,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "검사항목: 허리둘레",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "체질량지수와 허리둘레를 함께 확인하면 체형을 더 잘 이해하는 데 도움이 된다는 주장",
+              "허리둘레가 체질량지수를 보완하는 정보라는 관계"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거 1은 허리둘레가 비만 목표질환의 검사항목이며 판정 기준이 있다는 것만 보여줄 뿐, 체질량지수와 함께 보면 체형 이해에 도움이 된다는 내용은 근거에 없다.",
+              "band": "문장이 판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 353,
+            "output_tokens": 277,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003732,
+          "latencyMs": 2538,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "검사항목: 허리둘레",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "체질량지수와 함께 허리둘레를 확인하면 체형을 더 잘 이해하는 데 도움이 된다는 주장 (BMI와 허리둘레의 관계나 체형 이해에 대한 내용은 근거에 없음)"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거는 허리둘레의 판정 기준만 제시할 뿐, BMI와 함께 보면 체형 이해에 도움이 된다는 내용은 확인되지 않는다.",
+              "band": "문장은 판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-016",
+      "stratum": "other_item_only",
+      "origin": "LLM",
+      "itemCode": "SERUM_CREATININE",
+      "text": "당뇨병이 있는 경우 혈압과 심혈관질환 위험인자도 함께 관리하는 것이 중요하다고 안내되어 있습니다.",
+      "sources": [
+        "kdca-5305-checkup-3"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 923,
+            "output_tokens": 299,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005091,
+          "latencyMs": 2981,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "당뇨병 환자는 심혈관질환을 예방하는 것이 매우 중요합니다. 심혈관질환의 위험인자를 평가하고 적절히 관리해야 합니다.",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "병원 방문 시마다 혈압을 측정해야 합니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용 근거에 당뇨병 환자는 심혈관질환 위험인자를 평가하고 관리해야 하며 혈압 측정과 조절 목표가 있다고 명시되어 있어 문장의 내용이 확인된다.",
+              "band": "문장은 판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 923,
+            "output_tokens": 277,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004871,
+          "latencyMs": 3529,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "당뇨병 환자는 심혈관질환을 예방하는 것이 매우 중요합니다. 심혈관질환의 위험인자를 평가하고 적절히 관리해야 합니다.",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "병원 방문 시마다 혈압을 측정해야 합니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거 1에서 당뇨병 환자의 심혈관질환 위험인자 관리의 중요성과 혈압 측정·조절 내용이 직접 확인된다.",
+              "band": "문장이 판정 구간이나 기준 수치를 언급하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 923,
+            "output_tokens": 305,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005151,
+          "latencyMs": 3044,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "당뇨병 환자는 심혈관질환을 예방하는 것이 매우 중요합니다. 심혈관질환의 위험인자를 평가하고 적절히 관리해야 합니다.",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "병원 방문 시마다 혈압을 측정해야 합니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거에서 당뇨병 환자가 심혈관질환 위험인자를 평가·관리해야 하고 혈압을 측정하고 조절 목표를 두어야 한다는 내용이 확인되어 문장 전체가 뒷받침된다.",
+              "band": "문장이 판정 구간이나 기준 수치를 언급하지 않는다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-017",
+      "stratum": "rest",
+      "origin": "LLM",
+      "itemCode": "GAMMA_GTP",
+      "text": "감마지티피(γ-GTP) 결과는 277 U/L이며, 판정 기준상 질환의심 구간에 해당합니다. 질환의심 기준은 남자 78 이상, 여자 46 이상입니다.",
+      "sources": [
+        "mohw-annex4-row-gamma-gtp"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 427,
+            "output_tokens": 265,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003759,
+          "latencyMs": 2762,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "질환의심: 남 78 이상, 여 46 이상",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "질환의심 기준(남 78 이상, 여 46 이상)이 근거 1에서 그대로 확인된다. 277 U/L이 질환의심 구간이라는 것도 해당 기준에서 도출되는 내용이다.",
+              "band": "결과값 277 U/L은 남성 질환의심 기준 78 이상에 해당하며, 문장이 말한 구간과 기준 수치(남 78 이상, 여 46 이상)가 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 427,
+            "output_tokens": 261,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.00372,
+          "latencyMs": 2436,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "질환의심: 남 78 이상, 여 46 이상",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 질환의심 기준(남 78 이상, 여 46 이상)이 근거 1의 γ-GTP 판정기준에서 그대로 확인된다. 결과값 277 U/L 자체는 항목 정보에서 오는 값이며 새로운 주장이 아니다.",
+              "band": "결과값 277 U/L은 남성 질환의심 기준(78 이상)에 해당하고, 말한 기준 수치도 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 427,
+            "output_tokens": 249,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003599,
+          "latencyMs": 2405,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "질환의심: 남 78 이상, 여 46 이상",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "질환의심 기준(남 78 이상, 여 46 이상)이 근거 1에서 그대로 확인된다. 277 U/L이 질환의심 구간에 해당한다는 것은 이 기준에 결과값을 적용한 것이다.",
+              "band": "남성 277 U/L은 질환의심 기준(남 78 이상)에 해당하며, 문장이 말한 기준 수치도 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-018",
+      "stratum": "other_item_only",
+      "origin": "LLM",
+      "itemCode": "TRIGLYCERIDES",
+      "text": "중성지방은 HDL, 총콜레스테롤과 함께 살펴보는 것이 도움이 되며, 정확한 해석은 의료진과 상의하시기 바랍니다.",
+      "sources": [
+        "mohw-annex4-row-hdl",
+        "mohw-annex4-row-total-cholesterol"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 545,
+            "output_tokens": 244,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003785,
+          "latencyMs": 2861,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "unsupported",
+            "supportRaw": "unsupported",
+            "quoteVerified": true,
+            "quotes": [],
+            "unsupportedClaims": [
+              "중성지방은 HDL, 총콜레스테롤과 함께 살펴보는 것이 도움이 된다",
+              "정확한 해석은 의료진과 상의하시기 바란다"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용한 근거는 HDL과 총콜레스테롤의 판정 기준표일 뿐이고, 중성지방을 이들과 함께 보라는 내용이나 의료진 상의 권유는 어디에도 없다.",
+              "band": "문장이 판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 545,
+            "output_tokens": 248,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003825,
+          "latencyMs": 2558,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "unsupported",
+            "supportRaw": "unsupported",
+            "quoteVerified": true,
+            "quotes": [],
+            "unsupportedClaims": [
+              "중성지방은 HDL, 총콜레스테롤과 함께 살펴보는 것이 도움이 된다",
+              "정확한 해석은 의료진과 상의하시기 바란다"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용한 근거 1·2는 HDL과 총콜레스테롤의 판정 기준표일 뿐, 중성지방을 이들과 함께 보라는 내용이나 의료진 상의 권유는 담겨 있지 않다.",
+              "band": "문장이 판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 545,
+            "output_tokens": 258,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003926,
+          "latencyMs": 2620,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "unsupported",
+            "supportRaw": "unsupported",
+            "quoteVerified": true,
+            "quotes": [],
+            "unsupportedClaims": [
+              "중성지방은 HDL, 총콜레스테롤과 함께 살펴보는 것이 도움이 된다",
+              "정확한 해석은 의료진과 상의하시기 바란다"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용한 근거는 HDL과 총콜레스테롤의 판정 기준표일 뿐, 중성지방을 이 두 항목과 함께 봐야 한다는 관계나 의료진 상의 권유는 근거 문단에서 확인되지 않는다.",
+              "band": "문장이 판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-019",
+      "stratum": "other_item_only",
+      "origin": "LLM",
+      "itemCode": "DIASTOLIC_BP",
+      "text": "집에서 혈압을 자주 측정해 보고 그 결과를 진료 시 의료진에게 알려 주시는 것이 도움이 됩니다.",
+      "sources": [
+        "kdca-5305-checkup-3"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 917,
+            "output_tokens": 318,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005269,
+          "latencyMs": 3379,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "고혈압이 있는 당뇨병 환자는 집에서 혈압을 자주 측정해 보는 것이 좋습니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "측정 결과를 진료 시 의료진에게 알려 주는 것이 도움이 된다",
+              "당뇨병 환자가 아닌 일반 고혈압 의심자에게도 집에서 혈압을 자주 측정하라는 권고가 적용된다"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거는 고혈압이 있는 당뇨병 환자에게 집에서 혈압을 자주 측정하라고만 하며, 결과를 의료진에게 알리라는 내용은 근거에 없다.",
+              "band": "판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 917,
+            "output_tokens": 332,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.00541,
+          "latencyMs": 3458,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "고혈압이 있는 당뇨병 환자는 집에서 혈압을 자주 측정해 보는 것이 좋습니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "측정 결과를 진료 시 의료진에게 알려 주는 것이 도움이 된다는 내용",
+              "당뇨병 환자가 아닌 일반 대상에게도 가정혈압 측정이 권장된다는 일반화"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거는 고혈압이 있는 당뇨병 환자에게 집에서 혈압을 자주 측정하라고 권하지만, 결과를 의료진에게 알리라는 내용은 없고 대상도 당뇨병 환자로 한정되어 있다.",
+              "band": "문장은 판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 917,
+            "output_tokens": 317,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.00526,
+          "latencyMs": 3238,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "고혈압이 있는 당뇨병 환자는 집에서 혈압을 자주 측정해 보는 것이 좋습니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "측정 결과를 진료 시 의료진에게 알려 주는 것이 도움이 된다",
+              "당뇨병 환자가 아닌 일반 대상에게도 해당된다는 일반화"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거는 '고혈압이 있는 당뇨병 환자'에게 집에서 혈압을 자주 측정하라고 할 뿐, 결과를 의료진에게 알리라는 내용은 없고 대상도 당뇨병 환자로 한정되어 있다.",
+              "band": "판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-020",
+      "stratum": "rest",
+      "origin": "LLM",
+      "itemCode": "SERUM_CREATININE",
+      "text": "혈청 크레아티닌 결과는 2.60 mg/dL로, 국가건강검진 기준에서 질환의심 구간에 해당합니다. 기준은 1.5 이하가 정상A이고 1.5를 초과하면 질환의심입니다.",
+      "sources": [
+        "mohw-annex4-row-creatinine"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 375,
+            "output_tokens": 296,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003966,
+          "latencyMs": 2846,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 1.5 이하",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "질환의심: 1.5 초과",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "결과값이 2.60 mg/dL이다 (근거 문단에는 검사 결과값이 없음)"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "기준 설명(1.5 이하 정상A, 1.5 초과 질환의심)은 근거에서 확인되지만, 결과값 2.60 mg/dL과 해당 구간 판정은 근거 문단에 없는 정보다.",
+              "band": "결과값 2.60은 1.5 초과이므로 질환의심 구간이 맞고, 말한 기준 수치도 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 375,
+            "output_tokens": 326,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004266,
+          "latencyMs": 3107,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 1.5 이하",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "질환의심: 1.5 초과",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "결과값 2.60 mg/dL이 질환의심 구간에 해당한다는 개별 결과 적용 (근거 문단은 기준표만 제시)"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "기준 수치(1.5 이하 정상A, 1.5 초과 질환의심)는 근거에서 확인되지만, 이 사용자의 결과값 2.60이 질환의심에 해당한다는 적용은 근거 문단에 없다.",
+              "band": "결과값 2.60 mg/dL, 판정 질환의심, 기준 1.5 이하 정상A / 1.5 초과 질환의심이 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 375,
+            "output_tokens": 308,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004085,
+          "latencyMs": 2945,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 1.5 이하",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "질환의심: 1.5 초과",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "혈청 크레아티닌 결과가 2.60 mg/dL라는 수치(근거에 없음)"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "기준 부분(1.5 이하 정상A, 1.5 초과 질환의심)은 근거에서 확인되지만, 2.60 mg/dL라는 결과값과 이 값이 질환의심 구간에 해당한다는 판단은 근거 문단에 없다.",
+              "band": "2.60 mg/dL은 1.5를 초과하므로 질환의심이 맞고, 말한 기준 수치도 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-021",
+      "stratum": "rest",
+      "origin": "LLM",
+      "itemCode": "GAMMA_GTP",
+      "text": "정상A는 남성 11~63U/L, 질환의심은 남성 78U/L 이상으로 정해져 있습니다.",
+      "sources": [
+        "mohw-annex4-row-gamma-gtp"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 394,
+            "output_tokens": 249,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003534,
+          "latencyMs": 2946,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 남 11-63, 여 8-35 / 정상B(경계): 남 64-77, 여 36-45 / 질환의심: 남 78 이상, 여 46 이상",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장이 말한 정상A 남 11~63, 질환의심 남 78 이상이 인용한 근거 1의 판정기준 표에서 그대로 확인된다.",
+              "band": "정상A 남 11-63, 질환의심 남 78 이상은 항목 정보의 판정 기준과 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 394,
+            "output_tokens": 256,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003603,
+          "latencyMs": 2872,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 남 11-63, 여 8-35 / 정상B(경계): 남 64-77, 여 36-45 / 질환의심: 남 78 이상, 여 46 이상",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 정상A 남성 11~63, 질환의심 남성 78 이상 기준이 근거 1의 판정기준표에서 그대로 확인된다.",
+              "band": "문장이 말한 정상A 남 11-63, 질환의심 남 78 이상 기준이 항목 정보의 판정 기준과 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 394,
+            "output_tokens": 256,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003603,
+          "latencyMs": 2902,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 남 11-63, 여 8-35 / 정상B(경계): 남 64-77, 여 36-45 / 질환의심: 남 78 이상, 여 46 이상",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장이 말한 정상A 남성 11-63, 질환의심 남성 78 이상이 인용한 근거의 판정 기준표에서 그대로 확인된다.",
+              "band": "문장이 말한 정상A 남 11~63, 질환의심 남 78 이상은 항목 정보의 판정 기준과 일치한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-022",
+      "stratum": "rest",
+      "origin": "LLM",
+      "itemCode": "HEMOGLOBIN",
+      "text": "혈색소 결과는 12.9g/dL로, 남성 기준 정상B(경계) 구간인 12.0~12.9g/dL에 해당합니다.",
+      "sources": [
+        "mohw-annex4-row-hemoglobin"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 430,
+            "output_tokens": 244,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003556,
+          "latencyMs": 2250,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상B(경계): 남 12.0-12.9, 여 10.0-11.9",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 남성 정상B(경계) 구간 12.0~12.9 g/dL이 인용한 근거 1의 판정기준에서 그대로 확인된다. 결과값 12.9는 항목 정보의 내용이다.",
+              "band": "결과값 12.9 g/dL, 판정 정상B(경계), 남성 기준 12.0-12.9가 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 430,
+            "output_tokens": 229,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003406,
+          "latencyMs": 2378,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상B(경계): 남 12.0-12.9, 여 10.0-11.9",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장이 말하는 남성 정상B(경계) 구간 12.0~12.9 g/dL가 인용한 근거 문단에 그대로 나와 있다.",
+              "band": "결과값 12.9 g/dL, 판정 정상B(경계), 남성 기준 12.0-12.9 g/dL가 항목 정보와 모두 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 430,
+            "output_tokens": 232,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003436,
+          "latencyMs": 2297,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상B(경계): 남 12.0-12.9, 여 10.0-11.9",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장이 말한 남성 정상B(경계) 구간 12.0~12.9 g/dL은 근거 1의 판정기준표에서 그대로 확인된다.",
+              "band": "결과값 12.9 g/dL, 남성, 판정 정상B(경계)와 기준 구간 12.0~12.9 g/dL이 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-023",
+      "stratum": "rest",
+      "origin": "LLM",
+      "itemCode": "ALT",
+      "text": "정상A 기준은 35 이하이므로, 이번 결과는 기준 바로 위의 경계 구간입니다.",
+      "sources": [
+        "mohw-annex4-row-alt"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 333,
+            "output_tokens": 238,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003302,
+          "latencyMs": 2457,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 35 이하",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "정상B(경계): 36-45",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "정상A 기준 35 이하와 그 위의 정상B(경계) 구간 36-45가 근거에 그대로 나와 있어 문장의 주장이 모두 확인된다.",
+              "band": "결과값 39 U/L는 정상B(경계) 36-45 구간에 속하고, 정상A 기준 35 이하도 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 333,
+            "output_tokens": 243,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003351,
+          "latencyMs": 2427,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 35 이하 / 정상B(경계): 36-45",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "정상A 기준 35 이하와 그 위의 정상B(경계) 구간 36-45가 근거 문단에서 직접 확인되며, 결과값 39가 이 경계 구간에 해당한다는 서술은 이 기준과 부합한다.",
+              "band": "정상A 기준 35 이하, 결과 39는 정상B(경계) 36-45 구간으로 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 333,
+            "output_tokens": 256,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003481,
+          "latencyMs": 2544,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 35 이하",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "정상B(경계): 36-45",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "정상A 기준 35 이하와 그 바로 위의 정상B(경계) 구간 36-45가 근거 1에서 확인된다. 결과값 39가 그 구간에 속한다는 설명은 근거의 기준으로 직접 따라 나온다.",
+              "band": "정상A 기준 35 이하, 결과 39는 정상B(경계) 36-45 구간으로 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-024",
+      "stratum": "neighbor_band",
+      "origin": "LLM",
+      "itemCode": "DIASTOLIC_BP",
+      "text": "소금 섭취 줄이기, 규칙적인 운동, 금연·절주 같은 생활습관 개선이 혈압 관리에 도움이 된다고 안내되어 있습니다.",
+      "sources": [
+        "kdca-6765-summary-1",
+        "mohw-annex4-def-normal-b"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 1042,
+            "output_tokens": 281,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.00515,
+          "latencyMs": 2534,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "소금 섭취 줄이기, 규칙적 운동, 금연·절주 같은 생활습관 개선은 혈압약 한 알에 버금가는 효과가 있으므로 모든 환자에게 필수적입니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거 1에서 소금 섭취 줄이기, 규칙적 운동, 금연·절주 같은 생활습관 개선이 혈압 관리에 효과가 있다고 직접 확인된다. 문장의 주장이 모두 근거에 있다.",
+              "band": "문장이 판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 1042,
+            "output_tokens": 295,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005289,
+          "latencyMs": 2698,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "소금 섭취 줄이기, 규칙적 운동, 금연·절주 같은 생활습관 개선은 혈압약 한 알에 버금가는 효과가 있으므로 모든 환자에게 필수적입니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거 1에서 소금 섭취 줄이기, 규칙적 운동, 금연·절주 같은 생활습관 개선이 혈압 관리에 효과가 있고 필수적이라고 직접 확인되며, 이는 '도움이 된다'는 문장과 일치한다.",
+              "band": "문장이 판정 구간 이름이나 기준 수치를 언급하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 1042,
+            "output_tokens": 267,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.00501,
+          "latencyMs": 2502,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "소금 섭취 줄이기, 규칙적 운동, 금연·절주 같은 생활습관 개선은 혈압약 한 알에 버금가는 효과가 있으므로 모든 환자에게 필수적입니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거 1에서 소금 섭취 줄이기, 규칙적 운동, 금연·절주 같은 생활습관 개선이 혈압 관리에 효과가 있다는 내용이 직접 확인된다.",
+              "band": "문장이 판정 구간이나 기준 수치를 언급하지 않는다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-025",
+      "stratum": "neighbor_band",
+      "origin": "LLM",
+      "itemCode": "FASTING_GLUCOSE",
+      "text": "근거 문서는 공복혈당이 100~125mg/dL이면 정상보다 높지만 당뇨병 기준(126mg/dL 이상)에는 미치지 않는 상태라고 설명합니다.",
+      "sources": [
+        "kdca-5305-diagnosis-2"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 1201,
+            "output_tokens": 322,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005877,
+          "latencyMs": 3046,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "공복 혈장 포도당 100~125 mg/dL로 정상(100 mg/dL 미만)보다 높지만 당뇨병(126 mg/dL 이상)은 아닌 경우입니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 모든 내용(100~125 범위, 정상보다 높음, 당뇨병 126 이상 기준 미달)이 근거 1의 공복혈당장애 설명에서 그대로 확인된다.",
+              "band": "문장이 말한 100~125mg/dL 및 당뇨병 기준 126mg/dL 이상은 항목 정보의 정상B(경계) 100-125, 질환의심 126 이상과 일치하며, 결과값 111은 해당 구간에 속한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 1201,
+            "output_tokens": 301,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005667,
+          "latencyMs": 2760,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "공복 혈장 포도당 100~125 mg/dL로 정상(100 mg/dL 미만)보다 높지만 당뇨병(126 mg/dL 이상)은 아닌 경우입니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 주장(100~125 mg/dL는 정상보다 높지만 당뇨병 기준 126 이상에는 미치지 않음)이 근거 1의 공복혈당장애 설명에서 그대로 확인된다.",
+              "band": "100~125mg/dL와 당뇨병 기준 126mg/dL 이상은 항목 정보의 정상B(경계) 100-125, 질환의심 126 이상과 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 1201,
+            "output_tokens": 315,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005808,
+          "latencyMs": 2805,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "공복 혈장 포도당 100~125 mg/dL로 정상(100 mg/dL 미만)보다 높지만 당뇨병(126 mg/dL 이상)은 아닌 경우입니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 모든 주장(100~125mg/dL, 정상보다 높음, 당뇨병 126 이상 아님)이 근거 문단의 공복혈당장애 설명에서 그대로 확인된다.",
+              "band": "100~125mg/dL 범위와 당뇨병 기준 126mg/dL 이상은 항목 정보의 정상B(경계) 100-125, 질환의심 126 이상과 일치하며 결과값 111도 이 구간에 속한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-026",
+      "stratum": "rest",
+      "origin": "LLM",
+      "itemCode": "WAIST_CIRCUMFERENCE",
+      "text": "질환으로 발전할 가능성이 있어 추적검사나 전문 의료기관에서 정확한 확인이 필요한 경우에 해당하니, 진료 상담을 받아 보시기를 권합니다.",
+      "sources": [
+        "mohw-annex4-def-suspect"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 343,
+            "output_tokens": 327,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004211,
+          "latencyMs": 2982,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "질환으로 발전할 가능성이 있어 추적검사나 전문 의료기관을 통한 정확한 진단과 치료가 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 핵심 주장(질환 발전 가능성, 추적검사·전문 의료기관 확인 필요)은 근거 1의 질환의심 정의에서 그대로 확인된다. '진료 상담을 받아 보시기를 권합니다'는 근거의 '전문 의료기관을 통한 정확한 진단' 취지를 말 바꿈한 수준이다.",
+              "band": "문장은 질환의심 구간의 일반 정의를 말하며, 허리둘레 100cm(남 90 이상)는 질환의심 판정과 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 343,
+            "output_tokens": 305,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003992,
+          "latencyMs": 2968,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "질환으로 발전할 가능성이 있어 추적검사나 전문 의료기관을 통한 정확한 진단과 치료가 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 핵심 내용(질환 발전 가능성, 추적검사·전문 의료기관 확인 필요)이 근거의 질환의심 정의에서 직접 확인된다. 진료 상담 권유는 근거의 '전문 의료기관 ... 필요'를 말 바꿈한 수준이다.",
+              "band": "문장이 판정 구간 이름이나 기준 수치를 구체적으로 말하지 않고 질환의심에 해당하는 일반적 설명만 한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 343,
+            "output_tokens": 285,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003792,
+          "latencyMs": 2787,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "질환으로 발전할 가능성이 있어 추적검사나 전문 의료기관을 통한 정확한 진단과 치료가 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 핵심 내용(질환 발전 가능성, 추적검사·전문 의료기관 확인 필요)이 근거의 질환의심 정의와 일치한다. 진료 상담 권유는 전문 의료기관 확인의 말 바꿈 수준이다.",
+              "band": "문장이 판정 구간 이름이나 기준 수치를 직접 말하지 않고 일반적인 질환의심 정의만 설명한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-027",
+      "stratum": "other_item_only",
+      "origin": "LLM",
+      "itemCode": "BMI",
+      "text": "근거 문서는 체중이 늘면 LDL과 중성지방이 높아지고 HDL이 낮아질 수 있으므로, 체질량지수를 23 미만으로 유지하는 것이 바람직하다고 설명합니다.",
+      "sources": [
+        "kdca-6715-lifestyle-treatment-2"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 524,
+            "output_tokens": 289,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004194,
+          "latencyMs": 3400,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "체중이 증가하면 LDL과 중성지방은 높아지고 HDL은 낮아지므로, 체질량지수(BMI)를 23 미만으로 유지하고",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 모든 주장(체중 증가 시 LDL·중성지방 상승 및 HDL 저하, BMI 23 미만 유지 권고)이 근거 1에서 직접 확인된다.",
+              "band": "문장은 BMI 23 미만 유지라는 권고 수치를 말할 뿐, 판정 구간이나 판정 기준 수치를 이 항목의 구간으로 제시하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 524,
+            "output_tokens": 295,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004254,
+          "latencyMs": 3425,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "체중이 증가하면 LDL과 중성지방은 높아지고 HDL은 낮아지므로, 체질량지수(BMI)를 23 미만으로 유지하고",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 모든 주장(체중 증가 시 LDL·중성지방 상승 및 HDL 저하, BMI 23 미만 유지 권고)이 인용한 근거 1에서 직접 확인된다.",
+              "band": "문장은 BMI 23 미만 유지라는 일반 권고만 말할 뿐 판정 구간 이름이나 판정 기준 수치를 이 항목의 구간으로 제시하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 524,
+            "output_tokens": 272,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004024,
+          "latencyMs": 2860,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "체중이 증가하면 LDL과 중성지방은 높아지고 HDL은 낮아지므로, 체질량지수(BMI)를 23 미만으로 유지하고",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 모든 주장(체중 증가 시 LDL·중성지방 상승, HDL 저하, BMI 23 미만 유지 권고)이 근거 1에서 그대로 확인된다.",
+              "band": "BMI 23 미만 유지 권고는 목표 수치일 뿐 판정 구간이나 판정 기준 수치를 말한 것이 아니다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-028",
+      "stratum": "rest",
+      "origin": "LLM",
+      "itemCode": "ALT",
+      "text": "정상B(경계) 판정은 건강에 이상이 없으나 식생활습관 등 자가관리와 예방조치가 필요하다는 뜻입니다.",
+      "sources": [
+        "mohw-annex4-def-normal-b"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 328,
+            "output_tokens": 262,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003531,
+          "latencyMs": 2931,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상B(경계): 일반건강검진 및 의료급여생애전환기검진 결과 건강에 이상이 없으나 식생활습관, 환경개선 등 자가관리 및 예방조치가 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 정상B(경계) 정의가 근거 1의 판정 구분 설명과 말만 바꿔 일치한다.",
+              "band": "정상B(경계)라는 구간 이름이 항목 정보의 판정(정상B, 결과값 40 U/L는 36-45 구간)과 맞는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 328,
+            "output_tokens": 275,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003661,
+          "latencyMs": 3040,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상B(경계): 일반건강검진 및 의료급여생애전환기검진 결과 건강에 이상이 없으나 식생활습관, 환경개선 등 자가관리 및 예방조치가 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거의 정상B(경계) 정의와 문장의 내용이 말만 바꿔 일치하며 근거에 없는 주장이 없다.",
+              "band": "정상B(경계)라는 구간 이름은 언급하지만 기준 수치는 말하지 않으며, 구간 이름은 항목 정보의 판정과 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 328,
+            "output_tokens": 247,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003381,
+          "latencyMs": 2660,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상B(경계): 일반건강검진 및 의료급여생애전환기검진 결과 건강에 이상이 없으나 식생활습관, 환경개선 등 자가관리 및 예방조치가 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "정상B(경계)의 정의가 근거 1에서 직접 확인되며 문장은 이를 말 바꿈한 것이다.",
+              "band": "문장이 말한 정상B(경계)는 항목 정보의 판정(정상B 경계)과 일치한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-029",
+      "stratum": "other_item_only",
+      "origin": "LLM",
+      "itemCode": "GAMMA_GTP",
+      "text": "감마지티피는 간장질환 관련 검사 항목이며, 다른 간 관련 수치(AST, ALT 등)와 함께 살펴보는 것이 좋습니다.",
+      "sources": [
+        "mohw-annex4-row-triglycerides",
+        "mohw-annex4-row-blood-pressure"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 543,
+            "output_tokens": 238,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003721,
+          "latencyMs": 2762,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "unsupported",
+            "supportRaw": "unsupported",
+            "quoteVerified": true,
+            "quotes": [],
+            "unsupportedClaims": [
+              "감마지티피는 간장질환 관련 검사 항목이다",
+              "AST, ALT 등 다른 간 관련 수치와 함께 살펴보는 것이 좋다"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용한 근거는 중성지방(이상지질혈증)과 혈압(고혈압) 기준표뿐이라 감마지티피나 간장질환, AST·ALT에 대한 내용이 전혀 없다.",
+              "band": "문장이 판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 543,
+            "output_tokens": 249,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003831,
+          "latencyMs": 3004,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "unsupported",
+            "supportRaw": "unsupported",
+            "quoteVerified": true,
+            "quotes": [],
+            "unsupportedClaims": [
+              "감마지티피는 간장질환 관련 검사 항목이다",
+              "AST, ALT 등 다른 간 관련 수치와 함께 살펴보는 것이 좋다"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용한 근거 1은 중성지방, 근거 2는 혈압의 판정 기준표라서 감마지티피나 간장질환, AST·ALT에 대한 내용이 전혀 없어 문장의 주장을 확인할 수 없다.",
+              "band": "문장이 판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 543,
+            "output_tokens": 265,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003992,
+          "latencyMs": 2992,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "unsupported",
+            "supportRaw": "unsupported",
+            "quoteVerified": true,
+            "quotes": [],
+            "unsupportedClaims": [
+              "감마지티피는 간장질환 관련 검사 항목이다",
+              "AST, ALT 등 다른 간 관련 수치와 함께 살펴보는 것이 좋다"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용한 근거는 중성지방(이상지질혈증)과 혈압(고혈압)의 판정 기준표뿐이며, 감마지티피나 간장질환, AST·ALT에 대한 내용이 전혀 없어 문장의 핵심 주장이 확인되지 않는다.",
+              "band": "문장은 판정 구간이나 기준 수치를 언급하지 않는다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-030",
+      "stratum": "other_item_only",
+      "origin": "LLM",
+      "itemCode": "SYSTOLIC_BP",
+      "text": "혈압은 서로 다른 날 2회 이상 측정해 확인하는 것이 권장되므로, 의료진과 상의해 재측정과 진료를 받아 보시기를 권합니다.",
+      "sources": [
+        "kdca-5305-checkup-3"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 935,
+            "output_tokens": 322,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005346,
+          "latencyMs": 2581,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "서로 다른 날 2회 이상 측정해 수축기 혈압 140 mmHg 이상, 이완기 혈압 90 mmHg 이상일 경우 고혈압으로 진단할 수 있습니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "의료진과 상의해 재측정과 진료를 받아 보시기를 권합니다 (재측정·진료 권유는 근거에 없음)"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "서로 다른 날 2회 이상 측정해 고혈압을 진단한다는 부분은 근거에서 확인되지만, 의료진과 상의해 재측정·진료를 받으라는 권유는 근거에 없다.",
+              "band": "문장이 판정 구간 이름이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 935,
+            "output_tokens": 328,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005405,
+          "latencyMs": 2805,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "서로 다른 날 2회 이상 측정해 수축기 혈압 140 mmHg 이상, 이완기 혈압 90 mmHg 이상일 경우 고혈압으로 진단할 수 있습니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "의료진과 상의해 재측정과 진료를 받아 보시기를 권합니다 (재측정·진료 권유는 근거에 없음)"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "서로 다른 날 2회 이상 측정해 고혈압을 진단한다는 부분은 근거에서 확인되지만, 의료진과 상의해 재측정·진료를 받으라는 권유는 근거 문단에 없다.",
+              "band": "문장이 판정 구간 이름이나 기준 수치를 직접 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 935,
+            "output_tokens": 311,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005235,
+          "latencyMs": 2763,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "서로 다른 날 2회 이상 측정해 수축기 혈압 140 mmHg 이상, 이완기 혈압 90 mmHg 이상일 경우 고혈압으로 진단할 수 있습니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "의료진과 상의해 재측정과 진료를 받아 보시기를 권한다는 조언은 근거에 없음"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "서로 다른 날 2회 이상 측정으로 고혈압을 진단한다는 부분은 근거에서 확인되지만, 의료진과 상의해 재측정·진료를 받으라는 권고는 근거에 없다.",
+              "band": "문장은 판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-031",
+      "stratum": "rest",
+      "origin": "LLM",
+      "itemCode": "URINE_PROTEIN",
+      "text": "요단백 결과는 양성(1+)으로, 국가건강검진 기준에서 질환의심 구간에 해당합니다. 기준상 정상A는 음성(-), 정상B(경계)는 약양성(±), 질환의심은 양성(+1) 이상입니다.",
+      "sources": [
+        "mohw-annex4-row-urine-protein"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 366,
+            "output_tokens": 342,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004407,
+          "latencyMs": 3978,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 음성(-) / 정상B(경계): 약양성(±) / 질환의심: 양성(+1) 이상",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "요단백 결과가 양성(1+)이라는 환자의 결과값",
+              "환자의 결과가 질환의심 구간에 해당한다는 판정"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "기준 수치(정상A, 정상B, 질환의심)는 근거 1에서 그대로 확인되지만, 환자의 결과값 양성(1+)과 질환의심 구간에 해당한다는 적용은 근거 문단에 없다.",
+              "band": "결과값 양성(1+)은 질환의심 기준(양성(+1) 이상)에 해당하며, 문장이 말한 정상A·정상B·질환의심 기준 수치도 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 366,
+            "output_tokens": 354,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004528,
+          "latencyMs": 4184,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 음성(-) / 정상B(경계): 약양성(±) / 질환의심: 양성(+1) 이상",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "이 검진자의 요단백 결과가 양성(1+)이라는 점 (근거에는 결과값이 없음)",
+              "검진자의 결과가 질환의심 구간에 해당한다는 판단 (근거는 기준표만 제공)"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "기준 수치 설명(정상A/정상B/질환의심)은 근거 1에서 그대로 확인되지만, 검진자의 결과값(1+)과 그에 따른 질환의심 해당 판단은 근거 문단에 없다.",
+              "band": "결과 양성(1+)은 질환의심(양성(+1) 이상) 구간에 해당하며, 언급한 기준 수치도 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 366,
+            "output_tokens": 352,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004508,
+          "latencyMs": 3984,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 음성(-) / 정상B(경계): 약양성(±) / 질환의심: 양성(+1) 이상",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "이 수검자의 요단백 결과가 양성(1+)이라는 점 (근거에는 수검자 결과값이 없음)",
+              "수검자의 결과가 질환의심 구간에 해당한다는 적용 판단 (근거는 기준표만 제시)"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "기준 설명(정상A/정상B/질환의심)은 근거에서 그대로 확인되지만, 수검자 결과(양성 1+)와 질환의심 해당 판단은 근거 문단에 없다.",
+              "band": "결과 양성(1+)은 질환의심(양성 +1 이상) 구간이며, 말한 기준 수치도 항목 정보의 판정 기준과 일치한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-032",
+      "stratum": "neighbor_band",
+      "origin": "LLM",
+      "itemCode": "FASTING_GLUCOSE",
+      "text": "공복혈당이 126 mg/dL 이상이면 당뇨병을 의심하는 구간이며, 정확한 확인을 위해 추가 검사와 의료기관에서의 진단이 필요합니다.",
+      "sources": [
+        "kdca-5305-diagnosis-2",
+        "kdca-5305-checkup-2"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 1870,
+            "output_tokens": 332,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.007315,
+          "latencyMs": 3173,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "당뇨병(126 mg/dL 이상)은 아닌 경우입니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "공복혈당 126 mg/dL 이상이면 당뇨병을 의심하는 구간이라는 직접적인 서술",
+              "정확한 확인을 위해 추가 검사와 의료기관 진단이 필요하다는 조언"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거 1에서 당뇨병 기준이 126 mg/dL 이상임은 확인되지만, '의심 구간'이라는 표현과 추가 검사·의료기관 진단 필요성은 인용한 근거에서 확인되지 않는다.",
+              "band": "126 mg/dL 이상은 항목 정보의 질환의심 기준과 일치하고 결과값 136도 해당 구간에 속한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 1870,
+            "output_tokens": 349,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.007485,
+          "latencyMs": 3255,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "당뇨병(126 mg/dL 이상)은 아닌 경우입니다",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "공복혈당 126 이상이면 당뇨병을 의심하는 구간이라는 직접적 진술 (근거는 126 이상을 당뇨병 기준으로만 언급)",
+              "정확한 확인을 위해 추가 검사가 필요하다는 내용",
+              "의료기관에서의 진단이 필요하다는 내용"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거 1에서 126 mg/dL 이상이 당뇨병 기준임은 간접적으로 확인되지만, 추가 검사와 의료기관 진단 필요성은 인용한 근거에 없다.",
+              "band": "126 mg/dL 이상은 항목 정보의 질환의심 기준과 일치하며 결과값 136도 이 구간에 속한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 1870,
+            "output_tokens": 388,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.007876,
+          "latencyMs": 3291,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "공복 혈장 포도당 100~125 mg/dL로 정상(100 mg/dL 미만)보다 높지만 당뇨병(126 mg/dL 이상)은 아닌 경우입니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "공복혈당 126 mg/dL 이상이면 당뇨병을 '의심'하는 구간이라는 표현",
+              "정확한 확인을 위해 추가 검사와 의료기관 진단이 필요하다는 조언"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거 1에서 공복혈당 126 mg/dL 이상이 당뇨병 구간임은 확인되지만, 추가 검사와 의료기관 진단이 필요하다는 내용은 인용한 근거에 없다.",
+              "band": "126 mg/dL 이상이 질환의심(당뇨병 의심) 구간이라는 설명은 항목 정보의 판정 기준 및 결과값 136 mg/dL(질환의심)과 맞다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-033",
+      "stratum": "other_item_only",
+      "origin": "LLM",
+      "itemCode": "DIASTOLIC_BP",
+      "text": "혈압 결과가 기준 구간에 해당하는 만큼, 정확한 확인과 상담을 위해 의료진의 정기적인 진찰을 받아 보시기 바랍니다.",
+      "sources": [
+        "kdca-5305-checkup-3"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 934,
+            "output_tokens": 285,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004973,
+          "latencyMs": 2686,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "unsupported",
+            "supportRaw": "unsupported",
+            "quoteVerified": true,
+            "quotes": [],
+            "unsupportedClaims": [
+              "혈압 결과가 기준 구간에 해당하면 의료진의 정기적인 진찰을 받아야 한다는 권유"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용한 근거는 당뇨병 환자의 정기 진찰 항목(심혈관 위험인자 평가, 병원 방문 시 혈압 측정 등)이며, 혈압 결과가 기준 구간에 해당할 때 정기 진찰과 상담을 받으라는 내용은 확인되지 않는다.",
+              "band": "문장은 '기준 구간'이라고만 하고 구체적인 판정 구간 이름이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 934,
+            "output_tokens": 288,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005004,
+          "latencyMs": 2801,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "unsupported",
+            "supportRaw": "unsupported",
+            "quoteVerified": true,
+            "quotes": [],
+            "unsupportedClaims": [
+              "혈압 결과가 기준 구간에 해당하므로 의료진의 정기적인 진찰을 받아야 한다는 권유"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용한 근거는 당뇨병 환자의 정기 진찰 중 심혈관 위험인자 평가와 혈압 측정·진단 기준을 다룬다. 혈압 결과가 있는 일반인이 의료진의 정기 진찰을 받아야 한다는 권유는 근거에서 확인되지 않는다.",
+              "band": "'기준 구간에 해당'이라고만 하고 구체적인 판정 구간 이름이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 934,
+            "output_tokens": 476,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.006883,
+          "latencyMs": 3999,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "병원 방문 시마다 혈압을 측정해야 합니다. 서로 다른 날 2회 이상 측정해 수축기 혈압 140 mmHg 이상, 이완기 혈압 90 mmHg 이상일 경우 고혈압으로 진단할 수 있습니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "혈압 결과가 기준 구간에 해당한다는 판단 (근거는 당뇨병 환자 대상 문단이며 해당 수치와의 연결이 없음)",
+              "의료진의 정기적인 진찰을 받아 보라는 권유 (근거는 병원 방문 시 혈압 측정과 반복 측정 진단 기준을 말할 뿐 정기 진찰 권유 자체는 아님)"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거는 병원 방문 시 반복 혈압 측정과 진단 기준을 다루므로 확인·진찰 취지와 일부 겹치지만, 정기적인 진찰 권유와 구간 해당 판단은 근거에서 직접 확인되지 않는다.",
+              "band": "'기준 구간에 해당한다'고만 하고 구체적인 구간 이름이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-034",
+      "stratum": "rest",
+      "origin": "LLM",
+      "itemCode": "ALT",
+      "text": "ALT(SGPT) 결과는 42 U/L로, 국가건강검진 기준 정상B(경계) 구간(36~45)에 해당합니다. 간장질환 기준에서 건강에 큰 이상은 없으나 자가관리와 예방이 필요한 단계입니다.",
+      "sources": [
+        "mohw-annex4-def-normal-b",
+        "mohw-annex4-row-alt"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 516,
+            "output_tokens": 388,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005168,
+          "latencyMs": 3195,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 2,
+                "quote": "정상B(경계): 36-45",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "건강에 이상이 없으나 식생활습관, 환경개선 등 자가관리 및 예방조치가 필요한 자",
+                "found": true
+              },
+              {
+                "source": 2,
+                "quote": "목표질환: 간장질환 / 검사항목: 에이엘티(ALT(SGPT))",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "정상B(경계) 구간 36~45와 해당 구간의 정의(건강에 이상 없으나 자가관리·예방조치 필요)가 인용한 근거 1·2에서 모두 확인된다. 결과값 42 U/L은 항목 정보에서 오는 값으로 문장의 판정 설명과 충돌하지 않는다.",
+              "band": "ALT 42 U/L는 정상B(경계) 36-45 구간에 해당하며, 문장이 말한 구간과 기준 수치(36~45)가 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 516,
+            "output_tokens": 371,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004998,
+          "latencyMs": 3434,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 2,
+                "quote": "정상B(경계): 36-45",
+                "found": true
+              },
+              {
+                "source": 2,
+                "quote": "목표질환: 간장질환 / 검사항목: 에이엘티(ALT(SGPT))",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "건강에 이상이 없으나 식생활습관, 환경개선 등 자가관리 및 예방조치가 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "정상B(경계) 구간 36~45, 간장질환 목표질환, 이상 없으나 자가관리·예방이 필요한 단계라는 설명이 모두 인용한 근거 1·2에서 확인된다. 결과값 42 U/L은 항목 정보에서 온 것으로 문장의 핵심 주장은 근거에 의해 지지된다.",
+              "band": "결과값 42 U/L, 판정 정상B(경계), 기준 구간 36-45가 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 516,
+            "output_tokens": 340,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004687,
+          "latencyMs": 3077,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 2,
+                "quote": "정상B(경계): 36-45",
+                "found": true
+              },
+              {
+                "source": 2,
+                "quote": "목표질환: 간장질환",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "건강에 이상이 없으나 식생활습관, 환경개선 등 자가관리 및 예방조치가 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "정상B(경계) 구간 36~45와 간장질환 기준은 근거 2에서, 건강에 이상은 없으나 자가관리·예방이 필요하다는 설명은 근거 1에서 직접 확인된다. 결과값 42 U/L는 항목 정보에 해당한다.",
+              "band": "결과값 42 U/L는 정상B(경계) 36-45 구간에 속하며, 문장이 말한 구간과 기준 수치가 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-035",
+      "stratum": "other_item_only",
+      "origin": "LLM",
+      "itemCode": "WAIST_CIRCUMFERENCE",
+      "text": "질환의심은 일반건강검진 결과 고혈압, 당뇨병, 이상지질혈증이 의심되어 진료와 검사 등이 필요한 경우를 뜻합니다.",
+      "sources": [
+        "mohw-annex4-def-suspect-chronic"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 328,
+            "output_tokens": 222,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003132,
+          "latencyMs": 2557,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "일반건강검진 결과 고혈압, 당뇨병, 이상지질혈증이 의심되어 진료와 검사 등이 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 질환의심 정의가 인용한 근거 문단의 내용과 그대로 일치한다.",
+              "band": "문장은 질환의심의 일반적 정의만 말하고 구체적인 기준 수치나 구간을 제시하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 328,
+            "output_tokens": 234,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003252,
+          "latencyMs": 2606,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "일반건강검진 결과 고혈압, 당뇨병, 이상지질혈증이 의심되어 진료와 검사 등이 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 질환의심 정의가 인용한 근거 문단의 내용과 그대로 일치한다.",
+              "band": "구간 이름 '질환의심'을 일반적 의미로 설명할 뿐, 이 항목의 기준 수치나 구간 경계를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 328,
+            "output_tokens": 231,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003221,
+          "latencyMs": 2763,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "일반건강검진 결과 고혈압, 당뇨병, 이상지질혈증이 의심되어 진료와 검사 등이 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 질환의심 정의가 인용한 근거 문단의 내용과 그대로 일치한다.",
+              "band": "질환의심의 일반적 정의만 말하고 허리둘레 기준 수치(남 90 이상)나 결과값 구간을 언급하지 않는다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-036",
+      "stratum": "other_item_only",
+      "origin": "LLM",
+      "itemCode": "EGFR",
+      "text": "신질환은 기저 질환과 연관되는 경우가 있어 관련 질환의 치료도 함께 이루어져야 한다고 설명되어 있으니, 의료진과 함께 확인해 보시는 것이 좋습니다.",
+      "sources": [
+        "kdca-6715-prognosis-2"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 350,
+            "output_tokens": 403,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004986,
+          "latencyMs": 3499,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "신질환, 간질환, 췌장염 등 기저 질환과 연관된 경우에는 해당 질환의 치료도 함께 이루어져야 합니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "근거는 이상지질혈증이 신질환 등 기저 질환과 연관된 경우를 말하는데, 문장은 '신질환'이 기저 질환과 연관된다고 방향을 뒤바꿔 서술함"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용 근거는 이상지질혈증이 기저 질환(신질환 등)과 연관된 경우 해당 질환 치료도 함께 필요하다는 내용인데, 문장은 신질환이 기저 질환과 연관된다고 바꿔 말해 근거의 주어·방향이 어긋난다. '관련 질환의 치료도 함께'는 근거에서 확인되나 '의료진과 확인' 권유는 근거에 없다.",
+              "band": "판정 구간이나 기준 수치를 언급하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 350,
+            "output_tokens": 300,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003955,
+          "latencyMs": 2661,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "신질환, 간질환, 췌장염 등 기저 질환과 연관된 경우에는 해당 질환의 치료도 함께 이루어져야 합니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 핵심 주장(기저 질환과 연관된 경우 해당 질환의 치료도 함께 이루어져야 함)이 근거 문단에서 직접 확인된다. 의료진과 확인하라는 권유는 상담 권유로 별도 주장이 아니다. 다만 근거는 이상지질혈증 문맥이라 적절성은 낮을 수 있다.",
+              "band": "판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 350,
+            "output_tokens": 341,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004365,
+          "latencyMs": 3327,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "신질환, 간질환, 췌장염 등 기저 질환과 연관된 경우에는 해당 질환의 치료도 함께 이루어져야 합니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "이 문장이 신질환 자체에 대한 설명처럼 쓰여, 근거(이상지질혈증이 기저 질환과 연관된 경우)를 신질환 일반의 이야기로 옮겼다"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거는 이상지질혈증이 신질환 등 기저 질환과 연관된 경우 그 질환의 치료도 함께 필요하다는 내용인데, 문장은 신질환이 기저 질환과 연관된다는 식으로 방향과 맥락을 바꿨다.",
+              "band": "판정 구간이나 기준 수치를 언급하지 않는다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-037",
+      "stratum": "rest",
+      "origin": "LLM",
+      "itemCode": "ALT",
+      "text": "근거 문서에 따르면 정상A 기준은 35 U/L 이하이므로, 생활습관을 점검하고 필요하면 추후 검사 결과를 함께 살펴보시기를 권합니다.",
+      "sources": [
+        "mohw-annex4-row-alt"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 365,
+            "output_tokens": 245,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003436,
+          "latencyMs": 2905,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 35 이하",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "생활습관을 점검하고 필요하면 추후 검사 결과를 함께 살펴보시기를 권한다는 조언"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "정상A 기준이 35 U/L 이하라는 부분은 근거에서 확인되지만, 생활습관 점검 및 추후 검사 결과 확인 권유는 근거 문단에 없다.",
+              "band": "정상A 기준 35 U/L 이하는 항목 정보의 판정 기준과 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 365,
+            "output_tokens": 234,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003325,
+          "latencyMs": 2683,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 35 이하",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "생활습관을 점검하고 필요하면 추후 검사 결과를 함께 살펴보시기를 권합니다"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "정상A 기준이 35 U/L 이하라는 부분은 근거에서 확인되지만, 생활습관 점검과 추후 검사 결과 확인 권유는 근거에 없다.",
+              "band": "정상A 기준 35 이하는 항목 정보의 판정 기준과 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 365,
+            "output_tokens": 242,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003406,
+          "latencyMs": 2968,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 35 이하",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "생활습관을 점검하라는 권유",
+              "필요하면 추후 검사 결과를 함께 살펴보라는 권유"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "정상A 기준이 35 U/L 이하라는 부분은 근거에서 확인되지만, 생활습관 점검과 추후 검사 결과 확인 권유는 근거 문단에 없다.",
+              "band": "정상A 기준 35 U/L 이하는 항목 정보의 판정 기준과 일치한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-038",
+      "stratum": "rest",
+      "origin": "LLM",
+      "itemCode": "CHEST_XRAY",
+      "text": "정상B(경계)는 건강에 큰 이상은 없으나 자가관리와 예방조치가 필요하다는 뜻이며, 빈혈 관련 혈색소 검사는 별도 기준으로 판정됩니다.",
+      "sources": [
+        "mohw-annex4-def-normal-b",
+        "mohw-annex4-row-hemoglobin"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 584,
+            "output_tokens": 399,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005413,
+          "latencyMs": 3582,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상B(경계): 일반건강검진 및 의료급여생애전환기검진 결과 건강에 이상이 없으나 식생활습관, 환경개선 등 자가관리 및 예방조치가 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "빈혈 관련 혈색소 검사는 별도 기준으로 판정된다는 주장은 인용한 근거에서 직접 확인되지 않음(근거 2는 혈색소 기준표이나 '별도 기준'이라는 진술은 아님)"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "정상B(경계)의 정의는 근거 1에서 확인되지만, 혈색소 검사가 별도 기준으로 판정된다는 부분은 근거에 명시되어 있지 않다.",
+              "band": "정상B(경계)의 일반적 의미를 설명할 뿐 항목 정보의 판정(정상B 경계)과 어긋나지 않으며, 다른 구간이나 수치를 잘못 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 584,
+            "output_tokens": 341,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004834,
+          "latencyMs": 3135,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "건강에 이상이 없으나 식생활습관, 환경개선 등 자가관리 및 예방조치가 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "빈혈 관련 혈색소 검사는 별도 기준으로 판정됩니다"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "정상B(경계)의 의미는 근거 1에서 확인되지만, 혈색소 검사가 별도 기준으로 판정된다는 서술은 근거 2가 혈색소 기준표를 제시할 뿐 '별도 기준' 관계를 직접 말하지 않아 확인되지 않는다.",
+              "band": "정상B(경계)는 항목 정보의 판정과 일치하며, 구간의 일반적 의미만 설명하고 있어 틀린 기준 수치나 다른 구간을 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 584,
+            "output_tokens": 363,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005053,
+          "latencyMs": 3173,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "건강에 이상이 없으나 식생활습관, 환경개선 등 자가관리 및 예방조치가 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "빈혈 관련 혈색소 검사는 별도 기준으로 판정됩니다"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "정상B(경계)의 뜻은 근거 1에서 확인되지만, 혈색소 검사가 별도 기준으로 판정된다는 부분은 근거 2에 혈색소 기준표만 있을 뿐 '별도 기준'이라는 서술은 없어 직접 확인되지 않는다. 또한 흉부방사선 항목과 혈색소를 연결하는 것은 불필요한 내용이다.",
+              "band": "정상B(경계)는 항목 정보의 판정과 일치하며, 문장이 말한 구간 정의 외에 틀린 기준 수치는 없다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-039",
+      "stratum": "rest",
+      "origin": "LLM",
+      "itemCode": "BMI",
+      "text": "체질량지수(BMI) 결과는 30.0이며, 국가건강검진 기준으로 질환의심 구간(30 이상)에 해당합니다.",
+      "sources": [
+        "mohw-annex4-row-bmi"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 355,
+            "output_tokens": 241,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003376,
+          "latencyMs": 2457,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "질환의심: 30 이상",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용한 근거에 BMI 질환의심 기준이 '30 이상'으로 명시되어 있어, 결과값 30.0이 질환의심 구간(30 이상)에 해당한다는 문장의 주장이 근거에서 확인된다.",
+              "band": "BMI 30.0은 질환의심 구간(30 이상)에 해당하며, 문장이 말한 구간과 기준 수치가 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 355,
+            "output_tokens": 223,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003195,
+          "latencyMs": 2455,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "질환의심: 30 이상",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 BMI 질환의심 구간(30 이상) 주장이 인용한 근거의 판정기준에서 직접 확인된다. 결과값 30.0과 국가건강검진 기준이라는 내용도 근거와 어긋나지 않는다.",
+              "band": "결과값 30.0, 판정 질환의심, 기준 30 이상이 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 355,
+            "output_tokens": 227,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003236,
+          "latencyMs": 2557,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "질환의심: 30 이상",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장은 BMI 질환의심 구간이 30 이상이라고 말하며, 이는 근거 1의 판정기준표에서 직접 확인된다. 결과값 30.0과 구간 대응은 문장의 단순 적용으로 추가 주장이 없다.",
+              "band": "결과값 30.0, 판정 질환의심, 기준 30 이상이 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-040",
+      "stratum": "rest",
+      "origin": "LLM",
+      "itemCode": "HEMOGLOBIN",
+      "text": "혈색소는 12.3 g/dL로, 국가건강검진 기준에서 정상B(경계) 구간(남성 12.0-12.9, 여성 10.0-11.9)에 해당합니다.",
+      "sources": [
+        "mohw-annex4-def-normal-b"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 383,
+            "output_tokens": 326,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004281,
+          "latencyMs": 3480,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상B(경계)",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "혈색소 12.3 g/dL이 정상B(경계) 구간에 해당한다는 판정",
+              "정상B(경계) 구간의 수치 기준(남성 12.0-12.9, 여성 10.0-11.9)"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거 1은 정상B(경계)라는 판정 구분의 정의만 담고 있어 구간 이름은 확인되지만, 혈색소의 수치 기준과 12.3 g/dL이 이 구간에 속한다는 내용은 근거에 없다.",
+              "band": "결과값 12.3은 남성 정상B(경계) 범위 12.0-12.9에 들고, 문장이 말한 판정·기준 수치가 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 383,
+            "output_tokens": 426,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005281,
+          "latencyMs": 3992,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상B(경계): 일반건강검진 및 의료급여생애전환기검진 결과 건강에 이상이 없으나 식생활습관, 환경개선 등 자가관리 및 예방조치가 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "혈색소 12.3 g/dL이 정상B(경계) 구간에 해당한다는 판정",
+              "정상B(경계) 구간의 수치 기준(남성 12.0-12.9, 여성 10.0-11.9)"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거 1은 정상B(경계)의 일반적 정의만 담고 있어 구간 이름은 확인되지만, 혈색소의 구체적 수치 기준(남 12.0-12.9, 여 10.0-11.9)과 12.3 g/dL의 구간 해당 여부는 근거에서 확인되지 않는다.",
+              "band": "남성 12.3 g/dL은 정상B(경계) 남 12.0-12.9 범위에 들고, 문장이 말한 기준 수치도 항목 정보의 판정 기준과 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 383,
+            "output_tokens": 379,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004811,
+          "latencyMs": 3685,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상B(경계): 일반건강검진 및 의료급여생애전환기검진 결과 건강에 이상이 없으나 식생활습관, 환경개선 등 자가관리 및 예방조치가 필요한 자",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "혈색소 12.3 g/dL이 정상B(경계) 구간에 해당한다는 판정",
+              "정상B 구간의 수치 기준(남성 12.0-12.9, 여성 10.0-11.9)"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거 1은 정상B(경계)의 일반적 정의만 담고 있고 혈색소 수치 기준이나 12.3의 구간 판정은 없어, 정상B 구간 언급만 부분적으로 확인된다.",
+              "band": "남성 12.3 g/dL은 정상B(경계) 남 12.0-12.9 범위에 들고, 문장이 말한 기준 수치도 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-041",
+      "stratum": "other_item_only",
+      "origin": "LLM",
+      "itemCode": "TOTAL_CHOLESTEROL",
+      "text": "총콜레스테롤은 여러 콜레스테롤의 총량이므로, 고밀도(HDL)와 저밀도(LDL) 콜레스테롤 수치를 함께 살펴보는 것이 도움이 됩니다.",
+      "sources": [
+        "mohw-annex4-row-hdl",
+        "mohw-annex4-row-triglycerides"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 520,
+            "output_tokens": 298,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004275,
+          "latencyMs": 2865,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "unsupported",
+            "supportRaw": "unsupported",
+            "quoteVerified": true,
+            "quotes": [],
+            "unsupportedClaims": [
+              "총콜레스테롤이 여러 콜레스테롤의 총량이라는 설명",
+              "HDL과 LDL 수치를 함께 살펴보는 것이 도움이 된다는 조언"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용된 근거는 HDL 콜레스테롤과 중성지방의 판정 기준표일 뿐이며, 총콜레스테롤이 여러 콜레스테롤의 총량이라는 설명이나 HDL·LDL을 함께 보라는 조언은 어디에서도 확인되지 않는다. LDL은 근거에 등장하지도 않는다.",
+              "band": "문장이 판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 520,
+            "output_tokens": 276,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004056,
+          "latencyMs": 2661,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "unsupported",
+            "supportRaw": "unsupported",
+            "quoteVerified": true,
+            "quotes": [],
+            "unsupportedClaims": [
+              "총콜레스테롤은 여러 콜레스테롤의 총량이라는 설명",
+              "HDL과 LDL 수치를 함께 살펴보는 것이 도움이 된다는 조언"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용한 근거 1·2는 HDL 콜레스테롤과 중성지방의 판정 기준표일 뿐, 총콜레스테롤이 여러 콜레스테롤의 총량이라거나 HDL·LDL을 함께 보라는 내용은 없고 LDL 언급도 없다.",
+              "band": "문장이 판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 520,
+            "output_tokens": 291,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004206,
+          "latencyMs": 2763,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "unsupported",
+            "supportRaw": "unsupported",
+            "quoteVerified": true,
+            "quotes": [],
+            "unsupportedClaims": [
+              "총콜레스테롤은 여러 콜레스테롤의 총량이다",
+              "HDL과 LDL 콜레스테롤 수치를 함께 살펴보는 것이 도움이 된다"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용한 근거는 HDL 콜레스테롤과 중성지방의 판정 기준표일 뿐이며, 총콜레스테롤이 여러 콜레스테롤의 총량이라는 설명이나 HDL·LDL을 함께 보라는 조언은 어디에도 없다. LDL은 근거에 등장하지도 않는다.",
+              "band": "문장이 판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-042",
+      "stratum": "neighbor_band",
+      "origin": "LLM",
+      "itemCode": "SYSTOLIC_BP",
+      "text": "수축기 혈압 결과는 145 mmHg이며, 국가건강검진 기준에서 질환의심 구간(140 mmHg 이상)에 해당합니다. 고혈압은 수축기혈압 140 mmHg 이상 또는 이완기혈압 90 mmHg 이상인 경우를 말합니다.",
+      "sources": [
+        "kdca-6765-overview-1",
+        "mohw-annex4-row-blood-pressure"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 603,
+            "output_tokens": 366,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005122,
+          "latencyMs": 3890,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 2,
+                "quote": "질환의심: 140 이상 또는 90 이상",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "고혈압이란 위팔에 혈압대를 감아 측정한 동맥의 압력을 기준으로 수축기혈압 140 mmHg 이상, 또는 이완기혈압 90 mmHg 이상인 경우를 말합니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "질환의심 구간 140 이상은 근거 2에서, 고혈압 정의(수축기 140 이상 또는 이완기 90 이상)는 근거 1에서 직접 확인된다. 결과값 145 mmHg 자체는 항목 정보이며 판정 구간 적용에 불과하다.",
+              "band": "결과값 145 mmHg는 질환의심 구간(140 이상)에 해당하며 문장의 구간·기준 수치가 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 603,
+            "output_tokens": 367,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005131,
+          "latencyMs": 3701,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 2,
+                "quote": "질환의심: 140 이상 또는 90 이상",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "고혈압이란 위팔에 혈압대를 감아 측정한 동맥의 압력을 기준으로 수축기혈압 140 mmHg 이상, 또는 이완기혈압 90 mmHg 이상인 경우를 말합니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "질환의심 구간 140 이상은 근거 2에서, 고혈압 정의(수축기 140 이상 또는 이완기 90 이상)는 근거 1에서 직접 확인된다. 결과값 145 mmHg은 항목 정보에서 온 것이며 근거에 없는 추가 주장은 없다.",
+              "band": "145 mmHg은 질환의심(140 이상) 구간이며 문장이 말한 구간과 기준 수치가 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 603,
+            "output_tokens": 346,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004921,
+          "latencyMs": 3779,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 2,
+                "quote": "질환의심: 140 이상 또는 90 이상",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "고혈압이란 위팔에 혈압대를 감아 측정한 동맥의 압력을 기준으로 수축기혈압 140 mmHg 이상, 또는 이완기혈압 90 mmHg 이상인 경우를 말합니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "질환의심 구간 140 이상은 근거 2에서, 고혈압 정의는 근거 1에서 직접 확인된다. 결과값 145 mmHg는 항목 정보이며 문장의 핵심 주장은 근거로 뒷받침된다.",
+              "band": "145 mmHg는 질환의심(140 이상) 구간에 해당하며 문장의 구간·기준 수치가 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-043",
+      "stratum": "neighbor_band",
+      "origin": "LLM",
+      "itemCode": "FASTING_GLUCOSE",
+      "text": "공복혈당 결과는 158 mg/dL이며, 판정 기준상 질환의심 구간에 해당합니다. 질환의심 기준은 126 mg/dL 이상입니다.",
+      "sources": [
+        "mohw-annex4-row-fasting-glucose"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 349,
+            "output_tokens": 392,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004874,
+          "latencyMs": 3378,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "질환의심: 126 이상",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "목표질환: 당뇨병 / 검사항목: 공복 혈당 / 단위: mg/dL",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "공복혈당 결과가 158 mg/dL이라는 값 (근거 문단에는 환자의 결과값이 없음)",
+              "해당 결과가 질환의심 구간에 속한다는 개별 판정"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "질환의심 기준이 126 mg/dL 이상이라는 부분은 근거 1에서 확인되지만, 결과값 158 mg/dL과 그 값이 질환의심 구간에 해당한다는 적용은 근거 문단에 없고 항목 정보에서만 나온다.",
+              "band": "158 mg/dL은 126 이상이므로 질환의심 구간이 맞고, 문장이 말한 기준 수치 126 mg/dL 이상도 항목 정보의 판정 기준과 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 349,
+            "output_tokens": 275,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003704,
+          "latencyMs": 2760,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "질환의심: 126 이상",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "검사항목: 공복 혈당",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "질환의심 기준이 126 mg/dL 이상이라는 내용은 근거에서 직접 확인된다. 결과값 158과 판정은 항목 정보에서 온 내용으로, 해설이 근거에 없는 사실을 더하지는 않았다.",
+              "band": "결과값 158 mg/dL은 질환의심 구간(126 이상)에 해당하며, 문장이 말한 구간과 기준 수치가 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 349,
+            "output_tokens": 266,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003613,
+          "latencyMs": 2644,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "질환의심: 126 이상",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "공복 혈당",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "질환의심 기준이 126 mg/dL 이상이라는 내용은 근거 1에서 직접 확인된다. 결과값 158 mg/dL이 이 구간에 해당한다는 서술은 기준과 결과값의 단순 대조로, 근거에 없는 새로운 사실이 아니다.",
+              "band": "결과값 158 mg/dL, 판정 질환의심, 기준 126 이상 모두 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-044",
+      "stratum": "rest",
+      "origin": "LLM",
+      "itemCode": "EGFR",
+      "text": "신사구체여과율(eGFR) 결과는 29 mL/min/1.73m²로, 국가건강검진 기준 질환의심 구간(60 미만)에 해당합니다.",
+      "sources": [
+        "mohw-annex4-row-egfr"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 365,
+            "output_tokens": 306,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004045,
+          "latencyMs": 2874,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "신사구체여과율(e-GFR) / 단위: mL/min/1.73m2 / 정상A: 60 이상 / 정상B(경계): (구분 없음) / 질환의심: 60 미만",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "질환의심 구간이 60 미만이라는 기준은 근거 1에서 직접 확인된다. 결과값 29는 항목 정보에서 온 것으로 문장의 판정 기준 주장 자체는 근거에 의해 뒷받침된다.",
+              "band": "결과값 29는 60 미만이므로 질환의심 구간이며, 문장이 말한 구간과 기준 수치(60 미만)가 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 365,
+            "output_tokens": 295,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003935,
+          "latencyMs": 2866,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "신사구체여과율(e-GFR) / 단위: mL/min/1.73m2 / 정상A: 60 이상 / 정상B(경계): (구분 없음) / 질환의심: 60 미만",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장이 말하는 질환의심 구간(60 미만) 기준이 인용한 근거 1에서 그대로 확인된다. 결과값 29는 항목 정보에서 온 것이며 새로운 주장은 없다.",
+              "band": "결과값 29는 60 미만이고 판정이 질환의심이므로 문장이 말한 구간과 기준 수치(60 미만)가 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 365,
+            "output_tokens": 302,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004006,
+          "latencyMs": 2735,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "신사구체여과율(e-GFR) / 단위: mL/min/1.73m2 / 정상A: 60 이상 / 정상B(경계): (구분 없음) / 질환의심: 60 미만",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 핵심 주장인 eGFR 질환의심 구간 기준(60 미만)이 근거 1에서 직접 확인된다. 결과값 29는 항목 정보에서 온 것으로 근거 확인 대상이 아니다.",
+              "band": "결과값 29는 60 미만이고 판정이 질환의심이므로 문장이 말한 구간과 기준 수치(60 미만)가 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-045",
+      "stratum": "other_item_only",
+      "origin": "LLM",
+      "itemCode": "GAMMA_GTP",
+      "text": "근거 문서에서는 질환과 연관되는 경우 해당 질환의 치료도 함께 이루어져야 한다고 설명하고 있습니다.",
+      "sources": [
+        "kdca-6715-prognosis-2"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 347,
+            "output_tokens": 223,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.00318,
+          "latencyMs": 2353,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "신질환, 간질환, 췌장염 등 기저 질환과 연관된 경우에는 해당 질환의 치료도 함께 이루어져야 합니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 주장(질환과 연관된 경우 해당 질환의 치료도 함께 이루어져야 함)이 근거 1에서 그대로 확인된다.",
+              "band": "판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 347,
+            "output_tokens": 289,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.00384,
+          "latencyMs": 2662,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "신질환, 간질환, 췌장염 등 기저 질환과 연관된 경우에는 해당 질환의 치료도 함께 이루어져야 합니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "present",
+            "treatmentQuote": "해당 질환의 치료도 함께 이루어져야 한다고 설명하고 있습니다",
+            "reason": {
+              "support": "문장의 내용(질환과 연관된 경우 해당 질환 치료도 함께 필요)이 근거 1에서 그대로 확인된다. 다만 근거는 이상지질혈증 문서라 이 항목에 대한 적절성은 별개다.",
+              "band": "판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 347,
+            "output_tokens": 231,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003259,
+          "latencyMs": 2353,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "신질환, 간질환, 췌장염 등 기저 질환과 연관된 경우에는 해당 질환의 치료도 함께 이루어져야 합니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 '질환과 연관되는 경우 해당 질환의 치료도 함께 이루어져야 한다'는 내용이 근거 1에서 그대로 확인된다.",
+              "band": "문장이 판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-046",
+      "stratum": "other_item_only",
+      "origin": "LLM",
+      "itemCode": "AST",
+      "text": "이 판정은 간 관련 검사값이 기준보다 높다는 의미이며, 정확한 원인은 의료진의 추가 진료와 검사를 통해 확인하셔야 합니다.",
+      "sources": [
+        "mohw-annex4-row-alt",
+        "kdca-6715-symptoms-1"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 873,
+            "output_tokens": 278,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004782,
+          "latencyMs": 2803,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "unsupported",
+            "supportRaw": "unsupported",
+            "quoteVerified": true,
+            "quotes": [],
+            "unsupportedClaims": [
+              "판정이 간 관련 검사값이 기준보다 높다는 의미라는 내용",
+              "정확한 원인은 의료진의 추가 진료와 검사로 확인해야 한다는 내용"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용한 근거 1은 ALT 판정기준표이고 근거 2는 이상지질혈증 증상 설명이라, AST 질환의심 판정의 의미나 추가 진료·검사 안내는 두 근거 어디에서도 확인되지 않는다.",
+              "band": "문장이 구간 이름이나 기준 수치를 말하지 않고 '기준보다 높다'고만 언급한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 873,
+            "output_tokens": 303,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005032,
+          "latencyMs": 2995,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "unsupported",
+            "supportRaw": "unsupported",
+            "quoteVerified": true,
+            "quotes": [],
+            "unsupportedClaims": [
+              "이 판정이 간 관련 검사값이 기준보다 높다는 의미라는 내용",
+              "정확한 원인은 의료진의 추가 진료와 검사를 통해 확인해야 한다는 내용"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거 1은 ALT 판정기준표이고 근거 2는 이상지질혈증 증상 설명이라, AST 판정이 간 검사값이 기준보다 높다는 뜻이라는 문장의 핵심 주장이 두 근거 어디에도 직접 나오지 않는다.",
+              "band": "문장이 판정 구간 이름이나 기준 수치를 말하지 않고 '기준보다 높다'는 일반적 표현만 쓴다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 873,
+            "output_tokens": 264,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004641,
+          "latencyMs": 2865,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "unsupported",
+            "supportRaw": "unsupported",
+            "quoteVerified": true,
+            "quotes": [],
+            "unsupportedClaims": [
+              "판정이 간 관련 검사값이 기준보다 높다는 의미라는 것",
+              "정확한 원인은 추가 진료와 검사로 확인해야 한다는 것"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "인용한 근거는 ALT 판정 기준표와 이상지질혈증 증상 문단으로, AST 판정의 의미나 원인 확인을 위한 추가 진료·검사에 관한 내용이 없다.",
+              "band": "문장이 구간 이름이나 기준 수치를 직접 말하지 않고, 기준보다 높다는 일반적 표현만 쓴다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-047",
+      "stratum": "rest",
+      "origin": "LLM",
+      "itemCode": "HEMOGLOBIN",
+      "text": "혈색소 결과는 9.8 g/dL이며, 국가건강검진 기준상 질환의심 구간에 해당합니다. 이 항목의 질환의심 기준은 남자 12.0 g/dL 미만, 여자 10.0 g/dL 미만입니다.",
+      "sources": [
+        "mohw-annex4-row-hemoglobin"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 469,
+            "output_tokens": 388,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005073,
+          "latencyMs": 3601,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "질환의심: 남 12.0 미만, 여 10.0 미만",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "단위: g/dL",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "결과값이 9.8 g/dL이라는 사실은 근거 문단에 없음 (항목 정보에만 있음)",
+              "이 결과가 질환의심 구간에 해당한다는 적용 판정은 근거 문단에 명시되어 있지 않음"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "질환의심 기준(남 12.0 미만, 여 10.0 미만)은 근거에서 확인되지만, 결과값 9.8 g/dL과 해당 구간 판정은 근거 문단이 아닌 항목 정보에서 온 내용이다.",
+              "band": "남성 9.8 g/dL은 질환의심 기준(12.0 미만)에 해당하고, 언급된 기준 수치(남 12.0 미만, 여 10.0 미만)도 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 469,
+            "output_tokens": 393,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005123,
+          "latencyMs": 3718,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "질환의심: 남 12.0 미만, 여 10.0 미만",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "단위: g/dL",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "혈색소 결과가 9.8 g/dL이라는 사실은 인용한 근거 문단에 없다",
+              "이 사람의 결과가 질환의심 구간에 해당한다는 판정은 근거 문단에서 확인되지 않는다 (근거에는 기준표만 있음)"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "질환의심 기준(남 12.0 미만, 여 10.0 미만)은 근거에서 확인되지만, 결과값 9.8과 해당 사용자의 질환의심 판정은 근거 문단에 없어 부분 지지다.",
+              "band": "남성 9.8 g/dL은 질환의심(남 12.0 미만)에 해당하고, 문장이 말한 기준 수치(남 12.0 미만, 여 10.0 미만)도 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 469,
+            "output_tokens": 404,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.005234,
+          "latencyMs": 3891,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "질환의심: 남 12.0 미만, 여 10.0 미만",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "단위: g/dL",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "혈색소 결과가 9.8 g/dL이다 (환자의 결과값은 근거 문단에 없음)",
+              "이 결과가 질환의심 구간에 해당한다는 적용 판단 (근거에는 기준표만 있음)"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "질환의심 기준(남 12.0 미만, 여 10.0 미만)은 근거에서 그대로 확인되지만, 9.8 g/dL이라는 결과값과 그것이 질환의심 구간에 해당한다는 판단은 근거 문단에 없고 항목 정보에서 온 것이다.",
+              "band": "남성 9.8 g/dL은 질환의심 기준(남 12.0 미만)에 해당하고, 문장이 말한 남자 12.0 미만·여자 10.0 미만 기준 수치도 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-048",
+      "stratum": "rest",
+      "origin": "LLM",
+      "itemCode": "URINE_PROTEIN",
+      "text": "요단백 검사 결과는 양성(1+)이며, 국가건강검진 기준에서는 질환의심으로 판정되었습니다. 이 항목은 음성(-)이 정상A, 약양성(±)이 정상B(경계), 양성(+1) 이상이 질환의심으로 나뉩니다.",
+      "sources": [
+        "mohw-annex4-row-urine-protein"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 379,
+            "output_tokens": 307,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004084,
+          "latencyMs": 2901,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 음성(-) / 정상B(경계): 약양성(±) / 질환의심: 양성(+1) 이상",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 기준 설명(음성 정상A, 약양성 정상B 경계, 양성(+1) 이상 질환의심)이 근거 1의 판정기준과 그대로 일치한다. 결과값과 판정 언급은 항목 정보에 해당하는 내용이며 새로운 사실 주장이 없다.",
+              "band": "결과값 양성(1+)은 양성(+1) 이상에 해당해 질환의심이 맞고, 제시한 기준 수치도 항목 정보의 판정 기준과 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 379,
+            "output_tokens": 313,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004143,
+          "latencyMs": 2806,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "검사항목: 요단백 / 단위: - / 정상A: 음성(-) / 정상B(경계): 약양성(±) / 질환의심: 양성(+1) 이상",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 기준 구간 설명(음성 정상A, 약양성 정상B 경계, 양성 +1 이상 질환의심)이 근거 1의 판정기준과 그대로 일치한다. 결과값과 판정은 항목 정보에서 온 내용이며 근거와 충돌하지 않는다.",
+              "band": "양성(1+)은 양성(+1) 이상 구간에 해당해 질환의심이 맞고, 기준 수치 설명도 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 379,
+            "output_tokens": 328,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004293,
+          "latencyMs": 3107,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 음성(-) / 정상B(경계): 약양성(±) / 질환의심: 양성(+1) 이상",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 기준 구간 설명(음성 정상A, 약양성 정상B 경계, 양성(+1) 이상 질환의심)이 근거 1의 판정기준에서 그대로 확인된다. 결과값과 판정은 항목 정보에서 온 것으로 문장의 핵심 주장인 기준 구간이 근거로 뒷받침된다.",
+              "band": "결과 양성(1+)은 판정 기준상 질환의심 구간(양성(+1) 이상)에 해당하며, 문장이 말한 구간과 기준 수치가 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-049",
+      "stratum": "rest",
+      "origin": "LLM",
+      "itemCode": "HEMOGLOBIN",
+      "text": "혈색소는 12.8 g/dL로, 국가건강검진 기준에서 정상B(경계)에 해당합니다. 정상A 기준(남 13.0-16.5, 여 12.0-15.5)보다는 낮고, 질환의심 기준보다는 높은 구간입니다.",
+      "sources": [
+        "mohw-annex4-def-normal-b",
+        "mohw-annex4-row-hemoglobin"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 600,
+            "output_tokens": 320,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004655,
+          "latencyMs": 3324,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 2,
+                "quote": "정상A: 남 13.0-16.5, 여 12.0-15.5 / 정상B(경계): 남 12.0-12.9, 여 10.0-11.9 / 질환의심: 남 12.0 미만, 여 10.0 미만",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "정상B 판정과 정상A·질환의심 기준 수치가 근거 2의 판정기준표에서 모두 확인되며, 낮고 높은 구간 관계도 표에서 도출된다.",
+              "band": "12.8 g/dL(남)은 정상B(경계) 12.0-12.9 범위이며, 정상A 남 13.0-16.5와 질환의심 남 12.0 미만 기준 수치도 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 600,
+            "output_tokens": 339,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004845,
+          "latencyMs": 3360,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 2,
+                "quote": "정상A: 남 13.0-16.5, 여 12.0-15.5 / 정상B(경계): 남 12.0-12.9, 여 10.0-11.9 / 질환의심: 남 12.0 미만, 여 10.0 미만",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거 2의 판정기준표에서 정상A·정상B·질환의심 기준 수치가 모두 확인되며, 정상B가 정상A보다 낮고 질환의심보다 높은 구간이라는 설명도 이 표에서 도출된다.",
+              "band": "남성 12.8 g/dL은 정상B(남 12.0-12.9) 구간이며, 문장이 말한 정상A 기준(남 13.0-16.5, 여 12.0-15.5)도 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 600,
+            "output_tokens": 325,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.004705,
+          "latencyMs": 3299,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 2,
+                "quote": "정상A: 남 13.0-16.5, 여 12.0-15.5 / 정상B(경계): 남 12.0-12.9, 여 10.0-11.9 / 질환의심: 남 12.0 미만, 여 10.0 미만",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "정상A, 정상B(경계), 질환의심 기준 수치가 근거 2에서 그대로 확인되며, 12.8이 정상A보다 낮고 질환의심보다 높은 구간이라는 설명도 이 기준에서 도출된다.",
+              "band": "남성 12.8 g/dL은 정상B(경계) 남 12.0-12.9 범위에 들고, 문장이 말한 정상A 기준 수치도 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "cal-050",
+      "stratum": "other_item_only",
+      "origin": "LLM",
+      "itemCode": "GAMMA_GTP",
+      "text": "간질환이 연관된 경우에는 해당 질환에 대한 치료도 함께 이루어져야 한다고 안내되어 있습니다.",
+      "sources": [
+        "kdca-6715-prognosis-2"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 343,
+            "output_tokens": 280,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003742,
+          "latencyMs": 3374,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "신질환, 간질환, 췌장염 등 기저 질환과 연관된 경우에는 해당 질환의 치료도 함께 이루어져야 합니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "present",
+            "treatmentQuote": "해당 질환에 대한 치료도 함께 이루어져야 한다고 안내되어 있습니다",
+            "reason": {
+              "support": "근거 문단에 간질환 등 기저 질환과 연관된 경우 해당 질환의 치료도 함께 이루어져야 한다는 내용이 직접 있어 문장의 주장이 확인된다.",
+              "band": "문장이 판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 2,
+          "usage": {
+            "input_tokens": 343,
+            "output_tokens": 226,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003201,
+          "latencyMs": 2410,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "신질환, 간질환, 췌장염 등 기저 질환과 연관된 경우에는 해당 질환의 치료도 함께 이루어져야 합니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "문장의 '간질환이 연관된 경우 해당 질환 치료도 함께 이루어져야 한다'는 내용이 근거 1에서 그대로 확인된다.",
+              "band": "판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        },
+        {
+          "repeat": 3,
+          "usage": {
+            "input_tokens": 343,
+            "output_tokens": 244,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2555
+          },
+          "costUsd": 0.003381,
+          "latencyMs": 2338,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "supported",
+            "supportRaw": "supported",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "신질환, 간질환, 췌장염 등 기저 질환과 연관된 경우에는 해당 질환의 치료도 함께 이루어져야 합니다.",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "근거 문단에 간질환 등 기저 질환과 연관된 경우 해당 질환의 치료도 함께 이루어져야 한다는 내용이 그대로 있어 문장의 주장이 확인된다.",
+              "band": "문장이 판정 구간이나 기준 수치를 말하지 않는다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    }
+  ]
+}

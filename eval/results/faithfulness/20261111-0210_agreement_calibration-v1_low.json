@@ -1,0 +1,837 @@
+{
+  "schema": "checkup-ai/eval-run@1",
+  "runId": "20261111-0210_agreement_calibration-v1_low",
+  "kind": "agreement",
+  "label": "low",
+  "createdAt": "2026-11-11T02:10:33",
+  "git": {
+    "commit": "2d57b5e",
+    "dirty": false
+  },
+  "dataset": {
+    "name": "calibration-v1",
+    "source": "calibration",
+    "judgeRun": "20261111-0210_faithfulness_calibration-v1_low_calibration"
+  },
+  "config": {
+    "rubric": "faithfulness-v1.1",
+    "judgeSetting": "low",
+    "repeats": 3
+  },
+  "summary": {
+    "compared": 50,
+    "axes": {
+      "support": {
+        "agreement": 0.38,
+        "kappa": -0.085,
+        "confusion": {
+          "supported": {
+            "supported": 18,
+            "partial": 19,
+            "unsupported": 5
+          },
+          "partial": {
+            "supported": 3,
+            "partial": 1,
+            "unsupported": 3
+          },
+          "unsupported": {
+            "supported": 1,
+            "partial": 0,
+            "unsupported": 0
+          }
+        },
+        "kappaBinary": -0.036
+      },
+      "band": {
+        "agreement": 0.92,
+        "kappa": 0.841,
+        "confusion": {
+          "correct": {
+            "correct": 26,
+            "wrong": 0,
+            "not_stated": 1
+          },
+          "wrong": {
+            "correct": 0,
+            "wrong": 0,
+            "not_stated": 0
+          },
+          "not_stated": {
+            "correct": 2,
+            "wrong": 1,
+            "not_stated": 20
+          }
+        }
+      },
+      "treatment": {
+        "agreement": 0.94,
+        "kappa": 0.0,
+        "confusion": {
+          "none": {
+            "none": 47,
+            "present": 3
+          },
+          "present": {
+            "none": 0,
+            "present": 0
+          }
+        }
+      }
+    }
+  },
+  "details": [
+    {
+      "id": "cal-001",
+      "stratum": "other_item_only",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "unsupported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "인용한 근거 1, 2는 중성지방과 혈압의 판정 기준표이며, 정상B(경계)의 의미나 자가관리·예방조치 필요성에 대한 설명은 없다.",
+        "band": "문장은 정상B(경계)를 언급하며, 이는 혈색소 11.3 g/dL(여, 10.0-11.9)의 판정과 일치한다."
+      }
+    },
+    {
+      "id": "cal-003",
+      "stratum": "neighbor_band",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "기준 구간 수치는 근거 1에서 확인되지만, 결과값 109와 정상B 해당 여부는 항목 정보에서만 알 수 있고 인용 근거에는 없다.",
+        "band": "109 mg/dL는 정상B(경계) 100-125 구간에 해당하고, 제시된 기준 수치도 항목 정보와 일치한다."
+      }
+    },
+    {
+      "id": "cal-004",
+      "stratum": "neighbor_band",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "memo": "129는 120보다 높은데 어떻게 생각해야 되는지에 대한 정확한 언급이 필요할 거 같은데",
+      "judgeReason": {
+        "support": "고혈압 기준(수축기 140 이상 또는 이완기 90 이상)과 정상혈압 기준(120 미만, 80 미만)이 근거에 그대로 나와 있습니다.",
+        "band": "수축기 140 이상(질환의심)과 120 미만(정상A) 기준 수치가 항목 정보의 판정 기준과 일치합니다."
+      }
+    },
+    {
+      "id": "cal-005",
+      "stratum": "other_item_only",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "unsupported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "근거 2는 허리둘레의 판정기준 수치만 제시할 뿐, BMI와 함께 보면 체중 관리 방향 이해에 도움이 된다는 내용은 없다.",
+        "band": "판정 구간이나 기준 수치를 말하지 않는다."
+      }
+    },
+    {
+      "id": "cal-006",
+      "stratum": "rest",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "partial",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "진료와 검사가 필요하다는 부분은 근거 2에서 확인되지만, '수치가 기준보다 낮다'는 HDL 기준은 인용 근거에 없고 근거 1은 LDL 기준이다.",
+        "band": "구간 이름이나 구체적 기준 수치를 말하지 않고 '기준보다 낮다'고만 했다."
+      }
+    },
+    {
+      "id": "cal-008",
+      "stratum": "other_item_only",
+      "axes": [
+        "support",
+        "band"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "memo": "질환 의심이라고 해야 되는 건 아닌건가? 잘 모르겠어서 물어본거야",
+      "judgeReason": {
+        "support": "근거는 당뇨병 환자의 LDL 목표치(100 또는 70 mg/dL 미만)를 말하지만, 일반 기준보다 더 낮다는 비교와 의료진 상의 권유는 근거에 없다.",
+        "band": "문장은 당뇨병 동반 시 목표치가 더 낮다고만 말하며 수치를 직접 제시하지 않는다. 이는 항목 정보의 '당뇨병 동반 시 100 미만'과 모순되지 않는다."
+      }
+    },
+    {
+      "id": "cal-009",
+      "stratum": "rest",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "정상A와 정상B 기준 수치는 근거에서 확인되지만, 이번 결과가 그보다 높은 구간이라는 판단은 근거 문단에 없다.",
+        "band": "정상A 18.5~24.9, 정상B 25~29.9 및 18.5 미만은 항목 정보와 일치하고, 결과 31.9는 이 구간들보다 높아 맞다."
+      }
+    },
+    {
+      "id": "cal-011",
+      "stratum": "neighbor_band",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "정상B(경계) 구간이 100-125 mg/dL이라는 기준은 근거에서 확인된다. 그러나 결과값 123 mg/dL과 그 값이 해당 구간에 속한다는 내용은 근거 문단에 없다.",
+        "band": "123 mg/dL은 정상B(경계) 100-125 구간에 해당하며, 문장이 말한 구간과 기준 수치가 항목 정보와 일치한다."
+      }
+    },
+    {
+      "id": "cal-013",
+      "stratum": "other_item_only",
+      "axes": [
+        "support",
+        "band"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "unsupported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "인용한 근거는 혈압 판정기준표이며 성별에 따른 기준 차이, 경계 구간 해석, 생활습관 점검 등의 내용이 없다.",
+        "band": "문장이 말한 '경계 구간'은 결과값 38 U/L(여 정상B 36-45)과 맞고, 성별에 따라 기준이 다르다는 말도 항목 정보와 일치한다."
+      }
+    },
+    {
+      "id": "cal-014",
+      "stratum": "other_item_only",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "partial",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "근거는 이상지질혈증이 신질환·간질환·췌장염 등과 연관될 수 있다는 내용이며, 간장질환과 다른 질환의 연관성이나 관련 질환 확인은 근거에 없다.",
+        "band": "판정 구간이나 기준 수치를 말하지 않는다."
+      }
+    },
+    {
+      "id": "cal-015",
+      "stratum": "other_item_only",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "partial",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "근거는 허리둘레의 판정기준만 제시하며, BMI와 함께 확인하면 체형 이해에 도움이 된다는 주장은 근거에 없다.",
+        "band": "문장이 판정 구간이나 기준 수치를 언급하지 않는다."
+      }
+    },
+    {
+      "id": "cal-017",
+      "stratum": "rest",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "memo": "이렇게 완전 참고치에서 너무 벗어날 때는 또 다른 말 해주는 게 좋으려냐?",
+      "judgeReason": {
+        "support": "질환의심 기준(남 78 이상, 여 46 이상)은 근거에서 확인되지만, 결과값 277 U/L과 이 결과가 질환의심에 해당한다는 판정은 근거 문단에 없다.",
+        "band": "남성 277 U/L은 질환의심 기준인 78 이상에 해당하며, 문장이 말한 남 78 이상, 여 46 이상 기준도 항목 정보와 일치한다."
+      }
+    },
+    {
+      "id": "cal-018",
+      "stratum": "other_item_only",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "partial",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "unsupported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "memo": "근데 정상B 인데 의료진과 상의하라는 말 밖에 없어서 좀 그런 거 같은데",
+      "judgeReason": {
+        "support": "인용한 근거 1, 2는 HDL과 총콜레스테롤의 판정 기준표일 뿐이며, 중성지방을 이들과 함께 보라는 관계나 의료진 상담 내용은 근거에 없다.",
+        "band": "문장이 판정 구간이나 기준 수치를 말하지 않는다."
+      }
+    },
+    {
+      "id": "cal-019",
+      "stratum": "other_item_only",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "partial",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "근거는 고혈압이 있는 당뇨병 환자에게 집에서 혈압을 자주 측정하라고 하지만, 결과를 의료진에게 알리라는 내용은 없다.",
+        "band": "판정 구간이나 기준 수치를 말하지 않는다."
+      }
+    },
+    {
+      "id": "cal-020",
+      "stratum": "rest",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "기준(1.5 이하 정상A, 1.5 초과 질환의심)은 근거에서 확인된다. 다만 결과값 2.60 mg/dL과 그것이 질환의심에 해당한다는 개별 판정은 근거에 없다.",
+        "band": "2.60은 1.5를 초과하므로 질환의심이고, 말한 기준 수치도 항목 정보와 일치한다."
+      }
+    },
+    {
+      "id": "cal-025",
+      "stratum": "neighbor_band",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "memo": "특정 병을 언급하는 것 보다 관리하라고 하는 것이 낫지않나?",
+      "judgeReason": {
+        "support": "문장의 100~125 범위, 정상보다 높음, 당뇨병 126 이상 기준 미만이라는 내용이 근거에서 그대로 확인된다.",
+        "band": "100~125mg/dL와 126 이상 기준이 항목 정보의 정상B(경계) 100-125, 질환의심 126 이상과 일치하며 결과값 111도 이 구간에 속한다."
+      }
+    },
+    {
+      "id": "cal-026",
+      "stratum": "rest",
+      "axes": [
+        "support",
+        "band"
+      ],
+      "human": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "memo": "허리 둘레로 질환까지 얘기하나 보통?",
+      "judgeReason": {
+        "support": "문장은 질환의심 판정의 정의(발전 가능성, 추적검사, 전문 의료기관 확인)를 말 바꿔 설명하며 근거에서 확인된다. 진료 상담 권유는 전문 의료기관 확인 권유와 같은 취지다.",
+        "band": "구간 이름이나 기준 수치를 직접 말하지 않고 질환의심의 의미만 설명한다."
+      }
+    },
+    {
+      "id": "cal-027",
+      "stratum": "other_item_only",
+      "axes": [
+        "band"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "supported",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "근거 문단이 체중 증가에 따른 LDL·중성지방 상승과 HDL 저하, BMI 23 미만 유지 권고를 직접 말하고 있다.",
+        "band": "문장은 BMI 23 미만이라는 기준 수치를 말하는데, 항목 정보의 판정 기준(정상A 18.5-24.9, 정상B 25-29.9, 질환의심 30 이상)에는 23이 없어 다른 기준 수치에 해당한다."
+      }
+    },
+    {
+      "id": "cal-029",
+      "stratum": "other_item_only",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "unsupported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "인용한 근거 1(중성지방)과 근거 2(혈압)는 감마지티피나 간장질환, AST·ALT를 다루지 않아 문장의 어떤 주장도 확인되지 않는다.",
+        "band": "문장이 판정 구간이나 기준 수치를 말하지 않는다."
+      }
+    },
+    {
+      "id": "cal-030",
+      "stratum": "other_item_only",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "partial",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "서로 다른 날 2회 이상 측정해 확인한다는 내용은 근거에서 확인된다. 그러나 의료진과 상의해 재측정·진료를 받으라는 권유는 근거에 없다.",
+        "band": "구간 이름이나 기준 수치를 말하지 않는다."
+      }
+    },
+    {
+      "id": "cal-031",
+      "stratum": "rest",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "근거 1은 요단백의 구간별 기준만 제시한다. 기준 설명은 확인되지만, 결과가 양성(1+)이고 질환의심에 해당한다는 개별 결과는 근거에서 확인되지 않는다.",
+        "band": "질환의심 구간과 정상A, 정상B, 질환의심의 기준 수치가 모두 항목 정보와 일치한다."
+      }
+    },
+    {
+      "id": "cal-032",
+      "stratum": "neighbor_band",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "근거 1에서 당뇨병 기준이 126 mg/dL 이상임은 확인되지만, 공복혈당 126 이상이 당뇨병 의심 구간이라는 직접 문장과 추가 검사·의료기관 진단 필요성은 근거에 없습니다.",
+        "band": "126 mg/dL 이상이 질환의심 구간이라는 기준이 항목 정보와 맞고 결과값 136도 해당합니다."
+      }
+    },
+    {
+      "id": "cal-033",
+      "stratum": "other_item_only",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "partial",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "unsupported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "인용한 근거는 당뇨병 환자의 정기 진찰 중 혈압 측정과 고혈압 진단 기준을 다루지만, 혈압 결과가 있을 때 의료진의 정기 진찰을 받으라는 권고는 근거에 없다.",
+        "band": "'기준 구간에 해당'이라고만 하고 구체적인 구간 이름이나 수치를 말하지 않는다."
+      }
+    },
+    {
+      "id": "cal-035",
+      "stratum": "other_item_only",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "unsupported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "문장은 인용한 근거의 질환의심 정의를 말만 바꿔 그대로 옮긴 것이며, 더해진 주장이 없다.",
+        "band": "'질환의심'이라는 구간 이름은 언급하지만 이 항목의 기준 수치(남 90 이상)나 결과값은 말하지 않는다. 구간의 일반 정의만 설명한다."
+      }
+    },
+    {
+      "id": "cal-036",
+      "stratum": "other_item_only",
+      "axes": [
+        "support",
+        "treatment"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "partial",
+        "band": "not_stated",
+        "treatment": "present"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "기저 질환 연관 시 해당 질환 치료도 함께 필요하다는 내용은 근거에서 확인되지만, 의료진과 확인하라는 조언은 근거에 없다. 또한 근거는 이상지질혈증 문단이다.",
+        "band": "판정 구간이나 기준 수치를 언급하지 않는다."
+      }
+    },
+    {
+      "id": "cal-037",
+      "stratum": "rest",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "정상A 기준 35 이하는 근거에서 확인되지만, 생활습관 점검과 추후 검사 권고는 근거에 없다.",
+        "band": "정상A 기준 35 U/L 이하는 항목 정보의 판정 기준과 일치한다."
+      }
+    },
+    {
+      "id": "cal-040",
+      "stratum": "rest",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "근거는 정상B(경계)의 일반적 정의만 담고 있고, 혈색소 항목의 구체적 수치 기준은 없어 해당 수치 주장은 확인되지 않는다.",
+        "band": "12.3 g/dL은 남성 정상B(경계) 12.0-12.9 구간에 해당하며, 문장이 말한 남녀 기준 수치도 항목 정보와 일치한다."
+      }
+    },
+    {
+      "id": "cal-041",
+      "stratum": "other_item_only",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "unsupported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "인용된 근거는 HDL 콜레스테롤과 중성지방의 판정 기준표일 뿐이며, 총콜레스테롤이 여러 콜레스테롤의 총량이라는 설명이나 HDL·LDL을 함께 보라는 조언은 확인되지 않는다. LDL에 대한 근거도 없다.",
+        "band": "문장이 판정 구간이나 기준 수치를 말하지 않는다."
+      }
+    },
+    {
+      "id": "cal-043",
+      "stratum": "neighbor_band",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "질환의심 기준 126 이상은 근거에서 확인되지만, 결과값 158 mg/dL과 그것이 질환의심에 해당한다는 판단은 근거 문단에 없고 항목 정보에만 있다.",
+        "band": "158 mg/dL은 126 이상으로 질환의심 구간이며, 기준 수치 126 이상도 항목 정보와 일치한다."
+      }
+    },
+    {
+      "id": "cal-045",
+      "stratum": "other_item_only",
+      "axes": [
+        "treatment"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "present"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "문장은 질환과 연관된 경우 해당 질환의 치료도 함께 이루어져야 한다는 근거 내용을 그대로 말 바꿈한 것이다.",
+        "band": "판정 구간이나 기준 수치를 언급하지 않는다."
+      }
+    },
+    {
+      "id": "cal-046",
+      "stratum": "other_item_only",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "partial",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "unsupported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "근거 1은 ALT 판정 기준표이고 근거 2는 이상지질혈증 증상 설명이라, AST 판정이 기준보다 높다는 의미나 추가 진료·검사 안내는 어느 쪽에서도 확인되지 않는다.",
+        "band": "구간 이름이나 기준 수치를 말하지 않고 '기준보다 높다'고만 했다."
+      }
+    },
+    {
+      "id": "cal-047",
+      "stratum": "rest",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "질환의심 기준(남 12.0 미만, 여 10.0 미만)은 근거에서 확인된다. 그러나 결과값 9.8 g/dL과 이 사람이 질환의심에 해당한다는 판정은 항목 정보에만 있고 근거에는 없다.",
+        "band": "남성 9.8 g/dL은 질환의심 기준인 12.0 미만에 해당하고, 말한 기준 수치도 항목 정보와 일치한다."
+      }
+    },
+    {
+      "id": "cal-048",
+      "stratum": "rest",
+      "axes": [
+        "support"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "구간 기준 설명은 근거 1에서 확인된다. 하지만 이 사람의 결과값(양성 1+)과 질환의심 판정은 근거 문단에 없고 항목 정보에만 있다.",
+        "band": "양성(1+)은 질환의심, 정상A 음성, 정상B 약양성, 질환의심 양성(+1) 이상이라는 설명이 모두 항목 정보와 일치한다."
+      }
+    },
+    {
+      "id": "cal-050",
+      "stratum": "other_item_only",
+      "axes": [
+        "treatment"
+      ],
+      "human": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "judge": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "present"
+      },
+      "memo": "",
+      "judgeReason": {
+        "support": "간질환 등 기저 질환과 연관된 경우 해당 질환의 치료도 함께 이루어져야 한다는 내용이 근거에 그대로 있다.",
+        "band": "판정 구간이나 기준 수치를 말하지 않는다."
+      }
+    }
+  ]
+}
