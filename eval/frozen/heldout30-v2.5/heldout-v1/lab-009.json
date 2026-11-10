@@ -1,0 +1,180 @@
+{
+  "report": {
+    "examDate": "2026-07-31",
+    "examType": "UNKNOWN",
+    "sex": "FEMALE",
+    "age": 38,
+    "items": [
+      {
+        "code": "URINE_PROTEIN",
+        "rawName": "요단백(U-Protein)",
+        "value": "약양성(±)",
+        "unit": null,
+        "referenceRaw": "음성",
+        "centerJudgment": "경계"
+      },
+      {
+        "code": "HEMOGLOBIN",
+        "rawName": "혈색소(Hb)",
+        "value": "15.2",
+        "unit": "g/dL",
+        "referenceRaw": "12.0~15.5",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "FASTING_GLUCOSE",
+        "rawName": "공복혈당(FBS)",
+        "value": "150",
+        "unit": "mg/dL",
+        "referenceRaw": "100 미만",
+        "centerJudgment": "이상"
+      },
+      {
+        "code": "SERUM_CREATININE",
+        "rawName": "혈청 크레아티닌(Cr)",
+        "value": "1.36",
+        "unit": "mg/dL",
+        "referenceRaw": "1.5 이하",
+        "centerJudgment": "경계"
+      },
+      {
+        "code": "EGFR",
+        "rawName": "신사구체여과율(eGFR)",
+        "value": "63",
+        "unit": "mL/min/1.73m²",
+        "referenceRaw": "60 이상",
+        "centerJudgment": "경계"
+      },
+      {
+        "code": "AST",
+        "rawName": "SGOT(AST)",
+        "value": "28",
+        "unit": "U/L",
+        "referenceRaw": "40 이하",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "ALT",
+        "rawName": "SGPT(ALT)",
+        "value": "25",
+        "unit": "U/L",
+        "referenceRaw": "35 이하",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "GAMMA_GTP",
+        "rawName": "감마지티피(r-GTP)",
+        "value": "27",
+        "unit": "U/L",
+        "referenceRaw": "8~35",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "CHEST_XRAY",
+        "rawName": "흉부 X-ray",
+        "value": "정상",
+        "unit": null,
+        "referenceRaw": "정상",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "HEIGHT",
+        "rawName": "신장",
+        "value": "153.9",
+        "unit": "cm",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "WEIGHT",
+        "rawName": "체중",
+        "value": "55.7",
+        "unit": "kg",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "WAIST_CIRCUMFERENCE",
+        "rawName": "허리둘레",
+        "value": "81",
+        "unit": "cm",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "BMI",
+        "rawName": "체질량지수",
+        "value": "23.5",
+        "unit": "kg/m²",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "SYSTOLIC_BP",
+        "rawName": "혈압(수축기)",
+        "value": "106",
+        "unit": "mmHg",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "DIASTOLIC_BP",
+        "rawName": "혈압(이완기)",
+        "value": "77",
+        "unit": "mmHg",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "VISION_LEFT",
+        "rawName": "시력(좌)",
+        "value": "1.0",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "VISION_RIGHT",
+        "rawName": "시력(우)",
+        "value": "0.7",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "HEARING_LEFT",
+        "rawName": "청력(좌)",
+        "value": "정상",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "HEARING_RIGHT",
+        "rawName": "청력(우)",
+        "value": "비정상",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": "비정상"
+      }
+    ]
+  },
+  "needsReview": [],
+  "metrics": {
+    "model": "claude-haiku-5-5",
+    "promptVersion": "extraction-v1",
+    "pipeline": "validated-v2.5-noretry",
+    "latencyMs": 4376,
+    "promptTokens": 4120,
+    "completionTokens": 1281,
+    "attempts": 1,
+    "retriedSegments": 0,
+    "issues": {
+      "RAW_NAME_NOT_IN_SOURCE": 6,
+      "UNGROUNDED_FIELD": 8
+    },
+    "firstPassLatencyMs": 4349,
+    "firstPassPromptTokens": 4120,
+    "firstPassCompletionTokens": 1281
+  }
+}

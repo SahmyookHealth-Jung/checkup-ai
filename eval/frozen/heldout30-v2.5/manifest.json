@@ -1,0 +1,293 @@
+{
+  "name": "heldout30-v2.5",
+  "createdAt": "2026-11-10T23:30:49",
+  "git": {
+    "commit": "5f1feb6",
+    "dirty": true
+  },
+  "extraction": {
+    "model": "claude-haiku-5-5",
+    "promptVersion": "extraction-v1",
+    "pipeline": "validated-v2.5-noretry",
+    "settings": "firstPassMaxTokens=2500,retryMaxTokens=600,retryBatchSize=4,thinking=disabled,redaction=true"
+  },
+  "datasets": [
+    "heldout-v1",
+    "heldout-v2",
+    "heldout-v3"
+  ],
+  "reports": 30,
+  "meanF1": 0.9964,
+  "documents": [
+    {
+      "dataset": "heldout-v1",
+      "id": "lab-001",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v1",
+      "id": "lab-002",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v1",
+      "id": "lab-003",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v1",
+      "id": "lab-004",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v1",
+      "id": "lab-005",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v1",
+      "id": "lab-006",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v1",
+      "id": "lab-007",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v1",
+      "id": "lab-008",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v1",
+      "id": "lab-009",
+      "cached": false,
+      "f1": 0.9744,
+      "fp": 0,
+      "fn": 1,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v1",
+      "id": "lab-010",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v2",
+      "id": "trend-001",
+      "cached": false,
+      "f1": 0.9189,
+      "fp": 0,
+      "fn": 3,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v2",
+      "id": "trend-002",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v2",
+      "id": "trend-003",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v2",
+      "id": "trend-004",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v2",
+      "id": "trend-005",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v2",
+      "id": "trend-006",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v2",
+      "id": "trend-007",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v2",
+      "id": "trend-008",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v2",
+      "id": "trend-009",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v2",
+      "id": "trend-010",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v3",
+      "id": "guide-001",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v3",
+      "id": "guide-002",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v3",
+      "id": "guide-003",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v3",
+      "id": "guide-004",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v3",
+      "id": "guide-005",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v3",
+      "id": "guide-006",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v3",
+      "id": "guide-007",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v3",
+      "id": "guide-008",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v3",
+      "id": "guide-009",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v3",
+      "id": "guide-010",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    }
+  ]
+}
