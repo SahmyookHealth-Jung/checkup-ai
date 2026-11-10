@@ -1,0 +1,225 @@
+{
+  "schema": "checkup-ai/eval-run@1",
+  "runId": "20261111-0034_faithfulness_20261110-2337_explanation_heldout30-v2.5_baseline_low_trial",
+  "kind": "faithfulness",
+  "label": "trial",
+  "createdAt": "2026-11-11T00:34:23",
+  "git": {
+    "commit": "a64866d",
+    "dirty": true
+  },
+  "dataset": {
+    "name": "20261110-2337_explanation_heldout30-v2.5_baseline",
+    "source": "explanation",
+    "runs": [
+      2
+    ],
+    "sentences": 3
+  },
+  "config": {
+    "model": "claude-sonnet-5-5",
+    "rubric": "faithfulness-v1",
+    "prompt": "judge-v1",
+    "setting": "low",
+    "settingDetail": {
+      "thinking": {
+        "type": "adaptive"
+      },
+      "output_config": {
+        "effort": "low"
+      },
+      "max_tokens": 8000
+    },
+    "repeats": 1
+  },
+  "summary": {
+    "calls": 3,
+    "judged": 3,
+    "errors": 0,
+    "support": {
+      "partial": 3
+    },
+    "supportRaw": {
+      "partial": 3
+    },
+    "passRate": 0.0,
+    "passed": 0,
+    "bandWrong": 0,
+    "treatmentPresent": 0,
+    "quoteVerifyFailed": 0,
+    "selfConsistency": null,
+    "byStratum": {
+      "other_item_only": {
+        "judged": 1,
+        "pass": 0,
+        "support": {
+          "partial": 1
+        }
+      },
+      "rest": {
+        "judged": 2,
+        "pass": 0,
+        "support": {
+          "partial": 2
+        }
+      }
+    },
+    "costUsd": 0.017,
+    "avgCostUsd": 0.00567,
+    "avgLatencyMs": 3404,
+    "avgTokens": {
+      "input_tokens": 508,
+      "output_tokens": 279,
+      "cache_creation_input_tokens": 691,
+      "cache_read_input_tokens": 1381
+    },
+    "fromCache": 0
+  },
+  "details": [
+    {
+      "id": "r2/heldout-v1/lab-001/BMI/1",
+      "stratum": "rest",
+      "itemCode": "BMI",
+      "text": "체질량지수(BMI)는 33.5 kg/m²로, 국가건강검진 기준에서 질환의심(30 이상) 구간에 해당합니다.",
+      "sources": [
+        "mohw-annex4-row-bmi"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 354,
+            "output_tokens": 254,
+            "cache_creation_input_tokens": 2072,
+            "cache_read_input_tokens": 0
+          },
+          "costUsd": 0.008428,
+          "latencyMs": 4295,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "질환의심: 30 이상",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "BMI 결과값이 33.5 kg/m²라는 내용은 인용한 근거에서 확인되지 않음"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "질환의심 기준이 30 이상이라는 내용은 근거에서 확인되지만, 결과값 33.5는 근거에 없고 항목 정보에서만 확인된다.",
+              "band": "BMI 33.5는 30 이상이므로 질환의심 구간이며, 문장이 말한 기준 수치도 항목 정보와 일치한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "r2/heldout-v1/lab-001/BMI/2",
+      "stratum": "rest",
+      "itemCode": "BMI",
+      "text": "정상A 기준은 18.5~24.9, 정상B(경계)는 25~29.9입니다. 이 결과는 비만과 관련된 검사에서 진료나 추가 검사가 필요한 구간으로 정해져 있습니다.",
+      "sources": [
+        "mohw-annex4-row-bmi",
+        "mohw-annex4-row-triglycerides"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 519,
+            "output_tokens": 290,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2072
+          },
+          "costUsd": 0.004145,
+          "latencyMs": 2595,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "정상A: 18.5-24.9 / 정상B(경계): 25-29.9, 18.5 미만 / 질환의심: 30 이상",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "이 결과가 진료나 추가 검사가 필요한 구간으로 정해져 있다는 내용"
+            ],
+            "band": "correct",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "정상A와 정상B(경계) 기준 수치는 근거 1에서 확인된다. 그러나 이 결과가 진료나 추가 검사가 필요한 구간이라는 내용은 근거에 없다.",
+              "band": "정상A 18.5~24.9와 정상B(경계) 25~29.9는 항목 정보의 기준과 일치한다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    },
+    {
+      "id": "r2/heldout-v1/lab-001/BMI/3",
+      "stratum": "other_item_only",
+      "itemCode": "BMI",
+      "text": "체중 조절은 이상지질혈증 관리에서도 중요하며, 체질량지수를 23 미만으로 유지하는 것이 바람직하다고 설명됩니다. 정확한 상태는 의료진과 상담해 확인해 보시기 바랍니다.",
+      "sources": [
+        "kdca-6715-lifestyle-treatment-2",
+        "mohw-annex4-def-suspect-chronic"
+      ],
+      "repeats": [
+        {
+          "repeat": 1,
+          "usage": {
+            "input_tokens": 652,
+            "output_tokens": 294,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 2072
+          },
+          "costUsd": 0.004451,
+          "latencyMs": 3323,
+          "stopReason": "end_turn",
+          "result": {
+            "support": "partial",
+            "supportRaw": "partial",
+            "quoteVerified": true,
+            "quotes": [
+              {
+                "source": 1,
+                "quote": "체중 조절도 매우 중요합니다.",
+                "found": true
+              },
+              {
+                "source": 1,
+                "quote": "체질량지수(BMI)를 23 미만으로 유지하고",
+                "found": true
+              }
+            ],
+            "unsupportedClaims": [
+              "정확한 상태는 의료진과 상담해 확인해 보시기 바랍니다(상담 권고)는 근거에 없음"
+            ],
+            "band": "not_stated",
+            "treatment": "none",
+            "treatmentQuote": "",
+            "reason": {
+              "support": "체중 조절과 BMI 23 미만 유지는 근거 1에서 확인되지만, 의료진 상담 권고는 인용한 근거에 없다.",
+              "band": "BMI 23 미만은 관리 목표로 언급될 뿐, 검진 판정 구간이나 기준 수치를 말한 것이 아니다."
+            }
+          },
+          "cached": false
+        }
+      ]
+    }
+  ]
+}
