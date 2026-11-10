@@ -20,7 +20,7 @@ spring:
       embedding:
         model: bge-m3                      # Spring AI 2.0 키. 1.x의 embedding.options.model은 deprecated
       chat:
-        model: ${OLLAMA_CHAT_MODEL:qwen3:4b}   # 임시 선택. 2단계 모델 비교 후 ADR 0005에서 확정
+        model: ${OLLAMA_CHAT_MODEL:qwen3:4b}   # 오프라인 모드(application-offline.yml)에서만 채팅에 쓴다 (ADR 0005)
         temperature: 0                     # 추출은 재현성이 중요하다
         think: false                       # 사고 과정 출력 끔 (CPU에서 토큰 낭비)
         num-ctx: 8192                      # 결과지 + 출력 JSON이 기본 4096을 넘을 수 있다
@@ -44,7 +44,7 @@ spring:
 
     vectorstore:
       pgvector:
-        # 벡터 테이블(메타데이터, 키워드 검색 컬럼, 인덱스)은 2주차에 설계해 Flyway로 만든다.
+        # 벡터 테이블(메타데이터, 키워드 검색 컬럼, 인덱스)은 4단계 RAG 설계(ADR)에서 정해 Flyway로 만든다.
         initialize-schema: false
         dimensions: 1024                   # bge-m3 출력 차원
 
