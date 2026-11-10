@@ -54,9 +54,8 @@ checkup-ai/
 │   ├── core/                공통 기반: AI 호출 관측·비용, 공통 가드레일, 예외
 │   ├── report/              기능 1: 결과지 추출 + RAG 해설
 │   ├── stats/               기능 2: Text-to-SQL (7단계에 추가)
-│   └── app/                 실행 모듈: 조립, 설정(application.yml), Flyway 마이그레이션
+│   └── app/                 실행 모듈: 조립, 설정(application.yml), Flyway 마이그레이션, 최소 화면(정적 HTML, ADR 0007)
 ├── eval/                    Python 평가 스크립트·평가셋 (응답 캐시는 gitignore)
-├── frontend/                React + Vite (4단계에 최소 화면)
 ├── data/guidelines/         공개 가이드라인 출처 목록 (원문은 raw/에 내려받고 gitignore)
 ├── data/synthetic/          합성 검진 결과지
 ├── docs/                    PROJECT_BRIEF, adr/, devlog
