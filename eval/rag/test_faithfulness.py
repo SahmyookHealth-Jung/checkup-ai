@@ -53,6 +53,14 @@ class PromptAndCostTest(unittest.TestCase):
         for label in ("supported", "partial", "unsupported", "correct", "wrong", "not_stated", "none", "present"):
             self.assertIn(label, system_prompt())
 
+    def test_system_prompt_has_guide_and_user_message_has_sex(self):
+        from rag.faithfulness_rubric import GUIDE
+        for line in GUIDE:
+            self.assertIn(line, system_prompt())
+        item = {"name": "감마지티피", "value": "66", "unit": "U/L", "judgmentLabel": "정상B(경계)", "criterion": "x", "sex": "MALE"}
+        self.assertIn("성별: 남", user_message(item, "문장", SOURCES))
+        self.assertIn("성별: 모름", user_message({**item, "sex": None}, "문장", SOURCES))
+
     def test_user_message_numbers_sources_in_order(self):
         item = {"name": "공복혈당", "value": "131", "unit": "mg/dL", "judgmentLabel": "질환의심", "criterion": "126 이상"}
         message = user_message(item, "문장", SOURCES)

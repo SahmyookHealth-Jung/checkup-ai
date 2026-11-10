@@ -59,6 +59,8 @@ details dl { margin: 8px 0 0; }
 details dt { font-weight: 600; margin-top: 8px; }
 details dd { margin: 2px 0 0 0; color: var(--muted); font-size: 14px; }
 input[type=file] { display: none; }
+.guide { margin: 0; padding-left: 20px; }
+.guide li { margin: 4px 0; }
 </style>
 </head>
 <body>
@@ -74,8 +76,11 @@ input[type=file] { display: none; }
 </header>
 <main>
   <section>
+    <p class="label">판단 요령 (<span id="rubricVersion"></span>)</p>
+    <ul class="guide" id="guide"></ul>
+    <p class="hint" id="prefillNote"></p>
     <details>
-      <summary>판단 기준 보기 (라벨링 전에 한 번 읽어 주세요)</summary>
+      <summary>라벨별 정의 보기</summary>
       <p class="hint">"뒷받침"은 <b>그 문장이 인용한 근거만</b> 보고 판단합니다. 항목 정보와 내용이 맞아도 인용이 엉뚱하면 미지지입니다. "판정 구간"은 위쪽 항목 정보와 비교합니다.</p>
       <dl id="rubric"></dl>
     </details>
@@ -113,7 +118,11 @@ const DATA = __DATA__;
 const KEYS = { support: ["1", "2", "3"], band: ["q", "w", "e"], treatment: ["a", "s"] };
 const STORE = "checkup-ai:" + DATA.set + ":" + DATA.rubricVersion;
 let labels = {};
-try { labels = JSON.parse(localStorage.getItem(STORE) || "{}"); } catch (e) { labels = {}; }
+let stored = null;
+try { stored = localStorage.getItem(STORE); } catch (e) { stored = null; }
+try { labels = JSON.parse(stored || "{}"); } catch (e) { labels = {}; }
+// 처음 열 때만 이전 기준의 라벨을 미리 채운다 (DATA.prefill). 고친 내용은 이 브라우저에 따로 저장된다
+if (!stored && DATA.prefill) { labels = JSON.parse(JSON.stringify(DATA.prefill.labels)); }
 let index = 0;
 
 const $ = (id) => document.getElementById(id);
@@ -128,6 +137,11 @@ const complete = (l) => l && axisNames.every((a) => l[a]);
 const save = () => { try { localStorage.setItem(STORE, JSON.stringify(labels)); } catch (e) { $("status").textContent = "자동 저장이 안 됩니다. 중간에 '라벨 내려받기'로 저장해 주세요."; } };
 
 function renderRubric() {
+  $("rubricVersion").textContent = DATA.rubricVersion;
+  $("guide").replaceChildren(...(DATA.guide || []).map((g) => el("li", {}, g)));
+  if (DATA.prefill) {
+    $("prefillNote").textContent = `처음 열 때 ${DATA.prefill.rubricVersion} 기준의 1차 라벨을 미리 채웠습니다. 위 요령에 맞지 않는 것만 고치시면 됩니다.`;
+  }
   const dl = $("rubric");
   axisNames.forEach((a) => {
     const axis = DATA.axes[a];
@@ -147,6 +161,7 @@ function render() {
   $("item").replaceChildren(
     el("div", {}, el("span", { class: "label" }, "항목"), el("b", {}, it.name)),
     el("div", {}, el("span", { class: "label" }, "결과값"), el("b", {}, it.value + (it.unit ? " " + it.unit : ""))),
+    el("div", {}, el("span", { class: "label" }, "성별"), el("b", {}, { MALE: "남", FEMALE: "여" }[it.sex] || "모름")),
     el("div", {}, el("span", { class: "label" }, "판정 (국가건강검진 기준)"), el("b", {}, it.judgmentLabel)));
   $("criterion").textContent = it.criterion ? "판정 기준: " + it.criterion : "";
   $("sentence").textContent = row.text;
@@ -209,9 +224,9 @@ $("export").addEventListener("click", () => {
   const rows = DATA.rows.map((r) => ({ calId: r.calId, ...(labels[r.calId] || {}) }));
   const missing = rows.filter((r) => !complete(r)).length;
   const out = { set: DATA.set, rubricVersion: DATA.rubricVersion, exportedAt: new Date().toISOString(),
-    complete: missing === 0, labels: rows };
+    complete: missing === 0, prefilledFrom: DATA.prefill ? DATA.prefill.rubricVersion : null, labels: rows };
   const a = el("a", { href: URL.createObjectURL(new Blob([JSON.stringify(out, null, 2)], { type: "application/json" })),
-    download: DATA.set + ".labels.json" });
+    download: `${DATA.set}.labels-${DATA.rubricVersion}.json` });
   document.body.append(a); a.click(); a.remove();
   $("status").textContent = missing ? `미완료 ${missing}개가 있는 상태로 내려받았습니다.` : "50개 모두 내려받았습니다.";
 });

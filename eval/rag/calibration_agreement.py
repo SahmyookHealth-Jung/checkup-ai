@@ -4,7 +4,7 @@
 축마다 κ(3단계, 2단계), 단순 일치율, 혼동 행렬, 불일치 목록을 낸다. 채점기는 반복 회차의 다수결을 쓴다(동률은 엄격한 쪽).
 
 사용법 (eval/ 폴더에서):
-    .venv/bin/python -m rag.calibration_agreement --judge results/faithfulness/<runId>.json [--labels calibration/calibration-v1.labels.json]
+    .venv/bin/python -m rag.calibration_agreement --judge results/faithfulness/<runId>.json [--labels calibration/calibration-v1.labels-faithfulness-v1.1.json]
 """
 from __future__ import annotations
 
@@ -52,7 +52,7 @@ def compare(labels: dict, judge: dict) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--judge", type=Path, required=True)
-    parser.add_argument("--labels", type=Path, default=Path("calibration/calibration-v1.labels.json"))
+    parser.add_argument("--labels", type=Path, default=Path(f"calibration/calibration-v1.labels-{RUBRIC_VERSION}.json"))
     args = parser.parse_args()
     judge_path = args.judge if args.judge.is_absolute() else EVAL_DIR / args.judge
     labels_path = args.labels if args.labels.is_absolute() else EVAL_DIR / args.labels

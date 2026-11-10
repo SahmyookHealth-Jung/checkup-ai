@@ -16,11 +16,11 @@ import re
 import time
 from pathlib import Path
 
-from rag.faithfulness_rubric import AXES, VERSION as RUBRIC_VERSION
+from rag.faithfulness_rubric import AXES, GUIDE, VERSION as RUBRIC_VERSION
 from run_record import EVAL_DIR
 
 MODEL = "claude-sonnet-5-5"
-PROMPT_VERSION = "judge-v1"
+PROMPT_VERSION = "judge-v2"  # v2: 판단 요령(GUIDE)과 성별 추가 (채점 기준 v1.1)
 CACHE_DIR = EVAL_DIR / ".cache" / "judge"
 # 100만 토큰당 달러. 출처: claude-api 스킬 shared/models.md, model-migration.md (2026-11-11 확인).
 # 캐시 쓰기는 5분 TTL 가격이다
@@ -79,6 +79,9 @@ def system_prompt() -> str:
         "- 일반 의학 상식으로 맞는 말이어도, 근거 문단에 없으면 뒷받침되지 않은 것이다.",
         "",
     ]
+    lines.append("판단 요령")
+    lines += [f"- {g}" for g in GUIDE]
+    lines.append("")
     for axis_key, axis in AXES.items():
         lines.append(f"[{axis_key}] {axis['name']}: {axis['question']}")
         for value, (name, desc) in axis["labels"].items():
@@ -97,9 +100,10 @@ def system_prompt() -> str:
 
 def user_message(item: dict, sentence: str, sources: list[dict]) -> str:
     unit = f" {item['unit']}" if item.get("unit") else ""
+    sex = {"MALE": "남", "FEMALE": "여"}.get(item.get("sex") or "", "모름")
     parts = [
         "[항목 정보]",
-        f"항목: {item['name']} | 결과값: {item['value']}{unit} | 판정: {item['judgmentLabel']}",
+        f"항목: {item['name']} | 결과값: {item['value']}{unit} | 판정: {item['judgmentLabel']} | 성별: {sex}",
         f"판정 기준: {item.get('criterion') or '없음'}",
         "",
         "[해설 문장]",

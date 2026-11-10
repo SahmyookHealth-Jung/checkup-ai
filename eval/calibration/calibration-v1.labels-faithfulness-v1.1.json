@@ -1,0 +1,319 @@
+{
+  "set": "calibration-v1",
+  "rubricVersion": "faithfulness-v1.1",
+  "exportedAt": "2026-11-10T17:05:05.163Z",
+  "complete": true,
+  "prefilledFrom": "faithfulness-v1",
+  "labels": [
+    {
+      "calId": "cal-001",
+      "support": "supported",
+      "band": "not_stated",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-002",
+      "support": "supported",
+      "band": "not_stated",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-003",
+      "support": "supported",
+      "band": "correct",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-004",
+      "support": "partial",
+      "band": "correct",
+      "treatment": "none",
+      "memo": "129는 120보다 높은데 어떻게 생각해야 되는지에 대한 정확한 언급이 필요할 거 같은데"
+    },
+    {
+      "calId": "cal-005",
+      "support": "supported",
+      "band": "not_stated",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-006",
+      "support": "supported",
+      "band": "not_stated",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-007",
+      "memo": "80이면 정상 아니야?",
+      "treatment": "none",
+      "band": "not_stated",
+      "support": "supported"
+    },
+    {
+      "calId": "cal-008",
+      "support": "supported",
+      "band": "not_stated",
+      "treatment": "none",
+      "memo": "질환 의심이라고 해야 되는 건 아닌건가? 잘 모르겠어서 물어본거야"
+    },
+    {
+      "calId": "cal-009",
+      "support": "supported",
+      "band": "correct",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-010",
+      "support": "supported",
+      "band": "correct",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-011",
+      "support": "supported",
+      "band": "correct",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-012",
+      "support": "supported",
+      "band": "correct",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-013",
+      "support": "supported",
+      "band": "not_stated",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-014",
+      "support": "supported",
+      "band": "not_stated",
+      "treatment": "none",
+      "memo": ""
+    },
+    {
+      "calId": "cal-015",
+      "support": "supported",
+      "band": "not_stated",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-016",
+      "support": "supported",
+      "band": "not_stated",
+      "treatment": "none",
+      "memo": "당뇨병으로 확정을 짓고 얘기하는 느낌?"
+    },
+    {
+      "calId": "cal-017",
+      "support": "supported",
+      "band": "correct",
+      "treatment": "none",
+      "memo": "이렇게 완전 참고치에서 너무 벗어날 때는 또 다른 말 해주는 게 좋으려냐?"
+    },
+    {
+      "calId": "cal-018",
+      "support": "partial",
+      "band": "not_stated",
+      "treatment": "none",
+      "memo": "근데 정상B 인데 의료진과 상의하라는 말 밖에 없어서 좀 그런 거 같은데"
+    },
+    {
+      "calId": "cal-019",
+      "support": "supported",
+      "band": "not_stated",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-020",
+      "support": "supported",
+      "band": "correct",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-021",
+      "support": "supported",
+      "band": "correct",
+      "treatment": "none",
+      "memo": ""
+    },
+    {
+      "calId": "cal-022",
+      "support": "supported",
+      "band": "correct",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-023",
+      "band": "correct",
+      "treatment": "none",
+      "support": "supported"
+    },
+    {
+      "calId": "cal-024",
+      "support": "supported",
+      "band": "not_stated",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-025",
+      "support": "partial",
+      "band": "correct",
+      "treatment": "none",
+      "memo": "특정 병을 언급하는 것 보다 관리하라고 하는 것이 낫지않나?"
+    },
+    {
+      "calId": "cal-026",
+      "support": "partial",
+      "band": "correct",
+      "treatment": "none",
+      "memo": "허리 둘레로 질환까지 얘기하나 보통?"
+    },
+    {
+      "calId": "cal-027",
+      "support": "supported",
+      "band": "not_stated",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-028",
+      "support": "supported",
+      "band": "correct",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-029",
+      "support": "supported",
+      "band": "not_stated",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-030",
+      "support": "supported",
+      "band": "not_stated",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-031",
+      "support": "supported",
+      "band": "correct",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-032",
+      "support": "supported",
+      "band": "correct",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-033",
+      "band": "not_stated",
+      "support": "partial",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-034",
+      "support": "supported",
+      "band": "correct",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-035",
+      "support": "unsupported",
+      "band": "not_stated",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-036",
+      "band": "not_stated",
+      "support": "supported",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-037",
+      "support": "supported",
+      "band": "correct",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-038",
+      "support": "partial",
+      "band": "correct",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-039",
+      "support": "supported",
+      "band": "correct",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-040",
+      "support": "supported",
+      "band": "correct",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-041",
+      "band": "not_stated",
+      "support": "supported",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-042",
+      "support": "supported",
+      "band": "correct",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-043",
+      "support": "supported",
+      "band": "correct",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-044",
+      "support": "supported",
+      "band": "correct",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-045",
+      "support": "supported",
+      "band": "not_stated",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-046",
+      "support": "partial",
+      "band": "not_stated",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-047",
+      "support": "supported",
+      "band": "correct",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-048",
+      "support": "supported",
+      "band": "correct",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-049",
+      "support": "supported",
+      "band": "correct",
+      "treatment": "none"
+    },
+    {
+      "calId": "cal-050",
+      "support": "supported",
+      "band": "not_stated",
+      "treatment": "none"
+    }
+  ]
+}

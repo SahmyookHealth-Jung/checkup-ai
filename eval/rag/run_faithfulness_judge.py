@@ -25,7 +25,7 @@ from pathlib import Path
 
 import run_record
 from rag.agreement import self_consistency
-from rag.build_calibration_set import CHUNKS, JUDGMENT_LABELS, item_names, stratum
+from rag.build_calibration_set import CHUNKS, JUDGMENT_LABELS, item_names, report_sex, stratum
 from rag.faithfulness_judge import MODEL, PROMPT_VERSION, SETTINGS, call_judge
 from rag.faithfulness_rubric import VERSION as RUBRIC_VERSION, passes
 from run_record import EVAL_DIR, ROOT
@@ -69,11 +69,14 @@ def explanation_targets(path: Path, runs: list[int], chunks: dict) -> list[dict]
     record = json.loads(path.read_text(encoding="utf-8"))
     names = item_names()
     targets = []
+    frozen = record["dataset"].get("name") if record["dataset"].get("source") == "frozen" else None
     for report in (r for r in record["details"] if r["run"] in runs):
+        sex = report_sex(frozen, report["dataset"], report["id"])
         for it in report["output"]:
             item = {"code": it["code"], "name": names.get(it["code"], it["code"]), "value": it["value"],
                     "unit": it.get("unit"), "judgment": it["judgment"],
-                    "judgmentLabel": JUDGMENT_LABELS.get(it["judgment"], it["judgment"]), "criterion": it.get("criterion")}
+                    "judgmentLabel": JUDGMENT_LABELS.get(it["judgment"], it["judgment"]), "criterion": it.get("criterion"),
+                    "sex": sex}
             for index, s in enumerate(it["sentences"], start=1):
                 targets.append({"id": f"r{report['run']}/{report['dataset']}/{report['id']}/{it['code']}/{index}",
                                 "stratum": stratum(it["code"], s["sources"], chunks), "origin": s.get("origin", "LLM"),

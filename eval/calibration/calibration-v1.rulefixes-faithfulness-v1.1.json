@@ -1,0 +1,85 @@
+{
+  "set": "calibration-v1",
+  "rubricVersion": "faithfulness-v1.1",
+  "appliedBy": "Claude (사용자 요청, 2026-11-11)",
+  "note": "사람 판단이 아니라 규칙을 그대로 적용한 수정이다. 사용자가 v1.1 화면에서 고치던 상태 위에 적용했다. cal-026은 판정 구분 정의를 풀어 쓴 문장이라 규칙에서 빼고 사용자가 판단했다.",
+  "fixes": [
+    {
+      "calId": "cal-007",
+      "axis": "treatment",
+      "from": "present",
+      "to": "none",
+      "rule": "생활습관·자가 측정 권유는 치료·약이 아니다 (v1.1 결정)"
+    },
+    {
+      "calId": "cal-019",
+      "axis": "treatment",
+      "from": "present",
+      "to": "none",
+      "rule": "생활습관·자가 측정 권유는 치료·약이 아니다 (v1.1 결정)"
+    },
+    {
+      "calId": "cal-005",
+      "axis": "band",
+      "from": "correct",
+      "to": "not_stated",
+      "rule": "문장에 구간 이름·기준 수치가 없다"
+    },
+    {
+      "calId": "cal-008",
+      "axis": "band",
+      "from": "correct",
+      "to": "not_stated",
+      "rule": "문장에 구간 이름·기준 수치가 없다"
+    },
+    {
+      "calId": "cal-014",
+      "axis": "band",
+      "from": "correct",
+      "to": "not_stated",
+      "rule": "문장에 구간 이름·기준 수치가 없다"
+    },
+    {
+      "calId": "cal-015",
+      "axis": "band",
+      "from": "correct",
+      "to": "not_stated",
+      "rule": "문장에 구간 이름·기준 수치가 없다"
+    },
+    {
+      "calId": "cal-016",
+      "axis": "band",
+      "from": "correct",
+      "to": "not_stated",
+      "rule": "문장에 구간 이름·기준 수치가 없다"
+    },
+    {
+      "calId": "cal-018",
+      "axis": "band",
+      "from": "correct",
+      "to": "not_stated",
+      "rule": "문장에 구간 이름·기준 수치가 없다"
+    },
+    {
+      "calId": "cal-019",
+      "axis": "band",
+      "from": "correct",
+      "to": "not_stated",
+      "rule": "문장에 구간 이름·기준 수치가 없다"
+    },
+    {
+      "calId": "cal-024",
+      "axis": "band",
+      "from": "correct",
+      "to": "not_stated",
+      "rule": "문장에 구간 이름·기준 수치가 없다"
+    },
+    {
+      "calId": "cal-029",
+      "axis": "band",
+      "from": "correct",
+      "to": "not_stated",
+      "rule": "문장에 구간 이름·기준 수치가 없다"
+    }
+  ]
+}
