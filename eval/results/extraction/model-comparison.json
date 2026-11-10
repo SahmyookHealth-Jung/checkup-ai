@@ -1,18 +1,83 @@
 {
-  "prices": {"claude-haiku-5-5": [0.10, 0.50]},
+  "prices": {
+    "claude-haiku-5-5": [
+      0.1,
+      0.5
+    ]
+  },
   "runs": [
-    {"model": "qwen3:4b", "group": "개발셋 (양식 3종, 30개)", "data": "../data/synthetic/extraction/v1",
-     "results": ["results/extraction/20261109-1320_validated-v2.1_qwen3-4b_full_pdf.json",
-                 "results/extraction/20261109-1659_validated-v2.2_qwen3-4b_ids_pdf.json"],
-     "replayed": ".cache/replay/dev-qwen/out"},
-    {"model": "qwen3:4b", "group": "처음 보는 양식 (3종, 30개)", "data": "../data/synthetic/extraction/heldout-v1",
-     "results": ["results/extraction/20261109-1859_validated-v2.3_qwen3-4b_heldout-v1_full_pdf.json"],
-     "replayed": ".cache/replay/h1-v23/out"},
-    {"model": "qwen3:4b", "group": "처음 보는 양식 (3종, 30개)", "data": "../data/synthetic/extraction/heldout-v2",
-     "results": ["results/extraction/20261109-1816_validated-v2.3_qwen3-4b_heldout-v2_full_pdf.json"],
-     "replayed": ".cache/replay/h2-v23/out"},
-    {"model": "qwen3:4b", "group": "처음 보는 양식 (3종, 30개)", "data": "../data/synthetic/extraction/heldout-v3",
-     "results": ["results/extraction/20261110-1614_validated-v2.4_qwen3-4b_heldout-v3_full_pdf.json"],
-     "replayed": ".cache/replay/h3-v24/out"}
+    {
+      "model": "qwen3:4b",
+      "group": "개발셋 (양식 3종, 30개)",
+      "data": "../data/synthetic/extraction/v1",
+      "results": [
+        "results/extraction/20261109-1320_validated-v2.1_qwen3-4b_full_pdf.json",
+        "results/extraction/20261109-1659_validated-v2.2_qwen3-4b_ids_pdf.json"
+      ],
+      "replayed": ".cache/replay/dev-qwen/out"
+    },
+    {
+      "model": "qwen3:4b",
+      "group": "처음 보는 양식 (3종, 30개)",
+      "data": "../data/synthetic/extraction/heldout-v1",
+      "results": [
+        "results/extraction/20261109-1859_validated-v2.3_qwen3-4b_heldout-v1_full_pdf.json"
+      ],
+      "replayed": ".cache/replay/h1-v23/out"
+    },
+    {
+      "model": "qwen3:4b",
+      "group": "처음 보는 양식 (3종, 30개)",
+      "data": "../data/synthetic/extraction/heldout-v2",
+      "results": [
+        "results/extraction/20261109-1816_validated-v2.3_qwen3-4b_heldout-v2_full_pdf.json"
+      ],
+      "replayed": ".cache/replay/h2-v23/out"
+    },
+    {
+      "model": "qwen3:4b",
+      "group": "처음 보는 양식 (3종, 30개)",
+      "data": "../data/synthetic/extraction/heldout-v3",
+      "results": [
+        "results/extraction/20261110-1614_validated-v2.4_qwen3-4b_heldout-v3_full_pdf.json"
+      ],
+      "replayed": ".cache/replay/h3-v24/out"
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "group": "개발셋 (양식 3종, 30개)",
+      "data": "../data/synthetic/extraction/v1",
+      "results": [
+        "results/extraction/20261110-1651_validated-v2.4_claude-haiku-5-5_full_pdf.json"
+      ],
+      "replayed": ".cache/replay/haiku-dev/out"
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "group": "처음 보는 양식 (3종, 30개)",
+      "data": "../data/synthetic/extraction/heldout-v1",
+      "results": [
+        "results/extraction/20261110-1652_validated-v2.4_claude-haiku-5-5_heldout-v1_full_pdf.json"
+      ],
+      "replayed": ".cache/replay/haiku-h1/out"
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "group": "처음 보는 양식 (3종, 30개)",
+      "data": "../data/synthetic/extraction/heldout-v2",
+      "results": [
+        "results/extraction/20261110-1654_validated-v2.4_claude-haiku-5-5_heldout-v2_full_pdf.json"
+      ],
+      "replayed": ".cache/replay/haiku-h2/out"
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "group": "처음 보는 양식 (3종, 30개)",
+      "data": "../data/synthetic/extraction/heldout-v3",
+      "results": [
+        "results/extraction/20261110-1655_validated-v2.4_claude-haiku-5-5_heldout-v3_full_pdf.json"
+      ],
+      "replayed": ".cache/replay/haiku-h3/out"
+    }
   ]
 }

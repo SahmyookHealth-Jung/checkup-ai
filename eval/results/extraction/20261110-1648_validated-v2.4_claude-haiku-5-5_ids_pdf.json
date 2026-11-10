@@ -1,0 +1,356 @@
+{
+  "summary": {
+    "runAt": "2026-11-10T16:48:50",
+    "model": "claude-haiku-5-5",
+    "promptVersion": "extraction-v1",
+    "pipeline": "validated-v2.4",
+    "dataset": "v1",
+    "subset": "ids",
+    "format": "pdf",
+    "metric": "v2",
+    "documents": 1,
+    "failed": 0,
+    "itemF1": {
+      "tp": 23,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "firstPassF1": {
+      "tp": 23,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "byTemplate": {
+      "std": {
+        "tp": 23,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    "fieldAccuracy": {
+      "unit": {
+        "accuracy": 1.0,
+        "total": 23,
+        "correct": 23,
+        "invented": 0,
+        "dropped": 0,
+        "wrong": 0
+      },
+      "referenceRaw": {
+        "accuracy": 1.0,
+        "total": 23,
+        "correct": 23,
+        "invented": 0,
+        "dropped": 0,
+        "wrong": 0
+      },
+      "centerJudgment": {
+        "accuracy": 0.9565,
+        "total": 23,
+        "correct": 22,
+        "invented": 1,
+        "dropped": 0,
+        "wrong": 0
+      }
+    },
+    "firstPassFieldAccuracy": {
+      "unit": {
+        "accuracy": 1.0,
+        "total": 23,
+        "correct": 23,
+        "invented": 0,
+        "dropped": 0,
+        "wrong": 0
+      },
+      "referenceRaw": {
+        "accuracy": 1.0,
+        "total": 23,
+        "correct": 23,
+        "invented": 0,
+        "dropped": 0,
+        "wrong": 0
+      },
+      "centerJudgment": {
+        "accuracy": 0.8261,
+        "total": 23,
+        "correct": 19,
+        "invented": 4,
+        "dropped": 0,
+        "wrong": 0
+      }
+    },
+    "fieldAccuracyByTemplate": {
+      "std": {
+        "unit": 1.0,
+        "referenceRaw": 1.0,
+        "centerJudgment": 0.9565
+      }
+    },
+    "avgLatencyMs": 8868,
+    "avgPromptTokens": 4472,
+    "avgCompletionTokens": 1614,
+    "totalAttempts": 1,
+    "totalRetriedSegments": 0,
+    "issueCounts": {
+      "UNGROUNDED_FIELD": 3
+    }
+  },
+  "documents": [
+    {
+      "id": "std-001",
+      "cached": false,
+      "tp": 23,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "firstPass": {
+        "tp": 23,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "metrics": {
+        "model": "claude-haiku-5-5",
+        "promptVersion": "extraction-v1",
+        "pipeline": "validated-v2.4",
+        "latencyMs": 8868,
+        "promptTokens": 4472,
+        "completionTokens": 1614,
+        "attempts": 1,
+        "retriedSegments": 0,
+        "issues": {
+          "UNGROUNDED_FIELD": 3
+        },
+        "firstPassLatencyMs": 8817,
+        "firstPassPromptTokens": 4472,
+        "firstPassCompletionTokens": 1614
+      },
+      "error": null,
+      "errors": [],
+      "header": {
+        "examDate": "2026-07-19",
+        "examType": "GENERAL",
+        "sex": "MALE",
+        "age": 60
+      },
+      "diagnostics": {
+        "firstPassItems": [
+          {
+            "code": "HEIGHT",
+            "rawName": "신장",
+            "value": "165.9",
+            "unit": "cm",
+            "referenceRaw": "-",
+            "centerJudgment": "정상A"
+          },
+          {
+            "code": "WEIGHT",
+            "rawName": "체중",
+            "value": "71.6",
+            "unit": "kg",
+            "referenceRaw": "-",
+            "centerJudgment": "정상A"
+          },
+          {
+            "code": "WAIST_CIRCUMFERENCE",
+            "rawName": "허리둘레",
+            "value": "87",
+            "unit": "cm",
+            "referenceRaw": "90 미만",
+            "centerJudgment": "정상A"
+          },
+          {
+            "code": "BMI",
+            "rawName": "체질량지수",
+            "value": "26.0",
+            "unit": "kg/m²",
+            "referenceRaw": "18.5~24.9",
+            "centerJudgment": "정상B(경계)"
+          },
+          {
+            "code": "SYSTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "103",
+            "unit": "mmHg",
+            "referenceRaw": "120/80 미만",
+            "centerJudgment": "정상A"
+          },
+          {
+            "code": "DIASTOLIC_BP",
+            "rawName": "혈압(수축기/이완기)",
+            "value": "70",
+            "unit": "mmHg",
+            "referenceRaw": "120/80 미만",
+            "centerJudgment": "정상A"
+          },
+          {
+            "code": "VISION_LEFT",
+            "rawName": "시력(좌)",
+            "value": "0.7",
+            "unit": "-",
+            "referenceRaw": "-",
+            "centerJudgment": "정상A"
+          },
+          {
+            "code": "VISION_RIGHT",
+            "rawName": "시력(우)",
+            "value": "1.5",
+            "unit": "-",
+            "referenceRaw": "-",
+            "centerJudgment": "정상A"
+          },
+          {
+            "code": "HEARING_LEFT",
+            "rawName": "청력(좌)",
+            "value": "정상",
+            "unit": "-",
+            "referenceRaw": "-",
+            "centerJudgment": "정상A"
+          },
+          {
+            "code": "HEARING_RIGHT",
+            "rawName": "청력(우)",
+            "value": "정상",
+            "unit": "-",
+            "referenceRaw": "-",
+            "centerJudgment": "정상A"
+          },
+          {
+            "code": "URINE_PROTEIN",
+            "rawName": "요단백",
+            "value": "음성",
+            "unit": "-",
+            "referenceRaw": "음성",
+            "centerJudgment": "정상A"
+          },
+          {
+            "code": "HEMOGLOBIN",
+            "rawName": "혈색소",
+            "value": "12.2",
+            "unit": "g/dL",
+            "referenceRaw": "13.0~16.5",
+            "centerJudgment": "정상B(경계)"
+          },
+          {
+            "code": "FASTING_GLUCOSE",
+            "rawName": "공복혈당",
+            "value": "190",
+            "unit": "mg/dL",
+            "referenceRaw": "100 미만",
+            "centerJudgment": "질환의심"
+          },
+          {
+            "code": "TOTAL_CHOLESTEROL",
+            "rawName": "총콜레스테롤",
+            "value": "216",
+            "unit": "mg/dL",
+            "referenceRaw": "200 미만",
+            "centerJudgment": "정상B(경계)"
+          },
+          {
+            "code": "HDL_CHOLESTEROL",
+            "rawName": "HDL 콜레스테롤",
+            "value": "71",
+            "unit": "mg/dL",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "정상A"
+          },
+          {
+            "code": "TRIGLYCERIDES",
+            "rawName": "중성지방",
+            "value": "106",
+            "unit": "mg/dL",
+            "referenceRaw": "150 미만",
+            "centerJudgment": "정상A"
+          },
+          {
+            "code": "LDL_CHOLESTEROL",
+            "rawName": "LDL 콜레스테롤",
+            "value": "131",
+            "unit": "mg/dL",
+            "referenceRaw": "130 미만",
+            "centerJudgment": "정상B(경계)"
+          },
+          {
+            "code": "SERUM_CREATININE",
+            "rawName": "혈청 크레아티닌",
+            "value": "1.16",
+            "unit": "mg/dL",
+            "referenceRaw": "1.5 이하",
+            "centerJudgment": "정상A"
+          },
+          {
+            "code": "EGFR",
+            "rawName": "신사구체여과율",
+            "value": "78",
+            "unit": "mL/min/1.73m²",
+            "referenceRaw": "60 이상",
+            "centerJudgment": "정상A"
+          },
+          {
+            "code": "AST",
+            "rawName": "AST",
+            "value": "23",
+            "unit": "U/L",
+            "referenceRaw": "40 이하",
+            "centerJudgment": "정상A"
+          },
+          {
+            "code": "ALT",
+            "rawName": "ALT",
+            "value": "44",
+            "unit": "U/L",
+            "referenceRaw": "35 이하",
+            "centerJudgment": "정상B(경계)"
+          },
+          {
+            "code": "GAMMA_GTP",
+            "rawName": "감마지티피",
+            "value": "29",
+            "unit": "U/L",
+            "referenceRaw": "11~63",
+            "centerJudgment": "정상A"
+          },
+          {
+            "code": "CHEST_XRAY",
+            "rawName": "흉부방사선",
+            "value": "비활동성 폐결핵",
+            "unit": "-",
+            "referenceRaw": "-",
+            "centerJudgment": "정상B(경계)"
+          }
+        ],
+        "issues": [
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "HEIGHT",
+            "detail": "centerJudgment=정상A"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "WEIGHT",
+            "detail": "centerJudgment=정상A"
+          },
+          {
+            "type": "UNGROUNDED_FIELD",
+            "code": "VISION_LEFT",
+            "detail": "centerJudgment=정상A"
+          }
+        ]
+      }
+    }
+  ]
+}
