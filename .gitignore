@@ -24,6 +24,8 @@ bin/
 
 # --- Claude Code 개인 설정 ---
 .claude/settings.local.json
+# archify 스킬이 만든 다이어그램 출력 (평가 기록의 dirty 판정에 걸리지 않게 뺀다)
+.archify/
 
 # --- Python (eval) ---
 __pycache__/
