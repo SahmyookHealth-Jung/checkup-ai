@@ -47,6 +47,9 @@ cd backend && ./gradlew build              # 컴파일 + 단위 테스트 (외�
 (cd ../eval && .venv/bin/python -m rag.build_calibration_set)  # 충실도 보정셋 50문장 + 라벨링 화면(eval/.cache/labeling/, 커밋 안 함)
 (cd ../eval && .venv/bin/python -m rag.run_faithfulness_judge --calibration calibration-v1 --setting off --repeats 3)  # 충실도 채점 (Sonnet 5.5, 호출당 약 $0.006)
 (cd ../eval && .venv/bin/python -m rag.calibration_agreement --judge results/faithfulness/<runId>.json)  # 채점기와 사람 라벨의 κ
+(cd ../eval && .venv/bin/python -m rag.build_seeded_set)  # 채점기 검증용 오류 심은 세트 141문장 + 검토 화면(eval/.cache/labeling/, 커밋 안 함)
+(cd ../eval && .venv/bin/python -m rag.run_faithfulness_judge --calibration seeded-v1 --setting off --label seeded)  # 오류 심은 세트 채점 (새 호출 113회 약 $0.5)
+(cd ../eval && .venv/bin/python -m rag.seeded_recall --judge results/faithfulness/<runId>.json)  # 채점기가 심은 오류를 잡은 비율과 통과 기준
 (cd ../eval && .venv/bin/python -m rag.compare_conditions --base <기준> --new <조건> --label <이름>)  # 조건 짝비교 (전체 + 근거가 바뀐 항목)
 (cd ../eval && .venv/bin/python -m unittest discover -s rag -t .)            # 평가 지표 단위 테스트
 ```

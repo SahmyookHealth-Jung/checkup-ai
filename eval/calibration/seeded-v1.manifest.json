@@ -1,0 +1,60 @@
+{
+  "name": "seeded-v1",
+  "createdAt": "2026-11-11T11:49:19",
+  "baseSet": "calibration-v1",
+  "baseSelection": {
+    "judgeRun": "20261111-0216_faithfulness_calibration-v1_off_calibration-v1.2",
+    "labels": "calibration-v1.labels-faithfulness-v1.2.json",
+    "rule": "사람 라벨과 채점기 모든 회차가 지지, 치료 없음",
+    "bases": 28
+  },
+  "seed": 20261111,
+  "rubric": "faithfulness-v1.2",
+  "chunksSha256": "a981c329fe2ae795",
+  "sentences": {
+    "band_name": 15,
+    "band_number": 17,
+    "band_sex": 5,
+    "drug_added": 10,
+    "dose_change": 10,
+    "control_lifestyle": 10,
+    "citation_swap": 27,
+    "unsupported_fact": 10,
+    "inversion": 6,
+    "smoke": 3,
+    "base": 28
+  },
+  "criteria": {
+    "band": {
+      "name": "판정 구간 오류를 잡는다",
+      "types": [
+        "band_name",
+        "band_number",
+        "band_sex"
+      ],
+      "min_rate": 0.9
+    },
+    "treatment": {
+      "name": "치료·약 오류를 전부 잡는다",
+      "types": [
+        "drug_added",
+        "dose_change"
+      ],
+      "min_rate": 1.0
+    },
+    "control": {
+      "name": "대조 문장을 잘못 잡지 않는다",
+      "types": [
+        "control_lifestyle"
+      ],
+      "max_wrong": 1
+    },
+    "citation": {
+      "name": "바뀐 인용을 잡는다",
+      "types": [
+        "citation_swap"
+      ],
+      "min_rate": 0.9
+    }
+  }
+}
