@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
  *   <li>값 원문 대조: 원문에 없는 값은 버린다 (지어낸 값 차단)</li>
  *   <li>항목 모양: 숫자 여러 개가 뭉친 값, 값이 들어 있는 OTHER 항목명은 버린다 (줄 전체를 옮긴 것)</li>
  *   <li>OTHER 항목: 항목명과 값이 같은 줄에 없으면 버린다 (다른 항목 값을 빌려 만든 가짜 항목 차단)</li>
- *   <li>숫자 항목 상식 검사: 숫자가 아니거나 생리적으로 불가능한 값은 버린다</li>
+ *   <li>숫자 항목 상식 검사: 숫자로 읽히지 않는 값은 버리고(부등호 값은 남긴다), 생리적으로 불가능한 값은 확인 필요로 넘긴다</li>
  *   <li>같은 코드(OTHER는 같은 항목명)에 다른 값이 여럿이면 처음 것만 남긴다</li>
  *   <li>참고치 칸에 들어온 판정 등급(정상A 등)은 지운다</li>
  *   <li>필드 원문 대조: 값이 있는 줄에 없는 단위·참고치·판정은 null로 바꾼다</li>
@@ -100,16 +100,24 @@ public class ExtractionValidator {
         Set<String> seen = new HashSet<>();
         Set<ItemCode> keptCodes = new HashSet<>();
         Map<String, String> otherValues = new HashMap<>();  // OTHER 항목명 → 값
+        Map<ItemCode, ReportItem> inequalityKept = new EnumMap<>(ItemCode.class);  // 읽히는 값에 밀리는 부등호 값
         for (ReportItem item : alreadyKept) {
             seen.add(item.code() + "|" + SourceText.squash(item.value()));
             if (item.code() != ItemCode.OTHER) {
                 keptCodes.add(item.code());
+                if (isInequality(item)) {
+                    inequalityKept.put(item.code(), item);
+                }
             } else {
                 otherValues.put(otherName(item), SourceText.squash(item.value()));
             }
         }
 
-        for (ReportItem item : candidates) {
+        // 부등호 값(">90")은 같은 코드의 읽히는 값보다 뒤에 검사한다. 먼저 오면 읽히는 값을 충돌로 밀어낸다.
+        // 2026-11-11 Fable 리뷰: 참고치를 옮긴 "<120"이 먼저 오자 실제 결과 118이 CONFLICT로 버려졌다
+        List<ReportItem> ordered = new ArrayList<>(candidates.stream().filter(item -> !isInequality(item)).toList());
+        ordered.addAll(candidates.stream().filter(ExtractionValidator::isInequality).toList());
+        for (ReportItem item : ordered) {
             if (item.code() == null || item.value() == null || item.value().isBlank()) {
                 issues.add(new Issue(IssueType.EMPTY, item.code(), "code 또는 value 없음"));
                 continue;
@@ -149,10 +157,18 @@ public class ExtractionValidator {
                 issues.add(new Issue(IssueType.IMPLAUSIBLE, item.code(), implausible));
                 if (isOutOfRange(item)) {
                     // 원문에 있는 범위 밖 수치는 버리지 않고 "확인 필요"로 남긴다 (ADR 0007 1절, 가드레일 원칙 3).
-                    // 숫자가 아닌 값(참고치를 값으로 옮긴 "<120" 등)은 읽기 오류가 분명하므로 남기지 않는다
+                    // 읽히지 않는 값("정상", "150/95")은 숫자 항목의 결과가 아니므로 남기지 않는다
                     needsReview.add(new ReviewItem(item.code(), item.rawName(), item.value(), implausible));
                 }
                 continue;
+            }
+            ReportItem weaker = isInequality(item) ? null : inequalityKept.remove(item.code());
+            if (weaker != null) {
+                // 이미 남긴 부등호 값보다 읽히는 값을 남긴다 (재요청이 실제 결과를 가져온 경우)
+                kept.remove(weaker);
+                keptCodes.remove(item.code());
+                issues.add(new Issue(IssueType.CONFLICT, item.code(),
+                        "부등호 값 " + weaker.value() + " 대신 읽히는 값을 남김: " + item.value()));
             }
             if (item.code() != ItemCode.OTHER && !keptCodes.add(item.code())) {
                 issues.add(new Issue(IssueType.CONFLICT, item.code(), "같은 코드에 다른 값: " + item.value()));
@@ -170,7 +186,11 @@ public class ExtractionValidator {
                     continue;
                 }
             }
-            kept.add(groundFields(item, lines, issues));
+            ReportItem grounded = groundFields(item, lines, issues);
+            kept.add(grounded);
+            if (isInequality(item)) {
+                inequalityKept.put(item.code(), grounded);
+            }
         }
 
         CheckupReport cleaned = new CheckupReport(report.examDate(), report.examType(), report.sex(), report.age(), kept);
@@ -243,21 +263,47 @@ public class ExtractionValidator {
         return SourceText.squash(item.rawName() == null ? "" : item.rawName());
     }
 
-    /** 숫자이지만 생리적으로 가능한 범위 밖이다 (implausible의 두 경우 중 하나) */
+    /** 숫자로 읽히지만 생리적으로 가능한 범위 밖이다 (implausible의 두 경우 중 하나) */
     private static boolean isOutOfRange(ReportItem item) {
-        return item.code().kind() == ItemCode.ValueKind.NUMERIC && SourceText.isNumber(item.value())
+        return item.code().kind() == ItemCode.ValueKind.NUMERIC && NumericValue.parse(item.value()).isPresent()
                 && PLAUSIBLE.containsKey(item.code());
     }
 
+    /** 숫자 항목의 부등호 값(">90"): 남기지만 판정하지 않고, 같은 코드의 읽히는 값에 밀린다 */
+    private static boolean isInequality(ReportItem item) {
+        return item.code() != null && item.code().kind() == ItemCode.ValueKind.NUMERIC
+                && NumericValue.shape(item.value()) == NumericValue.Shape.INEQUALITY;
+    }
+
+    /**
+     * 숫자 항목의 값이 결과로 읽히지 않으면 이유를 돌려준다.
+     *
+     * <p>두 모양만 원문 표기 그대로 남긴다 (ADR 0004 보완, 2026-11-11, {@link NumericValue.Shape}).
+     * <ul>
+     *   <li>표시·쉼표를 떼면 숫자 하나("64 L", "9.3▼", "1,120"): 판정 코드가 같은 규칙으로 떼어 판정한다.
+     *       가능 범위 검사는 뗀 숫자로 한다.</li>
+     *   <li>부등호 + 숫자 하나(">90"): 판정 코드가 "확인 필요"로 알린다. 참고치를 옮긴 "<120"도 남는 대가가 있어,
+     *       읽히는 값에 밀리고 결과 줄을 차지하지 않게 했다.</li>
+     * </ul>
+     * 그 밖("150/95", "13.0~16.5", "650kg")은 예전처럼 버린다. 처음에는 숫자만 들어 있으면 남겼는데, 2026-11-11 Fable 리뷰에서
+     * 이런 값이 맞는 값을 밀어내고 가능 범위 검사도 건너뛰는 것이 재현됐다.
+     * 예전에는 위 두 모양도 "숫자가 아님"으로 버려, 판정 코드가 읽을 수 있는 값이 판정까지 오지 못했다
+     * (표기 변형 평가에서 조용히 지나간 4건).
+     */
     private static String implausible(ReportItem item) {
         if (item.code().kind() != ItemCode.ValueKind.NUMERIC) {
             return null;
         }
-        if (!SourceText.isNumber(item.value())) {
-            return "숫자가 아님: " + item.value();
+        switch (NumericValue.shape(item.value())) {
+            case OTHER:
+                return "숫자가 아님: " + item.value();
+            case INEQUALITY:
+                return null;
+            default:
+                break;
         }
         double[] range = PLAUSIBLE.get(item.code());
-        double value = Double.parseDouble(item.value().strip());
+        double value = NumericValue.parse(item.value()).getAsDouble();
         if (range != null && (value < range[0] || value > range[1])) {
             return "가능 범위 밖: " + item.value();
         }
@@ -329,6 +375,11 @@ public class ExtractionValidator {
         Set<Segment> claimed = new HashSet<>();
         List<ReportItem> unnamed = new ArrayList<>();
         for (ReportItem item : kept) {
+            if (isInequality(item)) {
+                // 부등호 값은 결과 줄을 차지하지 않는다. 참고치("<120")를 값으로 잘못 옮겼으면 실제 결과가 그 줄에 남아 있다.
+                // 2026-11-11 Fable 리뷰: 차지하게 두면 그 줄이 누락 의심에서 빠져 실제 값을 다시 물을 길이 없었다
+                continue;
+            }
             List<Segment> candidates = segments.stream().filter(s -> holdsValue(s, item.value(), lines)).toList();
             List<Segment> named = candidates.stream()
                     .filter(s -> nameNear(s.text(), s.line(), item.rawName(), lines, age)).toList();

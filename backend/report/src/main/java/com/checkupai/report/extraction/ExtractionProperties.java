@@ -43,7 +43,7 @@ public record ExtractionProperties(
 
     public enum Pipeline {
         BASELINE("baseline"),
-        VALIDATED("validated-v2.5");  // 캐시 키에 들어가므로 검증 로직을 바꾸면 올린다
+        VALIDATED("validated-v2.6");  // 캐시 키에 들어가므로 검증 로직을 바꾸면 올린다
 
         private final String label;
 

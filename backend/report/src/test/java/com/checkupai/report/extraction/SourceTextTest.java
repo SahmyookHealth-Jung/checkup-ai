@@ -41,6 +41,22 @@ class SourceTextTest {
     }
 
     @Test
+    @DisplayName("표시가 붙은 숫자 값은 값 속 숫자도 원문에 온전한 숫자로 있어야 한다")
+    void containsDecoratedNumber() {
+        assertThat(SourceText.containsValue("eGFR 64 L mL/min", "64 L")).isTrue();
+        assertThat(SourceText.containsValue("혈색소 9.3▼ g/dL", "9.3▼")).isTrue();
+        assertThat(SourceText.containsValue("공복혈당 1,120 mg/dL", "1,120")).isTrue();
+        assertThat(SourceText.containsValue("eGFR >90", ">90")).isTrue();
+        // 조각 검사만 하면 "64"가 "164" 안에서 통과한다
+        assertThat(SourceText.containsValue("신장 164 cm, LDL 100", "64 L")).isFalse();
+        assertThat(SourceText.containsValue("혈색소 19.3▼", "9.3▼")).isFalse();
+        // 점·쉼표로 이어진 숫자는 한 덩어리로 대조한다 (2026-11-11 Fable 리뷰)
+        assertThat(SourceText.containsValue("다음 예약 2026.09.16", "2026.09.16")).isTrue();
+        assertThat(SourceText.containsValue("TG 11,120 요단백 1+", "1,120")).isFalse();
+        assertThat(SourceText.containsValue("요단백 1+ (30)", "1+ (30)")).isTrue();
+    }
+
+    @Test
     @DisplayName("두 줄에 걸친 값은 두 줄을 이어 한 범위로 본다. 한 줄에 온전히 있으면 그 줄만 본다")
     void findsValueWindowsAcrossWrappedLines() {
         var lines = SourceText.lines("""

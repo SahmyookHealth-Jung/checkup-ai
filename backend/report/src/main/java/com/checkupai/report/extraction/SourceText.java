@@ -11,6 +11,12 @@ import java.util.regex.Pattern;
 final class SourceText {
 
     private static final Pattern WHITESPACE = Pattern.compile("\\s+");
+    /**
+     * 값 속의 숫자 덩어리. 점·쉼표로 이어진 숫자는 한 덩어리다 ("64 L"의 64, "1,120", "2026.09.16").
+     * 2026-11-11 Fable 리뷰: 소수 하나씩 자르면 "2026.09.16"이 "2026.09"와 "16"으로 쪼개져 원문에 있는 값을 버렸고,
+     * "1,120"은 "1"과 "120"으로 쪼개져 원문의 "11,120" 안에서 통과했다.
+     */
+    private static final Pattern NUMBER_IN_VALUE = Pattern.compile("\\d+([.,]\\d+)*");
 
     private SourceText() {
     }
@@ -36,6 +42,8 @@ final class SourceText {
      * 숫자는 다른 숫자의 일부이면 안 된다 ("12"는 "112" 안에, "18"은 "18.3" 안에, "5"는 "5.2" 안에 있는 것으로 보지 않는다).
      * 2026-11-10 Fable 리뷰: 뒤쪽이 소수점이어도 통과해 "18.3"의 앞부분 "18"을 인정했다. 문장 끝 마침표("18.")는 인정한다.
      * 글자 값은 공백으로 나눈 조각이 모두 들어 있으면 있다고 본다 ("비활동성 폐결핵" 사이 공백이 달라도 된다).
+     * 표시가 붙은 숫자 값("64 L", "1,120")은 조각 검사에 더해, 값 속 숫자도 원문에 온전한 숫자로 있어야 한다.
+     * 조각 검사만 하면 "64 L"의 "64"가 "164" 안에서도 통과한다 (ADR 0004 보완, 2026-11-11: 이런 값을 이제 버리지 않는다).
      */
     static boolean containsValue(String text, String value) {
         if (value == null || value.isBlank()) {
@@ -43,10 +51,21 @@ final class SourceText {
         }
         String trimmed = value.strip();
         if (isNumber(trimmed)) {
-            return Pattern.compile("(?<![\\d.])" + Pattern.quote(trimmed) + "(?!\\d|\\.\\d)").matcher(text).find();
+            return containsNumber(text, trimmed);
         }
         String squashedText = squash(text);
-        return Arrays.stream(WHITESPACE.split(trimmed)).allMatch(token -> squashedText.contains(token));
+        return Arrays.stream(WHITESPACE.split(trimmed)).allMatch(token -> squashedText.contains(token))
+                && NUMBER_IN_VALUE.matcher(trimmed).results().allMatch(chunk -> containsChunk(text, chunk.group()));
+    }
+
+    /** 숫자 덩어리가 더 긴 덩어리의 일부가 아니게 텍스트에 있다 ("1,120"은 "11,120" 안에 있는 것으로 보지 않는다) */
+    private static boolean containsChunk(String text, String chunk) {
+        return Pattern.compile("(?<![\\d.,])" + Pattern.quote(chunk) + "(?![\\d]|[.,]\\d)").matcher(text).find();
+    }
+
+    /** 숫자가 다른 숫자의 일부가 아닌 온전한 숫자로 텍스트에 있다 */
+    private static boolean containsNumber(String text, String number) {
+        return Pattern.compile("(?<![\\d.])" + Pattern.quote(number) + "(?!\\d|\\.\\d)").matcher(text).find();
     }
 
     /**

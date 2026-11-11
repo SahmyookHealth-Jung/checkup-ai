@@ -25,6 +25,9 @@ class ExtractionValidatorTest {
                         ※ 전회   결과는    직전    검진   기록입니다.
             """;
 
+    /** 참고치가 부등호 값인 줄. 모델이 참고치 "<120"을 값으로 옮기는 실수를 시험한다 */
+    private static final String BP_SOURCE = "수축기혈압 | 118 | mmHg | <120";
+
     private final ExtractionValidator validator = new ExtractionValidator();
 
     @Test
@@ -50,17 +53,96 @@ class ExtractionValidatorTest {
     }
 
     @Test
-    @DisplayName("숫자가 아니거나 생리적으로 불가능한 값은 버린다")
+    @DisplayName("숫자가 없는 값은 버리고, 생리적으로 불가능한 값은 결과에서 빼 확인 필요로 넘긴다")
     void dropsImplausibleNumbers() {
         ValidationResult result = validate(
                 item(ItemCode.HEMOGLOBIN, "FBS", "183"),       // 혈색소 183은 불가능: 다른 행을 읽은 것
-                item(ItemCode.SYSTOLIC_BP, "SBP", "<120"));    // 참고치를 값으로 잘못 읽음: 숫자가 아님
+                item(ItemCode.FASTING_GLUCOSE, "FBS", "정상"));   // 숫자 항목에 숫자가 없는 값
 
         assertThat(result.report().items()).isEmpty();
         assertThat(types(result)).containsOnly(IssueType.IMPLAUSIBLE);
-        // 범위 밖 숫자는 "확인 필요"로 남기고, 숫자가 아닌 값(참고치를 옮긴 것)은 남기지 않는다 (ADR 0007 1절)
         assertThat(result.needsReview()).extracting(ReviewItem::code, ReviewItem::value)
                 .containsExactly(tuple(ItemCode.HEMOGLOBIN, "183"));
+    }
+
+    @Test
+    @DisplayName("표시·쉼표가 붙은 숫자와 부등호 값은 원문 표기 그대로 남긴다. 판정 코드가 같은 규칙으로 읽는다 (ADR 0004 보완)")
+    void keepsDecoratedNumbersAsWritten() {
+        String source = """
+                신사구체여과율 | >90 | mL/min/1.73m² | 60 이상
+                혈색소 | 9.3▼ | g/dL | 12.0~15.5
+                크레아티닌 | 0.8 | mg/dL
+                총콜레스테롤 | 1,120 | mg/dL
+                중성지방 | 64 L | mg/dL
+                """;
+        CheckupReport report = new CheckupReport(null, CheckupReport.ExamType.GENERAL, CheckupReport.Sex.FEMALE, 50,
+                List.of(item(ItemCode.EGFR, "신사구체여과율", ">90"),
+                        item(ItemCode.HEMOGLOBIN, "혈색소", "9.3▼"),
+                        item(ItemCode.TOTAL_CHOLESTEROL, "총콜레스테롤", "1,120"),   // 표시를 뗀 1120으로 범위 검사
+                        item(ItemCode.TRIGLYCERIDES, "중성지방", "64 L")));
+
+        ValidationResult result = validator.validate(report, source);
+
+        // 부등호 값은 읽히는 값보다 뒤에 검사하므로 결과의 끝에 온다
+        assertThat(result.report().items()).extracting(ReportItem::code, ReportItem::value)
+                .containsExactly(tuple(ItemCode.HEMOGLOBIN, "9.3▼"), tuple(ItemCode.TRIGLYCERIDES, "64 L"),
+                        tuple(ItemCode.EGFR, ">90"));
+        assertThat(result.needsReview()).singleElement().satisfies(review -> {
+            assertThat(review.code()).isEqualTo(ItemCode.TOTAL_CHOLESTEROL);
+            assertThat(review.value()).isEqualTo("1,120");
+            assertThat(review.reason()).contains("가능 범위 밖");
+        });
+    }
+
+    @Test
+    @DisplayName("숫자가 들어 있어도 두 모양(표시 붙은 숫자, 부등호 값)이 아니면 버린다 (2026-11-11 Fable 리뷰)")
+    void dropsOtherShapesWithDigits() {
+        String source = """
+                혈압 | 150/95 | mmHg
+                체중 | 650kg
+                혈색소 | 9.1 | g/dL | 13.0~16.5
+                """;
+        CheckupReport report = new CheckupReport(null, CheckupReport.ExamType.GENERAL, CheckupReport.Sex.MALE, 50,
+                List.of(item(ItemCode.SYSTOLIC_BP, "혈압", "150/95"),
+                        item(ItemCode.WEIGHT, "체중", "650kg"),          // 판정 대상이 아니라 남기면 경고 없이 표시된다
+                        item(ItemCode.HEMOGLOBIN, "혈색소", "13.0~16.5")));  // 참고치를 값으로 옮김
+
+        ValidationResult result = validator.validate(report, source);
+
+        assertThat(result.report().items()).isEmpty();
+        assertThat(result.issues()).extracting(Issue::type, Issue::detail).containsExactly(
+                tuple(IssueType.IMPLAUSIBLE, "숫자가 아님: 150/95"), tuple(IssueType.IMPLAUSIBLE, "숫자가 아님: 650kg"),
+                tuple(IssueType.IMPLAUSIBLE, "숫자가 아님: 13.0~16.5"));
+        assertThat(result.needsReview()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("부등호 값이 먼저 와도 같은 코드의 읽히는 값을 남긴다 (참고치 \"<120\"이 실제 결과 118을 밀어내지 않게)")
+    void readableValueBeatsInequality() {
+        ValidationResult result = validator.validate(new CheckupReport(null, CheckupReport.ExamType.GENERAL,
+                CheckupReport.Sex.MALE, 50, List.of(item(ItemCode.SYSTOLIC_BP, "수축기혈압", "<120"),
+                        item(ItemCode.SYSTOLIC_BP, "수축기혈압", "118"))), BP_SOURCE);
+
+        assertThat(result.report().items()).extracting(ReportItem::value).containsExactly("118");
+        assertThat(result.issues()).extracting(Issue::type, Issue::detail)
+                .contains(tuple(IssueType.CONFLICT, "같은 코드에 다른 값: <120"));
+    }
+
+    @Test
+    @DisplayName("부등호 값은 결과 줄을 차지하지 않아 그 줄이 누락 의심으로 남고, 재요청이 가져온 읽히는 값이 부등호 값을 대신한다")
+    void inequalityDoesNotClaimLineAndYieldsToRetry() {
+        ValidationResult first = validator.validate(new CheckupReport(null, CheckupReport.ExamType.GENERAL,
+                CheckupReport.Sex.MALE, 50, List.of(item(ItemCode.SYSTOLIC_BP, "수축기혈압", "<120"))), BP_SOURCE);
+
+        assertThat(first.report().items()).extracting(ReportItem::value).containsExactly("<120");
+        assertThat(first.uncoveredSegments()).singleElement().asString().contains("118");
+
+        ValidationResult merged = validator.validateAdditional(first.report(),
+                List.of(item(ItemCode.SYSTOLIC_BP, "수축기혈압", "118")), BP_SOURCE);
+
+        assertThat(merged.report().items()).extracting(ReportItem::value).containsExactly("118");
+        assertThat(merged.issues()).extracting(Issue::type).containsExactly(IssueType.CONFLICT);
+        assertThat(merged.uncoveredSegments()).isEmpty();
     }
 
     @Test

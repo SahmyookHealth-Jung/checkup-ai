@@ -76,7 +76,7 @@ class ReportExtractorTest {
         assertThat(model.userMessages).hasSize(1);  // 누락 의심 2조각 <= 뽑은 4개: 정상으로 보고 재요청하지 않는다
         assertThat(result.metrics().attempts()).isEqualTo(1);
         assertThat(result.metrics().retriedSegments()).isZero();
-        assertThat(result.metrics().pipeline()).isEqualTo("validated-v2.5-noretry");
+        assertThat(result.metrics().pipeline()).isEqualTo("validated-v2.6-noretry");
         assertThat(result.diagnostics().retryInput()).contains("CEA 3.3 ng/mL", "hs-CRP 1.6 mg/L");
         assertThat(result.diagnostics().retryItems()).isNull();
     }

@@ -2,12 +2,14 @@ package com.checkupai.report.explanation;
 
 import com.checkupai.report.extraction.CheckupReport;
 import com.checkupai.report.extraction.ItemCode;
+import com.checkupai.report.extraction.NumericValue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.OptionalDouble;
 import java.util.regex.Pattern;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
@@ -29,16 +31,6 @@ import tools.jackson.databind.json.JsonMapper;
 public class ScreeningCriteria {
 
     static final String RESOURCE = "criteria/general-screening-2026-6.json";
-    private static final Pattern NUMBER = Pattern.compile("[-+]?\\d+(\\.\\d+)?");
-    /** 값 앞뒤의 높음·낮음 표시: "140 H", "H 140", "140▲", "9.3 (L)", "140*" */
-    private static final Pattern FLAG = Pattern.compile(
-            "^[\\s(\\[]*(?:high|low|[hl]|[▲▼↑↓*])[\\s)\\]]*(?=[-+]?\\d)|(?<=\\d)[\\s(\\[]*(?:high|low|[hl]|[▲▼↑↓*])[\\s)\\]]*$",
-            Pattern.CASE_INSENSITIVE);
-    /** 천 단위 쉼표: "1,120" */
-    private static final Pattern THOUSANDS = Pattern.compile("(?<=\\d),(?=\\d{3}(?!\\d))");
-    /** 실제 수치가 아닌 값: ">90", "<10", "400 이상" */
-    private static final Pattern INEQUALITY = Pattern.compile("[<>≤≥≦≧]|이상|이하|미만|초과");
-
     private final CriteriaFile file;
     private final String sourceLabel;
 
@@ -102,14 +94,14 @@ public class ScreeningCriteria {
         if (!sameUnit(unit, canonicalUnit)) {
             return Outcome.unknown("단위가 다름: " + unit.strip() + " (기준 단위 " + canonicalUnit + ")");
         }
-        if (INEQUALITY.matcher(value).find()) {
+        if (NumericValue.hasInequality(value)) {
             return Outcome.unknown("실제 수치가 아닌 값: " + value);
         }
-        String cleaned = cleanNumber(value);
-        if (!NUMBER.matcher(cleaned).matches()) {
+        OptionalDouble parsed = NumericValue.parse(value);
+        if (parsed.isEmpty()) {
             return Outcome.unknown("숫자로 읽지 못함: " + value);
         }
-        double number = Double.parseDouble(cleaned);
+        double number = parsed.getAsDouble();
         if (criteria.bySex() == null) {
             return judgeBands(criteria.bands(), number);
         }
@@ -134,11 +126,6 @@ public class ScreeningCriteria {
                 .map(band -> Outcome.of(band.judgment()))
                 .findFirst()
                 .orElse(Outcome.unknown("판정기준표에 없는 구간"));
-    }
-
-    /** 높음·낮음 표시와 천 단위 쉼표를 뗀다 ("140 H" → "140", "1,120" → "1120") */
-    static String cleanNumber(String value) {
-        return THOUSANDS.matcher(FLAG.matcher(value.strip()).replaceAll("")).replaceAll("").strip();
     }
 
     /** 단위가 비어 있으면 대표 단위로 본다. 표기 차이(대소문자, ㎎·㎗·㎡ 같은 합자, 공백)와 IU/L = U/L은 같은 단위다 */
