@@ -55,11 +55,16 @@ public final class ExtractionReplay {
             // 재요청을 묶음으로 나눠 보낸 경우에도 묶음 출력을 차례로 검증하는 것과 한 번에 검증하는 것은 같다.
             ValidationResult checked = validator.validate(first, text);
             List<Issue> issues = new ArrayList<>(checked.issues());
+            List<ReviewItem> needsReview = new ArrayList<>(checked.needsReview());
             CheckupReport result = checked.report();
             List<ReportItem> validatedItems = result.items();  // "검증만, 재요청 없음" 조건 (모델 비교용)
             if (!checked.uncoveredSegments().isEmpty() && doc.retryItems() != null) {
                 ValidationResult merged = validator.validateAdditional(result, doc.retryItems(), text);
                 issues.addAll(merged.issues());
+                merged.needsReview().stream()  // ReportExtractor와 같이 같은 값은 한 번만 남긴다
+                        .filter(review -> needsReview.stream().noneMatch(seen -> seen.code() == review.code()
+                                && SourceText.squash(seen.value()).equals(SourceText.squash(review.value()))))
+                        .forEach(needsReview::add);
                 result = merged.report();
             }
             // 저장된 재요청 입력은 ReportExtractor가 기록한 형태(표 머리 줄 + 누락 조각)다. 같은 형태로 만들어 비교한다
@@ -70,7 +75,8 @@ public final class ExtractionReplay {
             }
             List<String> savedRetryInput = doc.retryInput() == null ? List.of() : doc.retryInput();
             mapper.writeValue(outDir.resolve(in.getFileName()).toFile(), new Output(doc.id(), result.items(),
-                    validatedItems, issues, retryInput, savedRetryInput, !retryInput.equals(savedRetryInput)));
+                    validatedItems, needsReview, issues, retryInput, savedRetryInput, !retryInput.equals(savedRetryInput),
+                    checked.uncoveredSegments().size() > checked.report().items().size()));
         }
         System.out.println("재생 " + inputs.size() + "개 → " + outDir);
     }
@@ -85,11 +91,14 @@ public final class ExtractionReplay {
     /**
      * @param items 최종 항목 (검증 + 재요청)
      * @param validatedItems 1차 출력을 검증만 한 항목 (재요청 전)
+     * @param needsReview 확인 필요 항목 (원문에 있지만 가능 범위 밖이라 결과에 넣지 않은 값)
      * @param retryInput 현재 검증기로 만든 재요청 입력 (표 머리 줄 + 누락 조각, 누락이 없으면 빈 목록)
      * @param savedRetryInput 실제 실행에서 재요청한 조각
-     * @param retryInputChanged 둘이 다르다: 이 보고서의 재생 결과는 근사치다
+     * @param retryInputChanged 둘이 다르다: 재요청을 했던 보고서라면 재생 결과는 근사치다
+     * @param firstPassIncomplete 누락 의심 조각이 검증한 항목보다 많다. ReportExtractor는 재요청을 꺼도 이때 재요청한다
      */
-    record Output(String id, List<ReportItem> items, List<ReportItem> validatedItems, List<Issue> issues,
-                  List<String> retryInput, List<String> savedRetryInput, boolean retryInputChanged) {
+    record Output(String id, List<ReportItem> items, List<ReportItem> validatedItems, List<ReviewItem> needsReview,
+                  List<Issue> issues, List<String> retryInput, List<String> savedRetryInput, boolean retryInputChanged,
+                  boolean firstPassIncomplete) {
     }
 }
