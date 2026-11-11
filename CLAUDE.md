@@ -50,6 +50,8 @@ cd backend && ./gradlew build              # 컴파일 + 단위 테스트 (외�
 (cd ../eval && .venv/bin/python -m rag.build_seeded_set)  # 채점기 검증용 오류 심은 세트 141문장 + 검토 화면(eval/.cache/labeling/, 커밋 안 함)
 (cd ../eval && .venv/bin/python -m rag.run_faithfulness_judge --calibration seeded-v1 --setting off --label seeded)  # 오류 심은 세트 채점 (새 호출 113회 약 $0.5)
 (cd ../eval && .venv/bin/python -m rag.seeded_recall --judge results/faithfulness/<runId>.json)  # 채점기가 심은 오류를 잡은 비율과 통과 기준
+(cd ../eval && .venv/bin/python -m synth.generate --templates labv --seed 20261112 --out ../data/synthetic/extraction/heldout-v4)  # 값·단위 표기 변형 평가셋 (정답은 manifest의 variants)
+(cd ../eval && .venv/bin/python -m rag.run_notation_eval --frozen heldout-v4-v2.5 --label <이름>)  # 표기 변형 평가: 맞게 판정 / 확인 필요 / 틀린 판정 / 조용히 지나감
 (cd ../eval && .venv/bin/python -m rag.compare_conditions --base <기준> --new <조건> --label <이름>)  # 조건 짝비교 (전체 + 근거가 바뀐 항목)
 (cd ../eval && .venv/bin/python -m unittest discover -s rag -t .)            # 평가 지표 단위 테스트
 ```

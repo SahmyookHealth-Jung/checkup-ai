@@ -299,6 +299,15 @@ def lab_report(rng: random.Random, subject: Subject, items: list[Measured], labe
     return blocks, _expected(subject, "UNKNOWN", expected, age_printed=True), meta
 
 
+def lab_variants_report(rng: random.Random, subject: Subject, items: list[Measured], labels: dict) -> tuple:
+    """검사실 결과지형에 값·단위 표기 변형을 넣는다 (synth/variants.py). 양식은 이미 본 것이고, 처음 보는 것은 표기다.
+    바꾼 항목의 깨끗한 값은 manifest의 variants에 남긴다 (판정 평가의 정답)."""
+    from .variants import apply_variants
+    changed, truth = apply_variants(rng, items)
+    blocks, expected, meta = lab_report(rng, subject, changed, labels)
+    return blocks, expected, {**meta, "variants": truth}
+
+
 TEMPLATES = {
     "std": standard,        # 공단 표준 서식형
     "sum": clinic_summary,  # 기관 요약표형
@@ -478,4 +487,5 @@ HELDOUT_TEMPLATES = {
     "lab": lab_report,      # 검사실 결과지형 (heldout-v1, 검증 v2.2 시험에 사용. 결과를 봤으므로 이후로는 '본 양식')
     "trend": trend_report,  # 3개년 추이표형 (heldout-v2, 검증 v2.3 시험에 사용. v2.4 규칙의 근거라 이후로는 '본 양식')
     "guide": guide_report,  # 안내문형 (heldout-v3, 검증 v2.4 전에 생성)
+    "labv": lab_variants_report,  # 검사실 결과지형 + 값·단위 표기 변형 (heldout-v4, 판정 코드 보완 전에 생성)
 }

@@ -1,0 +1,184 @@
+{
+  "examDate": "2026-04-29",
+  "examType": "UNKNOWN",
+  "sex": "MALE",
+  "age": 35,
+  "items": [
+    {
+      "code": "HEIGHT",
+      "rawName": "신장",
+      "value": "168.7",
+      "unit": "cm",
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "WEIGHT",
+      "rawName": "체중",
+      "value": "95.9",
+      "unit": "kg",
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "WAIST_CIRCUMFERENCE",
+      "rawName": "허리둘레",
+      "value": "99",
+      "unit": "cm",
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "BMI",
+      "rawName": "체질량지수",
+      "value": "33.7",
+      "unit": "kg/m²",
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "SYSTOLIC_BP",
+      "rawName": "혈압(수축기/이완기)",
+      "value": "111",
+      "unit": "mmHg",
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "DIASTOLIC_BP",
+      "rawName": "혈압(수축기/이완기)",
+      "value": "78",
+      "unit": "mmHg",
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "VISION_LEFT",
+      "rawName": "시력(좌/우)",
+      "value": "0.8",
+      "unit": null,
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "VISION_RIGHT",
+      "rawName": "시력(좌/우)",
+      "value": "1.0",
+      "unit": null,
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "HEARING_LEFT",
+      "rawName": "청력(좌/우)",
+      "value": "비정상",
+      "unit": null,
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "HEARING_RIGHT",
+      "rawName": "청력(좌/우)",
+      "value": "정상",
+      "unit": null,
+      "referenceRaw": null,
+      "centerJudgment": null
+    },
+    {
+      "code": "URINE_PROTEIN",
+      "rawName": "요단백(U-Protein)",
+      "value": "+/-",
+      "unit": null,
+      "referenceRaw": "음성",
+      "centerJudgment": "경계"
+    },
+    {
+      "code": "HEMOGLOBIN",
+      "rawName": "혈색소(Hb)",
+      "value": "11.3",
+      "unit": "g/㎗",
+      "referenceRaw": "13.0~16.5",
+      "centerJudgment": "이상"
+    },
+    {
+      "code": "FASTING_GLUCOSE",
+      "rawName": "공복혈당(FBS)",
+      "value": "193",
+      "unit": "mg/dL",
+      "referenceRaw": "100 미만",
+      "centerJudgment": "이상"
+    },
+    {
+      "code": "SERUM_CREATININE",
+      "rawName": "혈청 크레아티닌(Cr)",
+      "value": "62",
+      "unit": "μmol/L",
+      "referenceRaw": null,
+      "centerJudgment": "정상"
+    },
+    {
+      "code": "EGFR",
+      "rawName": "신사구체여과율(eGFR)",
+      "value": "78",
+      "unit": "mL/min/1.73m²",
+      "referenceRaw": "60 이상",
+      "centerJudgment": "정상"
+    },
+    {
+      "code": "AST",
+      "rawName": "SGOT(AST)",
+      "value": "31",
+      "unit": "U/L",
+      "referenceRaw": "40 이하",
+      "centerJudgment": "정상"
+    },
+    {
+      "code": "ALT",
+      "rawName": "SGPT(ALT)",
+      "value": "138",
+      "unit": "U/L",
+      "referenceRaw": "35 이하",
+      "centerJudgment": "이상"
+    },
+    {
+      "code": "GAMMA_GTP",
+      "rawName": "감마지티피(r-GTP)",
+      "value": "31",
+      "unit": "U/L",
+      "referenceRaw": "11~63",
+      "centerJudgment": "정상"
+    },
+    {
+      "code": "OTHER",
+      "rawName": "암태아성항원(CEA)",
+      "value": "1.6",
+      "unit": "ng/mL",
+      "referenceRaw": "5.0 이하",
+      "centerJudgment": null
+    },
+    {
+      "code": "OTHER",
+      "rawName": "갑상선자극호르몬(TSH)",
+      "value": "2.57",
+      "unit": "μIU/mL",
+      "referenceRaw": "0.4~4.5",
+      "centerJudgment": null
+    },
+    {
+      "code": "OTHER",
+      "rawName": "당화혈색소(HbA1c)",
+      "value": "7.1",
+      "unit": "%",
+      "referenceRaw": "5.7 미만",
+      "centerJudgment": null
+    },
+    {
+      "code": "CHEST_XRAY",
+      "rawName": "흉부 X-ray",
+      "value": "비활동성 결핵 흔적",
+      "unit": null,
+      "referenceRaw": null,
+      "centerJudgment": "경계"
+    }
+  ]
+}
