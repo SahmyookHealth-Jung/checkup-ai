@@ -1,11 +1,8 @@
 package com.checkupai.report.retrieval;
 
 import com.checkupai.core.privacy.PersonalInfoRedactor;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,8 +11,6 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Service;
-import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * 근거 청크 파일을 벡터 저장소에 적재한다. 임베딩은 VectorStore가 로컬 bge-m3로 만든다.
@@ -68,29 +63,8 @@ public class GuidelineLoader {
     }
 
     private static List<Document> readChunks(Path file) {
-        if (!Files.exists(file)) {
-            throw new IllegalStateException("근거 청크 파일이 없다: " + file.toAbsolutePath().normalize()
-                    + " (eval/에서 .venv/bin/python -m rag.build_chunks 로 만든다)");
-        }
-        var mapper = JsonMapper.builder().build();
-        try {
-            List<Document> documents = new ArrayList<>();
-            for (String line : Files.readAllLines(file)) {
-                if (line.isBlank()) {
-                    continue;
-                }
-                Map<String, Object> chunk = mapper.readValue(line, new TypeReference<Map<String, Object>>() {});
-                @SuppressWarnings("unchecked")
-                Map<String, Object> metadata = (Map<String, Object>) chunk.get("metadata");
-                documents.add(Document.builder()
-                        .id(String.valueOf(chunk.get("id")))
-                        .text(String.valueOf(chunk.get("text")))
-                        .metadata(metadata)
-                        .build());
-            }
-            return documents;
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        return GuidelineChunks.read(file).stream()
+                .map(chunk -> Document.builder().id(chunk.id()).text(chunk.text()).metadata(new HashMap<>(chunk.metadata())).build())
+                .toList();
     }
 }

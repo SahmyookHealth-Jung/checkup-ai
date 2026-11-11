@@ -1,0 +1,30 @@
+{
+  "description": "판정 해설 근거 조회표 (ADR 0010 1절, 2026-11-11). 벡터 검색 대신 항목 코드로 근거 청크를 고른다. 청크 id가 아니라 문서와 절 이름으로 적어, 청크를 다시 만들어도 그대로 쓴다.",
+  "always": {
+    "criteriaRow": "그 항목의 판정기준표 행 (절 '검사항목별 판정기준', item_codes에 그 항목)",
+    "judgmentDefinition": {
+      "NORMAL_B": "mohw-annex4-def-normal-b",
+      "SUSPECT": "mohw-annex4-def-suspect-chronic"
+    }
+  },
+  "documents": [
+    {
+      "docId": "kdca-6765",
+      "title": "고혈압",
+      "itemCodes": ["SYSTOLIC_BP", "DIASTOLIC_BP"],
+      "sections": ["개요-정의", "진단 및 검사", "생활습관 관리", "치료-비약물 치료"]
+    },
+    {
+      "docId": "kdca-5305",
+      "title": "당뇨병",
+      "itemCodes": ["FASTING_GLUCOSE"],
+      "sections": ["개요-정의", "진단 및 검사", "생활습관 관리"]
+    },
+    {
+      "docId": "kdca-6715",
+      "title": "이상지질혈증",
+      "itemCodes": ["TOTAL_CHOLESTEROL", "HDL_CHOLESTEROL", "TRIGLYCERIDES", "LDL_CHOLESTEROL"],
+      "sections": ["개요-정의", "진단 및 검사", "치료-비약물 치료"]
+    }
+  ]
+}

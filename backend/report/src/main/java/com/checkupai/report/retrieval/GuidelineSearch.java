@@ -1,25 +1,21 @@
 package com.checkupai.report.retrieval;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Service;
 
 /**
- * 해설 근거 검색 (ADR 0007 3절). 4단계 기준선은 벡터 유사도 상위 k개뿐이다.
- * 5단계(ADR 0008 4절 4번)에서 항목 필터({@link #searchForItem})와 판정기준 행 조회({@link #criteriaRow})를 더했다.
- * 둘 다 켜고 끌 수 있게 해설 서비스가 고른다 (짝비교).
+ * 근거 벡터 검색 (ADR 0007 3절). 벡터 유사도 상위 k개와, 5단계(ADR 0008 4절 4번)에서 더한 항목 필터({@link #searchForItem}).
+ *
+ * <p>판정 해설은 2026-11-11부터 검색하지 않고 조회한다 (ADR 0010 1절, explanation.EvidenceLookup).
+ * 이 검색은 검색 평가(GuidelineController)와 다음에 만들 후속 질문 경로가 쓴다 (ADR 0010 2절).
  */
 @Service
 public class GuidelineSearch {
 
-    /** 판정기준표 행 청크의 절 이름 (data/guidelines/curated/mohw-2026-6-annex4.jsonl) */
-    static final String CRITERIA_ROW_SECTION = "검사항목별 판정기준";
     /** 항목 필터를 걸어도 top-k를 채우도록 넉넉히 가져올 배수 (청크가 100개 미만이라 비용이 작다) */
     private static final int OVERFETCH = 5;
 
@@ -72,24 +68,5 @@ public class GuidelineSearch {
             return true;
         }
         return list.stream().anyMatch(code -> itemCode.equals(String.valueOf(code)));
-    }
-
-    /**
-     * 그 항목의 판정기준표 행 (코드 문구의 출처, ADR 0008 1절). 유사도와 상관없이 정해진 행을 찾는다.
-     * 판정기준표 행만 가져와(절 이름 필터) 항목 코드가 맞는 행을 고른다. 없으면 비어 있다 (해설은 '근거 없음').
-     */
-    public Optional<RetrievedChunk> criteriaRow(String itemCode, String query) {
-        List<Document> documents = vectorStore.similaritySearch(SearchRequest.builder()
-                .query(query)
-                .topK(50)
-                .filterExpression(new FilterExpressionBuilder().eq("section", CRITERIA_ROW_SECTION).build())
-                .build());
-        return (documents == null ? List.<Document>of() : documents).stream()
-                .map(document -> new RetrievedChunk(document.getId(), document.getText(),
-                        document.getScore() == null ? 0.0 : document.getScore(), document.getMetadata()))
-                .filter(chunk -> CRITERIA_ROW_SECTION.equals(chunk.metadataText("section")))
-                .filter(chunk -> chunk.metadata().get("item_codes") instanceof Collection<?> codes
-                        && codes.stream().anyMatch(code -> itemCode.equals(String.valueOf(code))))
-                .max(Comparator.comparingDouble(RetrievedChunk::score));
     }
 }

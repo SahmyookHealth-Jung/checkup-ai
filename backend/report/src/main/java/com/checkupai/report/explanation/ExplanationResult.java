@@ -61,11 +61,10 @@ public record ExplanationResult(List<ItemJudgment> judgments, List<ItemExplanati
      * @param llmError 해설 생성이 실패했으면 오류 종류
      * @param salvagedItems 출력이 상한에서 잘려 살린 항목 수 (잘리지 않았으면 -1)
      * @param templatedItems 코드 문구로 답한 항목 수 (LLM 문장 수에는 넣지 않는다)
-     * @param itemFilter 항목 필터를 켰는지
      */
     public record Metrics(int targets, int targetsWithEvidence, int sentencesGenerated, int sentencesKept,
                           int invalidCitations, int uncitedSentences, int ungroundedNumberSentences,
                           int forbiddenHits, long retrievalMs, long llmMs, long totalMs, String llmError,
-                          int salvagedItems, int templatedItems, boolean itemFilter) {
+                          int salvagedItems, int templatedItems) {
     }
 }

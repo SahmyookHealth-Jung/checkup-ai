@@ -39,14 +39,6 @@ class GuidelineSearchTest {
     }
 
     @Test
-    @DisplayName("판정기준 행 조회는 유사도와 상관없이 그 항목의 기준표 행을 고른다")
-    void criteriaRowFindsOwnRow() {
-        assertThat(search.criteriaRow("ALT", "ALT 정상B(경계)")).get()
-                .extracting(RetrievedChunk::id).isEqualTo("mohw-annex4-row-alt");
-        assertThat(search.criteriaRow("FASTING_GLUCOSE", "공복혈당")).isEmpty();  // 기준표 행이 아니면 고르지 않는다
-    }
-
-    @Test
     @DisplayName("항목 코드 메타데이터가 없으면 정의 청크처럼 통과시킨다")
     void missingItemCodesPasses() {
         var chunk = new RetrievedChunk("x", "t", 0.9, Map.of());

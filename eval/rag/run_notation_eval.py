@@ -4,7 +4,7 @@
 맞게 판정 / 확인 필요로 알림 / 틀린 판정 / 조용히 지나감 으로 나눈다 (지표 정의는 notation_metrics.py).
 정답은 합성 데이터 manifest의 variants(변형 전의 깨끗한 값)에서 온다 (eval/synth/variants.py).
 
-판정은 결정적이라 1회만 돌린다. 해설 문장은 보지 않는다 (코드 문구를 켜서 LLM 호출을 줄인다. 보고서당 Haiku 0~1회).
+판정은 결정적이라 1회만 돌린다. 해설 문장은 보지 않는다 (판정 해설은 글 근거가 있는 항목만 LLM을 쓴다. 보고서당 Haiku 0~1회).
 
 사용법 (eval/ 폴더에서, 앱이 떠 있어야 한다):
     .venv/bin/python -m rag.freeze_extractions --name heldout-v4-v2.5 --datasets heldout-v4
@@ -41,7 +41,7 @@ def main() -> None:
                         if json.loads(line)["id"] == report_id).get("variants") or []
         expected = json.loads((DATA / dataset / f"{report_id}.expected.json").read_text(encoding="utf-8"))
         extraction = json.loads((frozen_dir / dataset / f"{report_id}.json").read_text(encoding="utf-8"))
-        explanation = _post(f"{args.api}/api/eval/explain?codeTemplates=true", extraction)
+        explanation = _post(f"{args.api}/api/eval/explain", extraction)
         report_rows = [{"dataset": dataset, "id": report_id, **r} for r in assess_report(criteria, expected, variants, explanation)]
         rows += report_rows
         bad = [f"{r['code']}({r['printed']})={r['outcome']}" for r in report_rows if r["outcome"] not in ("correct", "flagged")]

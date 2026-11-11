@@ -12,18 +12,15 @@ import com.checkupai.report.extraction.ExtractionResult;
 import com.checkupai.report.extraction.ItemCode;
 import com.checkupai.report.extraction.ReportItem;
 import com.checkupai.report.extraction.SalvagingOutputConverter;
-import com.checkupai.report.retrieval.GuidelineSearch;
 import com.checkupai.report.retrieval.RetrievedChunk;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.ai.chat.client.AdvisorParams;
 import org.springframework.ai.chat.client.ChatClient;
@@ -36,25 +33,19 @@ import org.springframework.stereotype.Service;
  * <ol>
  *   <li>판정: 코드가 국가건강검진 판정기준으로 항목마다 판정한다 ({@link ScreeningCriteria})</li>
  *   <li>대상: 정상B(경계)·질환의심 항목만 해설한다 (질환의심 먼저, 상한 {@code max-items})</li>
- *   <li>검색: 항목마다 "항목명 + 판정 구분"으로 근거를 찾고, 유사도 임계 미만은 버린다</li>
+ *   <li>근거: 검색하지 않고 항목 코드로 조회한다 ({@link EvidenceLookup}, ADR 0010 1절). 글 근거가 없는 항목은
+ *       판정기준표 행만 근거로 두고 코드 문구로 답한다 (ADR 0008 1절)</li>
  *   <li>생성: LLM은 항목별 문장과 근거 번호만 낸다. 근거 문단은 시스템 메시지로 보낸다
  *       (식별정보 제거 Advisor가 근거 원문을 바꾸지 않게. 2026-11-10 적재 때 근거 1건이 제거 규칙에 걸렸다)</li>
  *   <li>검증: 인용·숫자 근거를 코드가 확인하고, 고지문과 진료 권고는 코드가 붙인다 ({@link ExplanationGuardrails})</li>
  * </ol>
- * 5단계 개선 두 가지는 켜고 끌 수 있다 ({@link Options}, ADR 0008 4절 4번). 하나씩 짝비교하려고 기본값은 끔이다.
+ * 5단계에서 켜고 끌 수 있던 두 개선(항목 필터, 코드 문구)은 2026-11-11 조회로 바꾸며 고정했다 (ADR 0010 1절).
  */
 @Service
 public class ExplanationService {
 
     static final String FEATURE = "report.explanation";
     static final String PROMPT_VERSION = "explanation-v1";
-    /**
-     * 근거가 판정기준표 1행뿐인 항목 (ADR 0008 1절, 2026-11-10 기준선 분석). 코드 문구를 켜면 LLM 대신 코드가 답한다.
-     * 포털 글을 더하면 그 항목을 여기서 빼고 "코드 문구 → LLM 문장" 전후를 충실도로 잰다.
-     */
-    static final Set<ItemCode> CODE_TEMPLATE_ITEMS = EnumSet.of(ItemCode.BMI, ItemCode.WAIST_CIRCUMFERENCE,
-            ItemCode.HEMOGLOBIN, ItemCode.AST, ItemCode.ALT, ItemCode.GAMMA_GTP, ItemCode.URINE_PROTEIN,
-            ItemCode.SERUM_CREATININE, ItemCode.EGFR, ItemCode.CHEST_XRAY);
     private static final String USER_TEMPLATE = """
             아래 항목을 각각 설명해 주세요.
             {items}
@@ -62,27 +53,18 @@ public class ExplanationService {
 
     private final ChatClient chatClient;
     private final ScreeningCriteria criteria;
-    private final GuidelineSearch search;
+    private final EvidenceLookup lookup;
     private final ExplanationProperties properties;
     private final ExplanationValidator validator = new ExplanationValidator();
     private final String systemPrompt;
 
-    public ExplanationService(ChatClient.Builder chatClientBuilder, ScreeningCriteria criteria, GuidelineSearch search,
+    public ExplanationService(ChatClient.Builder chatClientBuilder, ScreeningCriteria criteria, EvidenceLookup lookup,
                               ExplanationProperties properties) {
         this.chatClient = chatClientBuilder.build();
         this.criteria = criteria;
-        this.search = search;
+        this.lookup = lookup;
         this.properties = properties;
         this.systemPrompt = loadPrompt("prompts/report-explanation-v1.st");
-    }
-
-    /**
-     * 해설 조건 (ADR 0008 4절 4번). 평가 API는 요청마다 바꿔 짝비교한다.
-     *
-     * @param itemFilter 그 항목의 근거와 항목 코드가 없는 근거만 쓴다
-     * @param codeTemplates {@link #CODE_TEMPLATE_ITEMS}는 LLM 대신 코드 문구로 답한다
-     */
-    public record Options(boolean itemFilter, boolean codeTemplates) {
     }
 
     /** 해설 대상 항목과 그 항목에 쓸 수 있는 근거 (근거 번호 → 근거 문단). templated면 코드 문구로 답한다 */
@@ -90,15 +72,7 @@ public class ExplanationService {
                           boolean templated) {
     }
 
-    public Options defaultOptions() {
-        return new Options(properties.itemFilter(), properties.codeTemplates());
-    }
-
     public ExplanationResult explain(ExtractionResult extraction) {
-        return explain(extraction, defaultOptions());
-    }
-
-    public ExplanationResult explain(ExtractionResult extraction, Options options) {
         long started = System.nanoTime();
         CheckupReport report = extraction.report();
         List<ReportItem> reportItems = report == null || report.items() == null ? List.of() : report.items();
@@ -123,8 +97,8 @@ public class ExplanationService {
                     item.unit(), judgment.judgment(), judgment.judgment().label(), judgment.criterion(),
                     item.centerJudgment()));
             if (judgment.judgment() == Judgment.SUSPECT || judgment.judgment() == Judgment.NORMAL_B) {
-                boolean templated = options.codeTemplates() && CODE_TEMPLATE_ITEMS.contains(item.code());
-                targets.add(new Target(item, judgment, new LinkedHashMap<>(), templated));
+                // 코드 문구로 답할지는 근거를 조회한 뒤 정한다 (글 청크가 없으면 코드 문구)
+                targets.add(new Target(item, judgment, new LinkedHashMap<>(), false));
             }
         }
         targets.sort(Comparator.comparing(target -> target.judgment().judgment() == Judgment.SUSPECT ? 0 : 1));
@@ -132,18 +106,18 @@ public class ExplanationService {
             targets = new ArrayList<>(targets.subList(0, properties.maxItems()));
         }
 
-        // 3. 항목마다 근거를 검색한다. 같은 청크는 같은 번호(S1 등)를 쓴다.
-        //    코드 문구 항목은 검색하지 않고 그 항목의 판정기준표 행만 근거로 둔다
+        // 3. 항목마다 근거를 조회한다. 같은 청크는 같은 번호(S1 등)를 쓴다.
+        //    코드 문구 항목의 근거는 그 항목의 판정기준표 행 하나다
         long retrievalStarted = System.nanoTime();
         Map<String, String> labelByChunkId = new LinkedHashMap<>();
         Map<String, RetrievedChunk> chunkByLabel = new LinkedHashMap<>();
-        for (Target target : targets) {
-            String code = target.item().code().name();
-            String query = target.item().code().koreanName() + " " + target.judgment().judgment().label();
-            List<RetrievedChunk> found = target.templated()
-                    ? search.criteriaRow(code, query).stream().toList()
-                    : search.relevant(options.itemFilter() ? search.searchForItem(query, code) : search.search(query));
-            for (RetrievedChunk chunk : found) {
+        for (int i = 0; i < targets.size(); i++) {
+            EvidenceLookup.Evidence evidence = lookup.evidence(targets.get(i).item().code(),
+                    targets.get(i).judgment().judgment());
+            Target target = new Target(targets.get(i).item(), targets.get(i).judgment(), new LinkedHashMap<>(),
+                    !evidence.guideline());
+            targets.set(i, target);
+            for (RetrievedChunk chunk : evidence.chunks()) {
                 String label = labelByChunkId.computeIfAbsent(chunk.id(), id -> "S" + (labelByChunkId.size() + 1));
                 chunkByLabel.put(label, chunk);
                 target.sources().put(label, chunk);
@@ -223,8 +197,7 @@ public class ExplanationService {
         needsReview.addAll(unjudged);
         var metrics = new ExplanationResult.Metrics(targets.size(), withEvidence.size(), generated, kept,
                 invalidCitations, uncited, ungrounded, forbidden, retrievalMs, llmMs,
-                (System.nanoTime() - started) / 1_000_000, llmError, salvagedItems, templatedItems,
-                options.itemFilter());
+                (System.nanoTime() - started) / 1_000_000, llmError, salvagedItems, templatedItems);
         return new ExplanationResult(judgments, items, needsReview, citations, ExplanationGuardrails.DISCLAIMER, metrics);
     }
 

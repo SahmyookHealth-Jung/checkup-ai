@@ -31,7 +31,7 @@ class EvalExplanationControllerTest {
     void disabledReturnsNotFound() {
         var controller = controller(false);
 
-        assertThatThrownBy(() -> controller.explain(extraction(), null, null))
+        assertThatThrownBy(() -> controller.explain(extraction()))
                 .isInstanceOfSatisfying(ResponseStatusException.class,
                         e -> assertThat(e.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND));
         assertThatThrownBy(controller::info).isInstanceOf(ResponseStatusException.class);
@@ -41,13 +41,10 @@ class EvalExplanationControllerTest {
     @Test
     @DisplayName("저장한 추출 결과의 report와 확인 필요 항목만 해설에 넘긴다")
     void passesReportAndNeedsReviewOnly() {
-        when(service.defaultOptions()).thenReturn(new ExplanationService.Options(false, false));
-        controller(true).explain(extraction(), null, null);
+        controller(true).explain(extraction());
 
         var captor = ArgumentCaptor.forClass(ExtractionResult.class);
-        var options = ArgumentCaptor.forClass(ExplanationService.Options.class);
-        verify(service).explain(captor.capture(), options.capture());
-        assertThat(options.getValue()).isEqualTo(new ExplanationService.Options(false, false));
+        verify(service).explain(captor.capture());
         ExtractionResult passed = captor.getValue();
         assertThat(passed.report().items()).extracting(ReportItem::code).containsExactly(ItemCode.FASTING_GLUCOSE);
         assertThat(passed.needsReview()).extracting(ReviewItem::code).containsExactly(ItemCode.AST);
@@ -58,36 +55,25 @@ class EvalExplanationControllerTest {
     @Test
     @DisplayName("report가 없으면 400")
     void rejectsMissingReport() {
-        assertThatThrownBy(() -> controller(true).explain(new ExtractionResult(null, null, null, null), null, null))
+        assertThatThrownBy(() -> controller(true).explain(new ExtractionResult(null, null, null, null)))
                 .isInstanceOfSatisfying(ResponseStatusException.class,
                         e -> assertThat(e.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST));
-        verify(service, org.mockito.Mockito.never()).explain(any(), any());
+        verify(service, org.mockito.Mockito.never()).explain(any());
     }
 
     @Test
-    @DisplayName("요청의 조건이 설정 기본값을 덮는다 (주지 않은 조건은 기본값)")
-    void requestOptionsOverrideDefaults() {
-        when(service.defaultOptions()).thenReturn(new ExplanationService.Options(false, true));
-        controller(true).explain(extraction(), true, null);
-
-        var options = ArgumentCaptor.forClass(ExplanationService.Options.class);
-        verify(service).explain(any(), options.capture());
-        assertThat(options.getValue()).isEqualTo(new ExplanationService.Options(true, true));
-    }
-
-    @Test
-    @DisplayName("설정 조회는 해설 결과를 바꾸는 값(프롬프트 버전, 항목 상한, 검색 k·임계값)을 돌려준다")
+    @DisplayName("설정 조회는 해설 결과를 바꾸는 값(프롬프트 버전, 항목 상한, 근거 조회 방식과 조회표 해시)을 돌려준다")
     void infoReportsSettings() {
         var info = controller(true).info();
 
         assertThat(info.promptVersion()).isEqualTo(ExplanationService.PROMPT_VERSION);
         assertThat(info.maxItems()).isEqualTo(8);
-        assertThat(info.topK()).isEqualTo(4);
-        assertThat(info.minSimilarity()).isEqualTo(0.5);
+        assertThat(info.evidence()).isEqualTo("lookup");
+        assertThat(info.evidenceLookupSha256()).hasSize(16);
     }
 
     private EvalExplanationController controller(boolean enabled) {
-        return new EvalExplanationController(service, new EvalProperties(enabled), new ExplanationProperties(8, 4000, false, false),
+        return new EvalExplanationController(service, new EvalProperties(enabled), new ExplanationProperties(8, 4000),
                 new GuidelineProperties("chunks.jsonl", 4, 0.5));
     }
 
