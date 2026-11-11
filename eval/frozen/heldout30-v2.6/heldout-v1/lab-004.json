@@ -1,0 +1,187 @@
+{
+  "report": {
+    "examDate": "2026-03-16",
+    "examType": "UNKNOWN",
+    "sex": "MALE",
+    "age": 33,
+    "items": [
+      {
+        "code": "HEIGHT",
+        "rawName": "신장",
+        "value": "167.0",
+        "unit": "cm",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "WEIGHT",
+        "rawName": "체중",
+        "value": "55.5",
+        "unit": "kg",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "WAIST_CIRCUMFERENCE",
+        "rawName": "허리둘레",
+        "value": "81",
+        "unit": "cm",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "BMI",
+        "rawName": "체질량지수",
+        "value": "19.9",
+        "unit": "kg/m²",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "SYSTOLIC_BP",
+        "rawName": "혈압(수축기/이완기)",
+        "value": "133",
+        "unit": "mmHg",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "DIASTOLIC_BP",
+        "rawName": "혈압(수축기/이완기)",
+        "value": "88",
+        "unit": "mmHg",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "VISION_LEFT",
+        "rawName": "시력(좌/우)",
+        "value": "1.2",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "VISION_RIGHT",
+        "rawName": "시력(좌/우)",
+        "value": "0.9",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "HEARING_LEFT",
+        "rawName": "청력(좌/우)",
+        "value": "비정상",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": "비정상"
+      },
+      {
+        "code": "HEARING_RIGHT",
+        "rawName": "청력(좌/우)",
+        "value": "정상",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "URINE_PROTEIN",
+        "rawName": "요단백(U-Protein)",
+        "value": "양성(1+)",
+        "unit": null,
+        "referenceRaw": "음성",
+        "centerJudgment": "이상"
+      },
+      {
+        "code": "HEMOGLOBIN",
+        "rawName": "혈색소(Hb)",
+        "value": "10.6",
+        "unit": "g/dL",
+        "referenceRaw": "13.0~16.5",
+        "centerJudgment": "이상"
+      },
+      {
+        "code": "FASTING_GLUCOSE",
+        "rawName": "공복혈당(FBS)",
+        "value": "158",
+        "unit": "mg/dL",
+        "referenceRaw": "100 미만",
+        "centerJudgment": "이상"
+      },
+      {
+        "code": "SERUM_CREATININE",
+        "rawName": "혈청 크레아티닌(Cr)",
+        "value": "1.02",
+        "unit": "mg/dL",
+        "referenceRaw": "1.5 이하",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "EGFR",
+        "rawName": "신사구체여과율(eGFR)",
+        "value": "83",
+        "unit": "mL/min/1.73m²",
+        "referenceRaw": "60 이상",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "AST",
+        "rawName": "SGOT(AST)",
+        "value": "43",
+        "unit": "U/L",
+        "referenceRaw": "40 이하",
+        "centerJudgment": "경계"
+      },
+      {
+        "code": "ALT",
+        "rawName": "SGPT(ALT)",
+        "value": "10",
+        "unit": "U/L",
+        "referenceRaw": "35 이하",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "GAMMA_GTP",
+        "rawName": "감마지티피(r-GTP)",
+        "value": "277",
+        "unit": "U/L",
+        "referenceRaw": "11~63",
+        "centerJudgment": "이상"
+      },
+      {
+        "code": "OTHER",
+        "rawName": "당화혈색소(HbA1c)",
+        "value": "5.3",
+        "unit": "%",
+        "referenceRaw": "5.7 미만",
+        "centerJudgment": null
+      },
+      {
+        "code": "CHEST_XRAY",
+        "rawName": "흉부 X-ray",
+        "value": "정상",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": "정상"
+      }
+    ]
+  },
+  "needsReview": [],
+  "metrics": {
+    "model": "claude-haiku-5-5",
+    "promptVersion": "extraction-v1",
+    "pipeline": "validated-v2.6-noretry",
+    "latencyMs": 5182,
+    "promptTokens": 4120,
+    "completionTokens": 1372,
+    "attempts": 1,
+    "retriedSegments": 0,
+    "issues": {
+      "UNGROUNDED_FIELD": 26
+    },
+    "firstPassLatencyMs": 5157,
+    "firstPassPromptTokens": 4120,
+    "firstPassCompletionTokens": 1372
+  }
+}

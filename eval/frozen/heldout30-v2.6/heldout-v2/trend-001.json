@@ -1,0 +1,161 @@
+{
+  "report": {
+    "examDate": "2026-08-02",
+    "examType": "UNKNOWN",
+    "sex": "MALE",
+    "age": 73,
+    "items": [
+      {
+        "code": "WAIST_CIRCUMFERENCE",
+        "rawName": "허리둘레",
+        "value": "82",
+        "unit": "cm",
+        "referenceRaw": "90 미만",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "BMI",
+        "rawName": "체질량지수",
+        "value": "27.2",
+        "unit": "kg/m²",
+        "referenceRaw": "18.5~24.9",
+        "centerJudgment": "주의"
+      },
+      {
+        "code": "SYSTOLIC_BP",
+        "rawName": "혈압(수축기/이완기)",
+        "value": "145",
+        "unit": "mmHg",
+        "referenceRaw": "120/80 미만",
+        "centerJudgment": "재검"
+      },
+      {
+        "code": "DIASTOLIC_BP",
+        "rawName": "혈압(수축기/이완기)",
+        "value": "102",
+        "unit": "mmHg",
+        "referenceRaw": "120/80 미만",
+        "centerJudgment": "재검"
+      },
+      {
+        "code": "URINE_PROTEIN",
+        "rawName": "요단백",
+        "value": "음성",
+        "unit": null,
+        "referenceRaw": "음성",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "HEMOGLOBIN",
+        "rawName": "혈색소",
+        "value": "15.8",
+        "unit": "g/dL",
+        "referenceRaw": "13.0~16.5",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "FASTING_GLUCOSE",
+        "rawName": "공복혈당",
+        "value": "77",
+        "unit": "mg/dL",
+        "referenceRaw": "100 미만",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "TOTAL_CHOLESTEROL",
+        "rawName": "총콜레스테롤",
+        "value": "192",
+        "unit": "mg/dL",
+        "referenceRaw": "200 미만",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "HDL_CHOLESTEROL",
+        "rawName": "HDL 콜레스테롤",
+        "value": "80",
+        "unit": "mg/dL",
+        "referenceRaw": "60 이상",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "TRIGLYCERIDES",
+        "rawName": "중성지방",
+        "value": "111",
+        "unit": "mg/dL",
+        "referenceRaw": "150 미만",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "LDL_CHOLESTEROL",
+        "rawName": "LDL 콜레스테롤",
+        "value": "109",
+        "unit": "mg/dL",
+        "referenceRaw": "130 미만",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "SERUM_CREATININE",
+        "rawName": "혈청 크레아티닌",
+        "value": "1.11",
+        "unit": "mg/dL",
+        "referenceRaw": "1.5 이하",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "EGFR",
+        "rawName": "신사구체여과율",
+        "value": "108",
+        "unit": "mL/min/1.73m²",
+        "referenceRaw": "60 이상",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "AST",
+        "rawName": "AST",
+        "value": "32",
+        "unit": "U/L",
+        "referenceRaw": "40 이하",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "ALT",
+        "rawName": "ALT",
+        "value": "41",
+        "unit": "U/L",
+        "referenceRaw": "35 이하",
+        "centerJudgment": "주의"
+      },
+      {
+        "code": "GAMMA_GTP",
+        "rawName": "감마지티피",
+        "value": "61",
+        "unit": "U/L",
+        "referenceRaw": "11~63",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "CHEST_XRAY",
+        "rawName": "흉부 X선",
+        "value": "정상",
+        "unit": null,
+        "referenceRaw": "정상",
+        "centerJudgment": "정상"
+      }
+    ]
+  },
+  "needsReview": [],
+  "metrics": {
+    "model": "claude-haiku-5-5",
+    "promptVersion": "extraction-v1",
+    "pipeline": "validated-v2.6-noretry",
+    "latencyMs": 4376,
+    "promptTokens": 4235,
+    "completionTokens": 1203,
+    "attempts": 1,
+    "retriedSegments": 0,
+    "issues": {},
+    "firstPassLatencyMs": 4351,
+    "firstPassPromptTokens": 4235,
+    "firstPassCompletionTokens": 1203
+  }
+}

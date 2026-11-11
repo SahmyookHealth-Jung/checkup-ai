@@ -1,0 +1,196 @@
+{
+  "report": {
+    "examDate": "2026-04-15",
+    "examType": "UNKNOWN",
+    "sex": "FEMALE",
+    "age": 71,
+    "items": [
+      {
+        "code": "HEIGHT",
+        "rawName": "신장",
+        "value": "170.4",
+        "unit": "cm",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "WEIGHT",
+        "rawName": "체중",
+        "value": "81.9",
+        "unit": "kg",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "WAIST_CIRCUMFERENCE",
+        "rawName": "허리둘레",
+        "value": "76",
+        "unit": "cm",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "BMI",
+        "rawName": "체질량지수",
+        "value": "28.2",
+        "unit": "kg/m²",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "SYSTOLIC_BP",
+        "rawName": "혈압(수축기)",
+        "value": "108",
+        "unit": "mmHg",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "DIASTOLIC_BP",
+        "rawName": "혈압(이완기)",
+        "value": "78",
+        "unit": "mmHg",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "VISION_LEFT",
+        "rawName": "시력(좌)",
+        "value": "0.3",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "VISION_RIGHT",
+        "rawName": "시력(우)",
+        "value": "1.0",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "HEARING_LEFT",
+        "rawName": "청력(좌)",
+        "value": "정상",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "HEARING_RIGHT",
+        "rawName": "청력(우)",
+        "value": "정상",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "URINE_PROTEIN",
+        "rawName": "요단백(U-Protein)",
+        "value": "Negative",
+        "unit": null,
+        "referenceRaw": "음성",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "HEMOGLOBIN",
+        "rawName": "혈색소(Hb)",
+        "value": "9.3▼",
+        "unit": "g/dL",
+        "referenceRaw": "12.0~15.5",
+        "centerJudgment": "이상"
+      },
+      {
+        "code": "FASTING_GLUCOSE",
+        "rawName": "공복혈당(FBS)",
+        "value": "93",
+        "unit": "mg/dl",
+        "referenceRaw": "100 미만",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "SERUM_CREATININE",
+        "rawName": "혈청 크레아티닌(Cr)",
+        "value": "1.04",
+        "unit": "mg/dL",
+        "referenceRaw": "1.5 이하",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "AST",
+        "rawName": "SGOT(AST)",
+        "value": "33",
+        "unit": "IU/L",
+        "referenceRaw": "40 이하",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "ALT",
+        "rawName": "SGPT(ALT)",
+        "value": "14",
+        "unit": "U/L",
+        "referenceRaw": "35 이하",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "GAMMA_GTP",
+        "rawName": "감마지티피(r-GTP)",
+        "value": "32",
+        "unit": "IU/L",
+        "referenceRaw": "8~35",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "OTHER",
+        "rawName": "요산(Uric acid)",
+        "value": "7.5",
+        "unit": "mg/dL",
+        "referenceRaw": "3.5~7.2",
+        "centerJudgment": null
+      },
+      {
+        "code": "OTHER",
+        "rawName": "당화혈색소(HbA1c)",
+        "value": "5.2",
+        "unit": "%",
+        "referenceRaw": "5.7 미만",
+        "centerJudgment": null
+      },
+      {
+        "code": "CHEST_XRAY",
+        "rawName": "흉부 X-ray",
+        "value": "특이소견 없음",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "EGFR",
+        "rawName": "신사구체여과율(eGFR)",
+        "value": ">90",
+        "unit": "mL/min/1.73m²",
+        "referenceRaw": "60 이상",
+        "centerJudgment": "정상"
+      }
+    ]
+  },
+  "needsReview": [],
+  "metrics": {
+    "model": "claude-haiku-5-5",
+    "promptVersion": "extraction-v1",
+    "pipeline": "validated-v2.6-noretry",
+    "latencyMs": 4699,
+    "promptTokens": 4164,
+    "completionTokens": 1437,
+    "attempts": 1,
+    "retriedSegments": 0,
+    "issues": {
+      "RAW_NAME_NOT_IN_SOURCE": 6,
+      "UNGROUNDED_FIELD": 27
+    },
+    "firstPassLatencyMs": 4666,
+    "firstPassPromptTokens": 4164,
+    "firstPassCompletionTokens": 1437
+  }
+}

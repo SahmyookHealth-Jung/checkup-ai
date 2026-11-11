@@ -1,0 +1,164 @@
+{
+  "report": {
+    "examDate": "2026-09-21",
+    "examType": "UNKNOWN",
+    "sex": "FEMALE",
+    "age": 67,
+    "items": [
+      {
+        "code": "HEIGHT",
+        "rawName": "신장",
+        "value": "166.9",
+        "unit": "cm",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "WEIGHT",
+        "rawName": "체중",
+        "value": "63.5",
+        "unit": "kg",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "WAIST_CIRCUMFERENCE",
+        "rawName": "허리둘레",
+        "value": "87",
+        "unit": "cm",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "BMI",
+        "rawName": "체질량지수",
+        "value": "22.8",
+        "unit": "kg/m²",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "SYSTOLIC_BP",
+        "rawName": "혈압(수축기)",
+        "value": "162",
+        "unit": "mmHg",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "DIASTOLIC_BP",
+        "rawName": "혈압(이완기)",
+        "value": "93",
+        "unit": "mmHg",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "URINE_PROTEIN",
+        "rawName": "요단백(U-Protein)",
+        "value": "음성",
+        "unit": null,
+        "referenceRaw": "음성",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "HEMOGLOBIN",
+        "rawName": "혈색소(Hb)",
+        "value": "9.5",
+        "unit": "g/dL",
+        "referenceRaw": "12.0~15.5",
+        "centerJudgment": "이상"
+      },
+      {
+        "code": "FASTING_GLUCOSE",
+        "rawName": "공복혈당(FBS)",
+        "value": "98",
+        "unit": "mg/dL",
+        "referenceRaw": "100 미만",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "SERUM_CREATININE",
+        "rawName": "혈청 크레아티닌(Cr)",
+        "value": "0.99",
+        "unit": "㎎/dL",
+        "referenceRaw": "1.5 이하",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "EGFR",
+        "rawName": "신사구체여과율(eGFR)",
+        "value": "88",
+        "unit": "ml/min/1.73㎡",
+        "referenceRaw": "60 이상",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "AST",
+        "rawName": "SGOT(AST)",
+        "value": "45",
+        "unit": "IU/L",
+        "referenceRaw": "40 이하",
+        "centerJudgment": "경계"
+      },
+      {
+        "code": "ALT",
+        "rawName": "SGPT(ALT)",
+        "value": "34",
+        "unit": "U/L",
+        "referenceRaw": "35 이하",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "GAMMA_GTP",
+        "rawName": "감마지티피(r-GTP)",
+        "value": "38",
+        "unit": "U/l",
+        "referenceRaw": "8~35",
+        "centerJudgment": "경계"
+      },
+      {
+        "code": "OTHER",
+        "rawName": "요산(Uric acid)",
+        "value": "6.1",
+        "unit": "mg/dL",
+        "referenceRaw": "3.5~7.2",
+        "centerJudgment": null
+      },
+      {
+        "code": "OTHER",
+        "rawName": "알부민(Albumin)",
+        "value": "4.9",
+        "unit": "g/dL",
+        "referenceRaw": "3.5~5.2",
+        "centerJudgment": null
+      },
+      {
+        "code": "CHEST_XRAY",
+        "rawName": "흉부 X-ray",
+        "value": "정상",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": "정상"
+      }
+    ]
+  },
+  "needsReview": [],
+  "metrics": {
+    "model": "claude-haiku-5-5",
+    "promptVersion": "extraction-v1",
+    "pipeline": "validated-v2.6-noretry",
+    "latencyMs": 4068,
+    "promptTokens": 4116,
+    "completionTokens": 1186,
+    "attempts": 1,
+    "retriedSegments": 0,
+    "issues": {
+      "RAW_NAME_NOT_IN_SOURCE": 2,
+      "UNGROUNDED_FIELD": 17
+    },
+    "firstPassLatencyMs": 4043,
+    "firstPassPromptTokens": 4116,
+    "firstPassCompletionTokens": 1186
+  }
+}

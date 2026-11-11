@@ -1,0 +1,227 @@
+{
+  "report": {
+    "examDate": "2026-04-22",
+    "examType": "UNKNOWN",
+    "sex": "FEMALE",
+    "age": 49,
+    "items": [
+      {
+        "code": "HEIGHT",
+        "rawName": "신장(cm)",
+        "value": "165.4",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "WEIGHT",
+        "rawName": "체중(kg)",
+        "value": "56.6",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "WAIST_CIRCUMFERENCE",
+        "rawName": "허리둘레(cm)",
+        "value": "99",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "BMI",
+        "rawName": "체질량지수(kg/m²)",
+        "value": "20.7",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "SYSTOLIC_BP",
+        "rawName": "혈압(mmHg)",
+        "value": "109",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "DIASTOLIC_BP",
+        "rawName": "혈압(mmHg)",
+        "value": "68",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "VISION_LEFT",
+        "rawName": "시력(좌)",
+        "value": "1.5",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": "양호"
+      },
+      {
+        "code": "VISION_RIGHT",
+        "rawName": "시력(우)",
+        "value": "0.5",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "HEARING_LEFT",
+        "rawName": "청력(좌)",
+        "value": "정상",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "HEARING_RIGHT",
+        "rawName": "청력(우)",
+        "value": "비정상",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "URINE_PROTEIN",
+        "rawName": "요단백",
+        "value": "음성",
+        "unit": null,
+        "referenceRaw": "음성",
+        "centerJudgment": "양호"
+      },
+      {
+        "code": "HEMOGLOBIN",
+        "rawName": "혈색소",
+        "value": "14.9",
+        "unit": "g/dL",
+        "referenceRaw": "12.0~15.5",
+        "centerJudgment": "양호"
+      },
+      {
+        "code": "FASTING_GLUCOSE",
+        "rawName": "공복혈당",
+        "value": "95",
+        "unit": "mg/dL",
+        "referenceRaw": "100 미만",
+        "centerJudgment": "양호"
+      },
+      {
+        "code": "TOTAL_CHOLESTEROL",
+        "rawName": "총콜레스테롤",
+        "value": "194",
+        "unit": "mg/dL",
+        "referenceRaw": "200 미만",
+        "centerJudgment": "양호"
+      },
+      {
+        "code": "HDL_CHOLESTEROL",
+        "rawName": "HDL 콜레스테롤",
+        "value": "81",
+        "unit": "mg/dL",
+        "referenceRaw": "60 이상",
+        "centerJudgment": "양호"
+      },
+      {
+        "code": "TRIGLYCERIDES",
+        "rawName": "중성지방",
+        "value": "76",
+        "unit": "mg/dL",
+        "referenceRaw": "150 미만",
+        "centerJudgment": "양호"
+      },
+      {
+        "code": "LDL_CHOLESTEROL",
+        "rawName": "LDL 콜레스테롤",
+        "value": "193",
+        "unit": "mg/dL",
+        "referenceRaw": "130 미만",
+        "centerJudgment": "진료권고"
+      },
+      {
+        "code": "SERUM_CREATININE",
+        "rawName": "혈청 크레아티닌",
+        "value": "0.98",
+        "unit": "mg/dL",
+        "referenceRaw": "1.5 이하",
+        "centerJudgment": "양호"
+      },
+      {
+        "code": "EGFR",
+        "rawName": "신사구체여과율",
+        "value": "98",
+        "unit": "mL/min/1.73m²",
+        "referenceRaw": "60 이상",
+        "centerJudgment": "양호"
+      },
+      {
+        "code": "AST",
+        "rawName": "AST",
+        "value": "22",
+        "unit": "U/L",
+        "referenceRaw": "40 이하",
+        "centerJudgment": "양호"
+      },
+      {
+        "code": "ALT",
+        "rawName": "ALT",
+        "value": "27",
+        "unit": "U/L",
+        "referenceRaw": "35 이하",
+        "centerJudgment": "양호"
+      },
+      {
+        "code": "GAMMA_GTP",
+        "rawName": "감마지티피",
+        "value": "68",
+        "unit": "U/L",
+        "referenceRaw": "8~35",
+        "centerJudgment": "진료권고"
+      },
+      {
+        "code": "OTHER",
+        "rawName": "암태아성항원",
+        "value": "3.8",
+        "unit": "ng/mL",
+        "referenceRaw": "5.0 이하",
+        "centerJudgment": null
+      },
+      {
+        "code": "OTHER",
+        "rawName": "고감도 C반응단백",
+        "value": "1.0",
+        "unit": "mg/L",
+        "referenceRaw": "1.0 미만",
+        "centerJudgment": null
+      },
+      {
+        "code": "CHEST_XRAY",
+        "rawName": "흉부 촬영",
+        "value": "비활동성 폐결핵",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": "관찰"
+      }
+    ]
+  },
+  "needsReview": [],
+  "metrics": {
+    "model": "claude-haiku-5-5",
+    "promptVersion": "extraction-v1",
+    "pipeline": "validated-v2.6-noretry",
+    "latencyMs": 5281,
+    "promptTokens": 4583,
+    "completionTokens": 1706,
+    "attempts": 1,
+    "retriedSegments": 0,
+    "issues": {
+      "UNGROUNDED_FIELD": 34
+    },
+    "firstPassLatencyMs": 5234,
+    "firstPassPromptTokens": 4583,
+    "firstPassCompletionTokens": 1706
+  }
+}

@@ -1,0 +1,301 @@
+{
+  "name": "heldout30-v2.6",
+  "createdAt": "2026-11-11T22:24:32",
+  "git": {
+    "commit": "28ef482",
+    "dirty": false
+  },
+  "extraction": {
+    "model": "claude-haiku-5-5",
+    "promptVersion": "extraction-v1",
+    "pipeline": "validated-v2.6-noretry",
+    "settings": "firstPassMaxTokens=2500,retryMaxTokens=600,retryBatchSize=4,thinking=disabled,redaction=true"
+  },
+  "cacheKeyInfo": {
+    "model": "claude-haiku-5-5",
+    "promptVersion": "extraction-v1",
+    "pipeline": "validated-v2.5-noretry",
+    "settings": "firstPassMaxTokens=2500,retryMaxTokens=600,retryBatchSize=4,thinking=disabled,redaction=true"
+  },
+  "replayOf": "heldout30-v2.5",
+  "datasets": [
+    "heldout-v1",
+    "heldout-v2",
+    "heldout-v3"
+  ],
+  "reports": 30,
+  "meanF1": 0.9964,
+  "baseMeanF1": 0.9964,
+  "documents": [
+    {
+      "dataset": "heldout-v1",
+      "id": "lab-001",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v1",
+      "id": "lab-002",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v1",
+      "id": "lab-003",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v1",
+      "id": "lab-004",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v1",
+      "id": "lab-005",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v1",
+      "id": "lab-006",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v1",
+      "id": "lab-007",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v1",
+      "id": "lab-008",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v1",
+      "id": "lab-009",
+      "f1": 0.9744,
+      "fp": 0,
+      "fn": 1,
+      "needsReview": 0,
+      "baseF1": 0.9744
+    },
+    {
+      "dataset": "heldout-v1",
+      "id": "lab-010",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v2",
+      "id": "trend-001",
+      "f1": 0.9189,
+      "fp": 0,
+      "fn": 3,
+      "needsReview": 0,
+      "baseF1": 0.9189
+    },
+    {
+      "dataset": "heldout-v2",
+      "id": "trend-002",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v2",
+      "id": "trend-003",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v2",
+      "id": "trend-004",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v2",
+      "id": "trend-005",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v2",
+      "id": "trend-006",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v2",
+      "id": "trend-007",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v2",
+      "id": "trend-008",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v2",
+      "id": "trend-009",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v2",
+      "id": "trend-010",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v3",
+      "id": "guide-001",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v3",
+      "id": "guide-002",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v3",
+      "id": "guide-003",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v3",
+      "id": "guide-004",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v3",
+      "id": "guide-005",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v3",
+      "id": "guide-006",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v3",
+      "id": "guide-007",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v3",
+      "id": "guide-008",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v3",
+      "id": "guide-009",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    },
+    {
+      "dataset": "heldout-v3",
+      "id": "guide-010",
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0,
+      "baseF1": 1.0
+    }
+  ]
+}
