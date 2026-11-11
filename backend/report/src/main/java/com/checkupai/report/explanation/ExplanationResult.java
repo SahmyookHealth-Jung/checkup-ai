@@ -43,7 +43,10 @@ public record ExplanationResult(List<ItemJudgment> judgments, List<ItemExplanati
                            String section, String url, String license, String text) {
     }
 
-    public record ReviewNotice(ItemCode code, String rawName, String value, String advice) {
+    /**
+     * @param reason 확인이 필요한 이유 (예: "가능 범위 밖: 1120", "단위가 다름: mmol/L (기준 단위 mg/dL)")
+     */
+    public record ReviewNotice(ItemCode code, String rawName, String value, String advice, String reason) {
     }
 
     /**

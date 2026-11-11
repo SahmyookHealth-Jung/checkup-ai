@@ -19,6 +19,18 @@ public final class ExplanationGuardrails {
     public static final String REVIEW_ADVICE =
             "결과지에서 읽은 값이 일반적인 범위를 크게 벗어납니다. 결과지 원본을 확인하고 의료진과 상담하세요.";
 
+    /** 원칙 3: 판정 대상인데 표기나 단위를 몰라 판정하지 못한 항목에 붙인다 (ADR 0007 보완, 2026-11-11) */
+    public static final String UNJUDGED_ADVICE =
+            "이 값은 표기나 단위를 확인하지 못해 판정하지 않았습니다. 결과지 원본을 확인하고 의료진과 상담하세요.";
+
+    /**
+     * 원칙 3: 판독 소견을 판정하지 못한 흉부방사선에 붙인다. 고시는 "정상 및 비활동성 폐결핵 이외의 자"를 질환의심으로 정하므로,
+     * 모르는 소견은 이상 소견일 수 있다. 판정은 하지 않되 기준을 밝혀 경고 강도를 유지한다 (2026-11-11 Codex 리뷰)
+     */
+    public static final String CHEST_UNJUDGED_ADVICE =
+            "이 판독 소견은 판정하지 못했습니다. 국가건강검진 판정기준에서 정상·비활동성 폐결핵 이외의 소견은 "
+                    + "질환의심에 해당할 수 있습니다. 결과지 원본을 확인하고 의료진과 상담하세요.";
+
     /** 원칙 2: 근거를 찾지 못한 항목 */
     public static final String NO_EVIDENCE = "이 항목을 설명할 근거를 공개 문서에서 찾지 못했습니다.";
 

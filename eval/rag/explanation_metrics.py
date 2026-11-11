@@ -21,13 +21,15 @@ MISS_CAUSES = ("extraction", "needsReview", "judgment", "maxItems", "other")
 
 
 def judge(criteria: dict, code: str, value: str | None, sex: str | None) -> str:
-    """ScreeningCriteria(Java)와 같은 규칙. 정답 값의 판정을 독립적으로 계산한다"""
+    """ScreeningCriteria(Java)와 같은 기준표 규칙. 정답 값의 판정을 독립적으로 계산한다.
+    깨끗한 값(숫자만, 대표 단위, 기준 파일의 표기)만 다룬다. Java의 단위 확인과 표기 정리(높음·낮음 표시, 쉼표)는 옮기지 않았다.
+    표기 변형의 정답은 변형 전의 깨끗한 값으로 낸다 (notation_metrics.py)"""
     item = criteria["items"].get(code)
     if item is None or value is None:
         return "NOT_JUDGED"
     if item.get("textBands"):
         for band in item["textBands"]:
-            if re.search(band["pattern"], value.strip()):
+            if re.search(band["pattern"], value.strip().lower()):
                 return band["judgment"]
         return "NOT_JUDGED"
     if not NUMBER.fullmatch(value.strip()):

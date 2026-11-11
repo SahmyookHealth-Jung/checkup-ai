@@ -77,4 +77,64 @@ class ScreeningCriteriaTest {
         assertThat(judgment.criterion()).contains("공복 혈당", "126 이상");
         assertThat(judgment.source()).contains("검사항목별 판정기준", "보건복지부고시 제2026-6호");
     }
+
+    @ParameterizedTest(name = "{0} {1} [{2}] → {3}")
+    @DisplayName("표기 변형: 높음·낮음 표시, 쉼표, 같은 단위의 다른 표기는 떼고 판정한다 (ADR 0007 보완)")
+    @CsvSource(delimiter = '|', value = {
+            "FASTING_GLUCOSE | 140 H | mg/dL | SUSPECT", "FASTING_GLUCOSE | H 140 | mg/dL | SUSPECT",
+            "FASTING_GLUCOSE | 140▲ | mg/dL | SUSPECT", "HEMOGLOBIN | 9.3▼ | g/dL | SUSPECT",
+            "HEMOGLOBIN | 9.3 (L) | g/dL | SUSPECT", "TRIGLYCERIDES | 1,120 | mg/dL | SUSPECT",
+            "FASTING_GLUCOSE | 93 | ㎎/dL | NORMAL_A", "FASTING_GLUCOSE | 93 | mg/dl | NORMAL_A",
+            "FASTING_GLUCOSE | 93 | mg/㎗ | NORMAL_A", "AST | 21 | IU/L | NORMAL_A", "AST | 21 | U/l | NORMAL_A",
+            "EGFR | 40 | ml/min/1.73㎡ | SUSPECT", "EGFR | 40 | mL/min/1.73m2 | SUSPECT", "BMI | 31 | kg/m2 | SUSPECT",
+            "FASTING_GLUCOSE | 93 | | NORMAL_A"
+    })
+    void judgesNotationVariants(ItemCode code, String value, String unit, Judgment expected) {
+        assertThat(criteria.judge(code, value, unit, MALE).judgment()).isEqualTo(expected);
+    }
+
+    @ParameterizedTest(name = "{0} {1} [{2}] → 판정하지 않음: {3}")
+    @DisplayName("모르는 표기: 다른 단위, 부등호, 읽지 못한 값은 판정하지 않고 이유를 남긴다 (환산하지 않는다)")
+    @CsvSource(delimiter = '|', value = {
+            "FASTING_GLUCOSE | 7.2 | mmol/L | 단위가 다름", "FASTING_GLUCOSE | 22.4 | mmol/L | 단위가 다름",
+            "SERUM_CREATININE | 88 | μmol/L | 단위가 다름", "HEMOGLOBIN | 135 | g/L | 단위가 다름",
+            "EGFR | >90 | mL/min/1.73m² | 실제 수치가 아닌 값", "TRIGLYCERIDES | 400 이상 | mg/dL | 실제 수치가 아닌 값",
+            "FASTING_GLUCOSE | 검사 안 함 | mg/dL | 숫자로 읽지 못함", "FASTING_GLUCOSE | 140 HDL | mg/dL | 숫자로 읽지 못함",
+            "FASTING_GLUCOSE | 7.2 L/min | mg/dL | 숫자로 읽지 못함", "FASTING_GLUCOSE | HDL 140 | mg/dL | 숫자로 읽지 못함", "FASTING_GLUCOSE | 100~125 | mg/dL | 숫자로 읽지 못함",
+            "HEMOGLOBIN | 16.6 | g/dL | 판정기준표에 없는 구간"
+    })
+    void doesNotJudgeUnknownNotation(ItemCode code, String value, String unit, String note) {
+        CriteriaJudgment judgment = criteria.judge(code, value, unit, MALE);
+        assertThat(judgment.judgment()).isEqualTo(Judgment.NOT_JUDGED);
+        assertThat(judgment.note()).startsWith(note);
+        assertThat(judgment.unjudgedTarget()).isTrue();
+    }
+
+    @ParameterizedTest(name = "{0} {1} → {2}")
+    @DisplayName("글자 표기 변형: 아는 표기만 판정한다. 흉부방사선 질환의심은 '의심'·'소견서 참조'처럼 명시된 표기일 때만이다")
+    @CsvSource(delimiter = '|', value = {
+            "URINE_PROTEIN | 음성(-) | NORMAL_A", "URINE_PROTEIN | Negative | NORMAL_A", "URINE_PROTEIN | - | NORMAL_A",
+            "URINE_PROTEIN | (-) | NORMAL_A", "URINE_PROTEIN | ± | NORMAL_B", "URINE_PROTEIN | +/- | NORMAL_B",
+            "URINE_PROTEIN | trace | NORMAL_B", "URINE_PROTEIN | Trace | NORMAL_B", "URINE_PROTEIN | 1+ | SUSPECT",
+            "URINE_PROTEIN | +1 | SUSPECT", "URINE_PROTEIN | 양성(+) | SUSPECT", "URINE_PROTEIN | 3+ | SUSPECT",
+            "URINE_PROTEIN | 검사 불가 | NOT_JUDGED",
+            "CHEST_XRAY | 정상(특이소견 없음) | NORMAL_A", "CHEST_XRAY | 정상A | NORMAL_A", "CHEST_XRAY | 특이소견 없음 | NORMAL_A",
+            "CHEST_XRAY | 이상 소견 없음 | NORMAL_A", "CHEST_XRAY | 결핵 의심 소견 없음 | NORMAL_A",
+            "CHEST_XRAY | 비활동성 폐결핵(추적 관찰) | NORMAL_B", "CHEST_XRAY | 폐결절 의심 | SUSPECT",
+            "CHEST_XRAY | 활동성 폐결핵 의심 | SUSPECT", "CHEST_XRAY | 심비대 소견 | SUSPECT", "CHEST_XRAY | 우상엽 결절 | SUSPECT",
+            "CHEST_XRAY | 결절 소견 없음 | NORMAL_A", "CHEST_XRAY | 대동맥 석회화 | NOT_JUDGED",
+            "CHEST_XRAY | 비활동성 결핵 흔적 | NOT_JUDGED", "CHEST_XRAY | 사진불량(재촬영 의심) | NOT_JUDGED"
+    })
+    void judgesKnownTextNotationsOnly(ItemCode code, String value, Judgment expected) {
+        CriteriaJudgment judgment = criteria.judge(code, value, null, MALE);
+        assertThat(judgment.judgment()).isEqualTo(expected);
+        assertThat(judgment.unjudgedTarget()).isEqualTo(expected == Judgment.NOT_JUDGED);
+    }
+
+    @Test
+    @DisplayName("판정기준표에 없는 항목은 판정 대상이 아니다 (확인 필요로 알리지 않는다)")
+    void itemsOutsideTheTableAreNotTargets() {
+        assertThat(criteria.judge(ItemCode.VISION_LEFT, "1.0", null, MALE).unjudgedTarget()).isFalse();
+        assertThat(criteria.judge(ItemCode.OTHER, "5.2", "%", MALE).unjudgedTarget()).isFalse();
+    }
 }

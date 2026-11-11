@@ -107,7 +107,7 @@
     const x = data.explanation;
     $('disclaimer').textContent = x.disclaimer;
     $('review').replaceChildren(...x.needsReview.map(r =>
-      el('div', { class: 'advice review' }, `확인 필요: ${r.rawName ?? r.code} ${r.value} — ${r.advice}`)));
+      el('div', { class: 'advice review' }, `확인 필요: ${r.rawName ?? r.code} ${r.value} — ${r.reason ? r.reason + '. ' : ''}${r.advice}`)));
     $('table').replaceChildren(...x.judgments.map(j => el('tr', {},
       el('td', {}, j.name), el('td', {}, j.rawName ?? ''), el('td', {}, `${j.value}${j.unit ? ' ' + j.unit : ''}`),
       el('td', {}, j.centerJudgment ?? '-'), el('td', { class: `j j-${j.judgment}` }, j.judgmentLabel))));

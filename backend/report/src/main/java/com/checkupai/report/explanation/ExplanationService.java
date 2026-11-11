@@ -107,11 +107,18 @@ public class ExplanationService {
         // 1~2. 코드가 판정하고 해설 대상을 고른다
         List<ItemJudgment> judgments = new ArrayList<>();
         List<Target> targets = new ArrayList<>();
+        List<ReviewNotice> unjudged = new ArrayList<>();
         for (ReportItem item : reportItems) {
             if (item.code() == null) {
                 continue;
             }
-            CriteriaJudgment judgment = criteria.judge(item.code(), item.value(), sex);
+            CriteriaJudgment judgment = criteria.judge(item.code(), item.value(), item.unit(), sex);
+            if (judgment.unjudgedTarget()) {
+                // 판정 대상인데 판정하지 못했다. 조용히 넘어가지 않고 확인 필요로 알린다 (ADR 0007 보완)
+                unjudged.add(new ReviewNotice(item.code(), item.rawName(), item.value(),
+                        item.code() == ItemCode.CHEST_XRAY ? ExplanationGuardrails.CHEST_UNJUDGED_ADVICE
+                                : ExplanationGuardrails.UNJUDGED_ADVICE, judgment.note()));
+            }
             judgments.add(new ItemJudgment(item.code(), item.code().koreanName(), item.rawName(), item.value(),
                     item.unit(), judgment.judgment(), judgment.judgment().label(), judgment.criterion(),
                     item.centerJudgment()));
@@ -208,10 +215,12 @@ public class ExplanationService {
         List<Citation> citations = citationNumbers.entrySet().stream()
                 .map(entry -> citation(entry.getValue(), chunkByLabel.get(entry.getKey())))
                 .toList();
-        List<ReviewNotice> needsReview = extraction.needsReview() == null ? List.of() : extraction.needsReview().stream()
-                .map(review -> new ReviewNotice(review.code(), review.rawName(), review.value(),
-                        ExplanationGuardrails.REVIEW_ADVICE))
-                .toList();
+        List<ReviewNotice> needsReview = new ArrayList<>();
+        if (extraction.needsReview() != null) {
+            extraction.needsReview().forEach(review -> needsReview.add(new ReviewNotice(review.code(), review.rawName(),
+                    review.value(), ExplanationGuardrails.REVIEW_ADVICE, review.reason())));
+        }
+        needsReview.addAll(unjudged);
         var metrics = new ExplanationResult.Metrics(targets.size(), withEvidence.size(), generated, kept,
                 invalidCitations, uncited, ungrounded, forbidden, retrievalMs, llmMs,
                 (System.nanoTime() - started) / 1_000_000, llmError, salvagedItems, templatedItems,
