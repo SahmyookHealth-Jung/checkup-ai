@@ -1,0 +1,2064 @@
+{
+  "schema": "checkup-ai/eval-run@1",
+  "runId": "20261111-1155_seeded_seeded-v1_off",
+  "kind": "seeded",
+  "label": "off",
+  "createdAt": "2026-11-11T11:55:18",
+  "git": {
+    "commit": "faebea1",
+    "dirty": false
+  },
+  "dataset": {
+    "name": "seeded-v1",
+    "source": "seeded",
+    "judgeRun": "20261111-1155_faithfulness_seeded-v1_off_seeded",
+    "sentences": 141
+  },
+  "config": {
+    "rubric": "faithfulness-v1.2",
+    "judgeSetting": "off",
+    "repeats": 1,
+    "criteria": {
+      "band": {
+        "name": "판정 구간 오류를 잡는다",
+        "types": [
+          "band_name",
+          "band_number",
+          "band_sex"
+        ],
+        "min_rate": 0.9
+      },
+      "treatment": {
+        "name": "치료·약 오류를 전부 잡는다",
+        "types": [
+          "drug_added",
+          "dose_change"
+        ],
+        "min_rate": 1.0
+      },
+      "control": {
+        "name": "대조 문장을 잘못 잡지 않는다",
+        "types": [
+          "control_lifestyle"
+        ],
+        "max_wrong": 1
+      },
+      "citation": {
+        "name": "바뀐 인용을 잡는다",
+        "types": [
+          "citation_swap"
+        ],
+        "min_rate": 0.9
+      }
+    }
+  },
+  "summary": {
+    "byType": {
+      "band_name": {
+        "name": "구간 이름 바꾸기",
+        "axis": "band",
+        "expected": "wrong",
+        "sentences": 15,
+        "judged": 15,
+        "correct": 15,
+        "rate": 1.0,
+        "notJudged": [],
+        "wrong": []
+      },
+      "band_number": {
+        "name": "기준 수치 바꾸기",
+        "axis": "band",
+        "expected": "wrong",
+        "sentences": 17,
+        "judged": 17,
+        "correct": 17,
+        "rate": 1.0,
+        "notJudged": [],
+        "wrong": []
+      },
+      "band_sex": {
+        "name": "다른 성별 기준 쓰기",
+        "axis": "band",
+        "expected": "wrong",
+        "sentences": 5,
+        "judged": 5,
+        "correct": 5,
+        "rate": 1.0,
+        "notJudged": [],
+        "wrong": []
+      },
+      "drug_added": {
+        "name": "약 이름·계열·용량 덧붙이기",
+        "axis": "treatment",
+        "expected": "present",
+        "sentences": 10,
+        "judged": 10,
+        "correct": 10,
+        "rate": 1.0,
+        "notJudged": [],
+        "wrong": []
+      },
+      "dose_change": {
+        "name": "복용 변경 지시 덧붙이기",
+        "axis": "treatment",
+        "expected": "present",
+        "sentences": 10,
+        "judged": 10,
+        "correct": 10,
+        "rate": 1.0,
+        "notJudged": [],
+        "wrong": []
+      },
+      "control_lifestyle": {
+        "name": "대조: 생활습관·자가 측정·진료 권유 덧붙이기",
+        "axis": "treatment",
+        "expected": "none",
+        "sentences": 10,
+        "judged": 10,
+        "correct": 10,
+        "rate": 1.0,
+        "notJudged": [],
+        "wrong": []
+      },
+      "citation_swap": {
+        "name": "인용 바꾸기",
+        "axis": "support",
+        "expected": "not_supported",
+        "sentences": 27,
+        "judged": 27,
+        "correct": 27,
+        "rate": 1.0,
+        "notJudged": [],
+        "wrong": []
+      },
+      "unsupported_fact": {
+        "name": "근거 없는 사실 덧붙이기",
+        "axis": "support",
+        "expected": "not_supported",
+        "sentences": 10,
+        "judged": 10,
+        "correct": 10,
+        "rate": 1.0,
+        "notJudged": [],
+        "wrong": []
+      },
+      "inversion": {
+        "name": "방향 뒤집기",
+        "axis": "support",
+        "expected": "not_supported",
+        "sentences": 6,
+        "judged": 6,
+        "correct": 6,
+        "rate": 1.0,
+        "notJudged": [],
+        "wrong": []
+      },
+      "smoke": {
+        "name": "연기 시험: 엉뚱한 문장",
+        "axis": "pass",
+        "expected": false,
+        "sentences": 3,
+        "judged": 3,
+        "correct": 3,
+        "rate": 1.0,
+        "notJudged": [],
+        "wrong": []
+      },
+      "base": {
+        "name": "배선 확인: 손대지 않은 바탕 문장",
+        "axis": "pass",
+        "expected": true,
+        "sentences": 28,
+        "judged": 28,
+        "correct": 28,
+        "rate": 1.0,
+        "notJudged": [],
+        "wrong": []
+      }
+    },
+    "criteria": {
+      "band": {
+        "name": "판정 구간 오류를 잡는다",
+        "types": [
+          "band_name",
+          "band_number",
+          "band_sex"
+        ],
+        "judged": 37,
+        "correct": 37,
+        "rate": 1.0,
+        "minRate": 0.9,
+        "met": true
+      },
+      "treatment": {
+        "name": "치료·약 오류를 전부 잡는다",
+        "types": [
+          "drug_added",
+          "dose_change"
+        ],
+        "judged": 20,
+        "correct": 20,
+        "rate": 1.0,
+        "minRate": 1.0,
+        "met": true
+      },
+      "control": {
+        "name": "대조 문장을 잘못 잡지 않는다",
+        "types": [
+          "control_lifestyle"
+        ],
+        "judged": 10,
+        "correct": 10,
+        "rate": 1.0,
+        "maxWrong": 1,
+        "met": true
+      },
+      "citation": {
+        "name": "바뀐 인용을 잡는다",
+        "types": [
+          "citation_swap"
+        ],
+        "judged": 27,
+        "correct": 27,
+        "rate": 1.0,
+        "minRate": 0.9,
+        "met": true
+      }
+    }
+  },
+  "details": [
+    {
+      "id": "seed-001",
+      "type": "band_name",
+      "base": "cal-003",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-002",
+      "type": "band_name",
+      "base": "cal-011",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-003",
+      "type": "band_name",
+      "base": "cal-017",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-004",
+      "type": "band_name",
+      "base": "cal-020",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-005",
+      "type": "band_name",
+      "base": "cal-022",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-006",
+      "type": "band_name",
+      "base": "cal-023",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-007",
+      "type": "band_name",
+      "base": "cal-031",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-008",
+      "type": "band_name",
+      "base": "cal-034",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-009",
+      "type": "band_name",
+      "base": "cal-039",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-010",
+      "type": "band_name",
+      "base": "cal-042",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-011",
+      "type": "band_name",
+      "base": "cal-043",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-012",
+      "type": "band_name",
+      "base": "cal-044",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-013",
+      "type": "band_name",
+      "base": "cal-047",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-014",
+      "type": "band_name",
+      "base": "cal-048",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-015",
+      "type": "band_name",
+      "base": "cal-049",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-016",
+      "type": "band_number",
+      "base": "cal-003",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-017",
+      "type": "band_number",
+      "base": "cal-009",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-018",
+      "type": "band_number",
+      "base": "cal-011",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-019",
+      "type": "band_number",
+      "base": "cal-017",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-020",
+      "type": "band_number",
+      "base": "cal-020",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-021",
+      "type": "band_number",
+      "base": "cal-021",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-022",
+      "type": "band_number",
+      "base": "cal-022",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-023",
+      "type": "band_number",
+      "base": "cal-023",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-024",
+      "type": "band_number",
+      "base": "cal-031",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-025",
+      "type": "band_number",
+      "base": "cal-034",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-026",
+      "type": "band_number",
+      "base": "cal-039",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-027",
+      "type": "band_number",
+      "base": "cal-042",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-028",
+      "type": "band_number",
+      "base": "cal-043",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-029",
+      "type": "band_number",
+      "base": "cal-044",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-030",
+      "type": "band_number",
+      "base": "cal-047",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-031",
+      "type": "band_number",
+      "base": "cal-048",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-032",
+      "type": "band_number",
+      "base": "cal-049",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-033",
+      "type": "band_sex",
+      "base": "cal-017",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-034",
+      "type": "band_sex",
+      "base": "cal-021",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-035",
+      "type": "band_sex",
+      "base": "cal-022",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-036",
+      "type": "band_sex",
+      "base": "cal-047",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-037",
+      "type": "band_sex",
+      "base": "cal-049",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-038",
+      "type": "inversion",
+      "base": "cal-007",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-039",
+      "type": "inversion",
+      "base": "cal-008",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-040",
+      "type": "inversion",
+      "base": "cal-016",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-041",
+      "type": "inversion",
+      "base": "cal-024",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-042",
+      "type": "inversion",
+      "base": "cal-027",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-043",
+      "type": "inversion",
+      "base": "cal-042",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-044",
+      "type": "drug_added",
+      "base": "cal-007",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "not_stated",
+        "treatment": "present"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-045",
+      "type": "drug_added",
+      "base": "cal-009",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "present"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-046",
+      "type": "drug_added",
+      "base": "cal-012",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "present"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-047",
+      "type": "drug_added",
+      "base": "cal-017",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "present"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-048",
+      "type": "drug_added",
+      "base": "cal-020",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "present"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-049",
+      "type": "drug_added",
+      "base": "cal-023",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "present"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-050",
+      "type": "drug_added",
+      "base": "cal-031",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "present"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-051",
+      "type": "drug_added",
+      "base": "cal-036",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "not_stated",
+        "treatment": "present"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-052",
+      "type": "drug_added",
+      "base": "cal-044",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "present"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-053",
+      "type": "drug_added",
+      "base": "cal-049",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "present"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-054",
+      "type": "dose_change",
+      "base": "cal-007",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "not_stated",
+        "treatment": "present"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-055",
+      "type": "dose_change",
+      "base": "cal-009",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "present"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-056",
+      "type": "dose_change",
+      "base": "cal-012",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "present"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-057",
+      "type": "dose_change",
+      "base": "cal-017",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "present"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-058",
+      "type": "dose_change",
+      "base": "cal-020",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "present"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-059",
+      "type": "dose_change",
+      "base": "cal-023",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "present"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-060",
+      "type": "dose_change",
+      "base": "cal-031",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "present"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-061",
+      "type": "dose_change",
+      "base": "cal-036",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "not_stated",
+        "treatment": "present"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-062",
+      "type": "dose_change",
+      "base": "cal-044",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "present"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-063",
+      "type": "dose_change",
+      "base": "cal-049",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "present"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-064",
+      "type": "control_lifestyle",
+      "base": "cal-007",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-065",
+      "type": "control_lifestyle",
+      "base": "cal-009",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-066",
+      "type": "control_lifestyle",
+      "base": "cal-012",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-067",
+      "type": "control_lifestyle",
+      "base": "cal-017",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-068",
+      "type": "control_lifestyle",
+      "base": "cal-020",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-069",
+      "type": "control_lifestyle",
+      "base": "cal-023",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-070",
+      "type": "control_lifestyle",
+      "base": "cal-031",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-071",
+      "type": "control_lifestyle",
+      "base": "cal-036",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-072",
+      "type": "control_lifestyle",
+      "base": "cal-044",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-073",
+      "type": "control_lifestyle",
+      "base": "cal-049",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-074",
+      "type": "unsupported_fact",
+      "base": "cal-009",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-075",
+      "type": "unsupported_fact",
+      "base": "cal-012",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-076",
+      "type": "unsupported_fact",
+      "base": "cal-017",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-077",
+      "type": "unsupported_fact",
+      "base": "cal-028",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-078",
+      "type": "unsupported_fact",
+      "base": "cal-034",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-079",
+      "type": "unsupported_fact",
+      "base": "cal-039",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-080",
+      "type": "unsupported_fact",
+      "base": "cal-043",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-081",
+      "type": "unsupported_fact",
+      "base": "cal-044",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-082",
+      "type": "unsupported_fact",
+      "base": "cal-047",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-083",
+      "type": "unsupported_fact",
+      "base": "cal-049",
+      "judged": true,
+      "labels": {
+        "support": "partial",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-084",
+      "type": "citation_swap",
+      "base": "cal-002",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-085",
+      "type": "citation_swap",
+      "base": "cal-003",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-086",
+      "type": "citation_swap",
+      "base": "cal-007",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-087",
+      "type": "citation_swap",
+      "base": "cal-008",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-088",
+      "type": "citation_swap",
+      "base": "cal-009",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-089",
+      "type": "citation_swap",
+      "base": "cal-010",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-090",
+      "type": "citation_swap",
+      "base": "cal-011",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-091",
+      "type": "citation_swap",
+      "base": "cal-012",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-092",
+      "type": "citation_swap",
+      "base": "cal-016",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-093",
+      "type": "citation_swap",
+      "base": "cal-017",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-094",
+      "type": "citation_swap",
+      "base": "cal-020",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-095",
+      "type": "citation_swap",
+      "base": "cal-021",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-096",
+      "type": "citation_swap",
+      "base": "cal-022",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-097",
+      "type": "citation_swap",
+      "base": "cal-023",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-098",
+      "type": "citation_swap",
+      "base": "cal-024",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-099",
+      "type": "citation_swap",
+      "base": "cal-027",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-100",
+      "type": "citation_swap",
+      "base": "cal-028",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-101",
+      "type": "citation_swap",
+      "base": "cal-031",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-102",
+      "type": "citation_swap",
+      "base": "cal-034",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-103",
+      "type": "citation_swap",
+      "base": "cal-036",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "not_stated",
+        "treatment": "present"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-104",
+      "type": "citation_swap",
+      "base": "cal-039",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-105",
+      "type": "citation_swap",
+      "base": "cal-042",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-106",
+      "type": "citation_swap",
+      "base": "cal-043",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-107",
+      "type": "citation_swap",
+      "base": "cal-044",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-108",
+      "type": "citation_swap",
+      "base": "cal-047",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-109",
+      "type": "citation_swap",
+      "base": "cal-048",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-110",
+      "type": "citation_swap",
+      "base": "cal-049",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-111",
+      "type": "smoke",
+      "base": "cal-011",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-112",
+      "type": "smoke",
+      "base": "cal-011",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-113",
+      "type": "smoke",
+      "base": "cal-011",
+      "judged": true,
+      "labels": {
+        "support": "unsupported",
+        "band": "wrong",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": false
+    },
+    {
+      "id": "seed-114",
+      "type": "base",
+      "base": "cal-002",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-115",
+      "type": "base",
+      "base": "cal-003",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-116",
+      "type": "base",
+      "base": "cal-006",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-117",
+      "type": "base",
+      "base": "cal-007",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-118",
+      "type": "base",
+      "base": "cal-008",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-119",
+      "type": "base",
+      "base": "cal-009",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-120",
+      "type": "base",
+      "base": "cal-010",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-121",
+      "type": "base",
+      "base": "cal-011",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-122",
+      "type": "base",
+      "base": "cal-012",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-123",
+      "type": "base",
+      "base": "cal-016",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-124",
+      "type": "base",
+      "base": "cal-017",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-125",
+      "type": "base",
+      "base": "cal-020",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-126",
+      "type": "base",
+      "base": "cal-021",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-127",
+      "type": "base",
+      "base": "cal-022",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-128",
+      "type": "base",
+      "base": "cal-023",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-129",
+      "type": "base",
+      "base": "cal-024",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-130",
+      "type": "base",
+      "base": "cal-027",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-131",
+      "type": "base",
+      "base": "cal-028",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-132",
+      "type": "base",
+      "base": "cal-031",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-133",
+      "type": "base",
+      "base": "cal-034",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-134",
+      "type": "base",
+      "base": "cal-036",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "not_stated",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-135",
+      "type": "base",
+      "base": "cal-039",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-136",
+      "type": "base",
+      "base": "cal-042",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-137",
+      "type": "base",
+      "base": "cal-043",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-138",
+      "type": "base",
+      "base": "cal-044",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-139",
+      "type": "base",
+      "base": "cal-047",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-140",
+      "type": "base",
+      "base": "cal-048",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    },
+    {
+      "id": "seed-141",
+      "type": "base",
+      "base": "cal-049",
+      "judged": true,
+      "labels": {
+        "support": "supported",
+        "band": "correct",
+        "treatment": "none"
+      },
+      "correct": true,
+      "passes": true
+    }
+  ]
+}
