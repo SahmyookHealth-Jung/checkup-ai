@@ -1,0 +1,225 @@
+{
+  "report": {
+    "examDate": "2026-07-08",
+    "examType": "UNKNOWN",
+    "sex": "FEMALE",
+    "age": 44,
+    "items": [
+      {
+        "code": "HEIGHT",
+        "rawName": "신장",
+        "value": "165.2",
+        "unit": "cm",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "WEIGHT",
+        "rawName": "체중",
+        "value": "74.2",
+        "unit": "kg",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "WAIST_CIRCUMFERENCE",
+        "rawName": "허리둘레",
+        "value": "90",
+        "unit": "cm",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "BMI",
+        "rawName": "체질량지수",
+        "value": "27.2",
+        "unit": "kg/m²",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "SYSTOLIC_BP",
+        "rawName": "혈압(수축기/이완기)",
+        "value": "104",
+        "unit": "mmHg",
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "DIASTOLIC_BP",
+        "rawName": "혈압(수축기/이완기)",
+        "value": "71",
+        "unit": "mmHg",
+        "referenceRaw": null,
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "VISION_LEFT",
+        "rawName": "시력(좌/우)",
+        "value": "1.5",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "VISION_RIGHT",
+        "rawName": "시력(좌/우)",
+        "value": "0.5",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": null
+      },
+      {
+        "code": "HEARING_LEFT",
+        "rawName": "청력(좌/우)",
+        "value": "정상",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "HEARING_RIGHT",
+        "rawName": "청력(좌/우)",
+        "value": "정상",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "URINE_PROTEIN",
+        "rawName": "요단백(U-Protein)",
+        "value": "양성(+)",
+        "unit": null,
+        "referenceRaw": "음성",
+        "centerJudgment": "이상"
+      },
+      {
+        "code": "HEMOGLOBIN",
+        "rawName": "혈색소(Hb)",
+        "value": "13.2",
+        "unit": "g/㎗",
+        "referenceRaw": "12.0~15.5",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "FASTING_GLUCOSE",
+        "rawName": "공복혈당(FBS)",
+        "value": "178",
+        "unit": "mg/dL",
+        "referenceRaw": "100 미만",
+        "centerJudgment": "이상"
+      },
+      {
+        "code": "TOTAL_CHOLESTEROL",
+        "rawName": "총콜레스테롤(T-Chol)",
+        "value": "221",
+        "unit": "mg/dL",
+        "referenceRaw": "200 미만",
+        "centerJudgment": "경계"
+      },
+      {
+        "code": "HDL_CHOLESTEROL",
+        "rawName": "HDL 콜레스테롤(HDL-C)",
+        "value": "71",
+        "unit": "mg/dL",
+        "referenceRaw": "60 이상",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "LDL_CHOLESTEROL",
+        "rawName": "LDL 콜레스테롤(LDL-C)",
+        "value": "149",
+        "unit": "mg/㎗",
+        "referenceRaw": "130 미만",
+        "centerJudgment": "경계"
+      },
+      {
+        "code": "EGFR",
+        "rawName": "신사구체여과율(eGFR)",
+        "value": "86",
+        "unit": "ml/min/1.73㎡",
+        "referenceRaw": "60 이상",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "AST",
+        "rawName": "SGOT(AST)",
+        "value": "21",
+        "unit": "U/l",
+        "referenceRaw": "40 이하",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "ALT",
+        "rawName": "SGPT(ALT)",
+        "value": "18",
+        "unit": "U/l",
+        "referenceRaw": "35 이하",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "GAMMA_GTP",
+        "rawName": "감마지티피(r-GTP)",
+        "value": "13",
+        "unit": "U/l",
+        "referenceRaw": "8~35",
+        "centerJudgment": "정상"
+      },
+      {
+        "code": "OTHER",
+        "rawName": "요산(Uric acid)",
+        "value": "8.8",
+        "unit": "mg/dL",
+        "referenceRaw": "3.5~7.2",
+        "centerJudgment": null
+      },
+      {
+        "code": "OTHER",
+        "rawName": "당화혈색소(HbA1c)",
+        "value": "6.1",
+        "unit": "%",
+        "referenceRaw": "5.7 미만",
+        "centerJudgment": null
+      },
+      {
+        "code": "CHEST_XRAY",
+        "rawName": "흉부 X-ray",
+        "value": "정상",
+        "unit": null,
+        "referenceRaw": null,
+        "centerJudgment": "정상"
+      }
+    ]
+  },
+  "needsReview": [
+    {
+      "code": "TRIGLYCERIDES",
+      "rawName": "중성지방(TG)",
+      "value": "1.65",
+      "reason": "가능 범위 밖: 1.65"
+    },
+    {
+      "code": "SERUM_CREATININE",
+      "rawName": "혈청 크레아티닌(Cr)",
+      "value": "65",
+      "reason": "가능 범위 밖: 65"
+    }
+  ],
+  "metrics": {
+    "model": "claude-haiku-5-5",
+    "promptVersion": "extraction-v1",
+    "pipeline": "validated-v2.5-noretry",
+    "latencyMs": 5412,
+    "promptTokens": 4316,
+    "completionTokens": 1762,
+    "attempts": 1,
+    "retriedSegments": 0,
+    "issues": {
+      "IMPLAUSIBLE": 2,
+      "UNGROUNDED_FIELD": 26
+    },
+    "firstPassLatencyMs": 5376,
+    "firstPassPromptTokens": 4316,
+    "firstPassCompletionTokens": 1762
+  }
+}

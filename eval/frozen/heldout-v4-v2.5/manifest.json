@@ -1,0 +1,111 @@
+{
+  "name": "heldout-v4-v2.5",
+  "createdAt": "2026-11-11T16:29:04",
+  "git": {
+    "commit": "c3c05d5",
+    "dirty": false
+  },
+  "extraction": {
+    "model": "claude-haiku-5-5",
+    "promptVersion": "extraction-v1",
+    "pipeline": "validated-v2.5-noretry",
+    "settings": "firstPassMaxTokens=2500,retryMaxTokens=600,retryBatchSize=4,thinking=disabled,redaction=true"
+  },
+  "datasets": [
+    "heldout-v4"
+  ],
+  "reports": 10,
+  "meanF1": 0.9657,
+  "documents": [
+    {
+      "dataset": "heldout-v4",
+      "id": "labv-001",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v4",
+      "id": "labv-002",
+      "cached": false,
+      "f1": 0.9756,
+      "fp": 0,
+      "fn": 1,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v4",
+      "id": "labv-003",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v4",
+      "id": "labv-004",
+      "cached": false,
+      "f1": 0.95,
+      "fp": 0,
+      "fn": 2,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v4",
+      "id": "labv-005",
+      "cached": false,
+      "f1": 0.9362,
+      "fp": 1,
+      "fn": 2,
+      "needsReview": 1
+    },
+    {
+      "dataset": "heldout-v4",
+      "id": "labv-006",
+      "cached": false,
+      "f1": 0.9767,
+      "fp": 0,
+      "fn": 1,
+      "needsReview": 1
+    },
+    {
+      "dataset": "heldout-v4",
+      "id": "labv-007",
+      "cached": false,
+      "f1": 1.0,
+      "fp": 0,
+      "fn": 0,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v4",
+      "id": "labv-008",
+      "cached": false,
+      "f1": 0.902,
+      "fp": 2,
+      "fn": 3,
+      "needsReview": 0
+    },
+    {
+      "dataset": "heldout-v4",
+      "id": "labv-009",
+      "cached": false,
+      "f1": 0.9583,
+      "fp": 0,
+      "fn": 2,
+      "needsReview": 2
+    },
+    {
+      "dataset": "heldout-v4",
+      "id": "labv-010",
+      "cached": false,
+      "f1": 0.9583,
+      "fp": 0,
+      "fn": 2,
+      "needsReview": 2
+    }
+  ]
+}
