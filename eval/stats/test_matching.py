@@ -24,6 +24,12 @@ class MatchingTest(unittest.TestCase):
         gold = {"columns": ["age", "pct", "n"], "rows": [["85세 이상", "12.5", "8"]]}
         self.assertTrue(matches(gold, {"rows": [["85세 이상", None, None]]}, ordered=False))
 
+    def test_numeric_ignores_label_wording(self):
+        gold = {"columns": ["smoking", "avg", "n"], "rows": [["피우지 않음", "27.6", "638782"]]}
+        pred = {"rows": [["피우지 않는다", 27.6, 638782]]}
+        self.assertFalse(matches(gold, pred, ordered=False))
+        self.assertTrue(matches(gold, pred, ordered=False, numeric=True))
+
 
 if __name__ == "__main__":
     unittest.main()
