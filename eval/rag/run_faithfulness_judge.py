@@ -4,6 +4,8 @@
 - 보정셋 (--calibration calibration-v1): 50문장. 설정(off, low)마다 3회 돌려 자기 일치도와 비용을 본다.
   사람 라벨과의 κ는 rag.calibration_agreement가 따로 계산한다 (이 스크립트는 사람 라벨을 읽지 않는다. 눈가림).
 - 해설 평가 결과 (--explanation <결과 파일> --runs 1,2): 기준선이나 개선 조건의 모든 문장을 채점한다.
+- 후속 질문 답 평가 결과 (--followup <결과 파일> --mode selected --runs 1): 답(ANSWER)의 모든 문장을 채점한다
+  (ADR 0011 5절 3단계). 항목 정보 자리에 질문과 LLM에 보낸 결과지 맥락을 넣는다. 근거는 문장이 인용한 단위(절, 고시는 행)다.
 
 결과는 eval/results/faithfulness/<runId>.json (공통 형식)과 eval/results/index.jsonl에 남는다.
 ANTHROPIC_API_KEY는 저장소 루트 .env에서 읽어 이 프로세스 환경에만 넣는다 (값은 출력하지 않는다).
@@ -85,6 +87,24 @@ def explanation_targets(path: Path, runs: list[int], chunks: dict) -> list[dict]
     return targets
 
 
+def followup_targets(path: Path, runs: list[int], mode: str) -> list[dict]:
+    from rag.followup_evidence import units
+    by_id = {u["id"]: u for u in units()}
+    record = json.loads(path.read_text(encoding="utf-8"))
+    targets = []
+    for row in record["details"]:
+        if row["run"] not in runs or row["mode"] != mode or row["decision"] != "ANSWER":
+            continue
+        item = {"code": "FOLLOWUP", "name": f"후속 질문 — {row['question']}", "value": "-", "unit": None,
+                "judgment": "-", "judgmentLabel": "-", "criterion": row.get("reportLines") or "없음", "sex": None}
+        for index, (text, unit_ids) in enumerate(zip(row["sentences"], row["sentenceSources"]), start=1):
+            targets.append({"id": f"r{row['run']}/{row['mode']}/{row['id']}/{index}", "stratum": row["category"],
+                            "origin": row["author"], "item": item, "text": text,
+                            "sources": [{"id": u, "text": by_id[u]["text"], "publisher": by_id[u]["title"],
+                                         "section": by_id[u]["section"]} for u in unit_ids]})
+    return targets
+
+
 def source(chunks: dict, chunk_id: str) -> dict:
     meta = chunks[chunk_id]["metadata"]
     return {"id": chunk_id, "text": chunks[chunk_id]["text"], "publisher": meta.get("publisher"),
@@ -129,7 +149,9 @@ def main() -> None:
     target = parser.add_mutually_exclusive_group(required=True)
     target.add_argument("--calibration", help="eval/calibration/ 아래 보정셋 이름")
     target.add_argument("--explanation", type=Path, help="해설 평가 결과 파일 (eval/ 기준 경로)")
-    parser.add_argument("--runs", default="1,2", help="--explanation의 회차")
+    target.add_argument("--followup", type=Path, help="후속 질문 답 평가 결과 파일 (eval/ 기준 경로)")
+    parser.add_argument("--runs", default="1,2", help="--explanation·--followup의 회차")
+    parser.add_argument("--mode", default="selected", help="--followup의 항목 조건 (selected / inferred)")
     parser.add_argument("--setting", choices=list(SETTINGS), required=True)
     parser.add_argument("--repeats", type=int, default=1)
     parser.add_argument("--limit", type=int, help="앞에서 N문장만 (시험 호출)")
@@ -146,6 +168,15 @@ def main() -> None:
         manifest = json.loads((EVAL_DIR / "calibration" / f"{args.calibration}.manifest.json").read_text(encoding="utf-8"))
         check_chunks(manifest.get("chunksSha256"), f"보정셋 {args.calibration}")
         targets, dataset = calibration_targets(args.calibration, chunks), {"name": args.calibration, "source": "calibration"}
+    elif args.followup:
+        from rag.followup_evidence import unit_ids_sha
+        runs = [int(r) for r in args.runs.split(",")]
+        source_path = args.followup if args.followup.is_absolute() else EVAL_DIR / args.followup
+        followup_record = json.loads(source_path.read_text(encoding="utf-8"))
+        if followup_record["dataset"].get("unitsSha256") != unit_ids_sha():
+            raise SystemExit("절 구성이 답 평가 때와 다르다. 그때의 청크로 다시 만든 뒤 채점한다")
+        targets = followup_targets(source_path, runs, args.mode)
+        dataset = {"name": followup_record["runId"], "source": "followup", "runs": runs, "mode": args.mode}
     else:
         runs = [int(r) for r in args.runs.split(",")]
         source_path = args.explanation if args.explanation.is_absolute() else EVAL_DIR / args.explanation

@@ -102,6 +102,10 @@ def main() -> None:
                        "ruleTreatment": result["ruleTreatment"], "ruleDiagnosis": result["ruleDiagnosis"],
                        "grounded": result["decision"] == "ANSWER" and bool(expected & set(cited)),
                        "cited": cited, "sentences": [s["text"] for s in result["sentences"]], "notice": result["notice"],
+                       # 충실도 채점용: 문장마다 인용한 근거 단위와 LLM에 보낸 결과지 맥락
+                       "sentenceSources": [[next(c["unitId"] for c in result["citations"] if c["number"] == n)
+                                            for n in s["citations"]] for s in result["sentences"]],
+                       "reportLines": result.get("reportLines"),
                        "itemSource": m["itemSource"], "contextChars": m["contextChars"],
                        "generated": m["sentencesGenerated"], "kept": m["sentencesKept"],
                        "forbiddenHits": m["forbiddenHits"], "unsupportedQuotes": m.get("unsupportedQuotes", 0),

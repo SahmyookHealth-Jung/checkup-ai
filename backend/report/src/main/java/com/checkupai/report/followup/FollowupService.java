@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.AdvisorParams;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.ChatOptions;
@@ -43,12 +45,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class FollowupService {
 
+    private static final Logger log = LoggerFactory.getLogger(FollowupService.class);
+
     static final String FEATURE = "report.followup";
     /**
      * v2 (2026-11-12): 문장마다 근거 구절(quote)을 받아 코드가 대조한다. v1은 인용 번호와 숫자만 확인해, 근거에 없는
      * 비수치 주장도 그럴듯한 번호를 붙이면 통과했다 (Codex 적대적 리뷰, 사용자 결정 A안)
      */
-    static final String PROMPT_VERSION = "followup-v2";
+    static final String PROMPT_VERSION = "followup-v3";
     /** 근거 구절의 최소 길이 (공백을 뺀 글자 수). 너무 짧은 구절("입니다")로 대조를 피하지 못하게 한다 */
     static final int MIN_QUOTE_CHARS = 10;
     private static final int MAX_TOKENS = 1500;
@@ -92,9 +96,12 @@ public class FollowupService {
                           long totalMs, String llmError) {
     }
 
+    /**
+     * @param reportLines LLM에 보낸 결과지 맥락 (항목별 결과값·판정·기준). 충실도 채점이 판정 구간을 비교할 때 쓴다
+     */
     public record FollowupResult(String question, Decision decision, String llmDecision, boolean ruleTreatment,
                                  boolean ruleDiagnosis, List<Sentence> sentences, String notice, List<Citation> citations,
-                                 String disclaimer, Metrics metrics) {
+                                 String disclaimer, String reportLines, Metrics metrics) {
     }
 
     private final ChatClient chatClient;
@@ -154,6 +161,8 @@ public class FollowupService {
                 quoted.add(new ExplanationDraft.SentenceDraft(sentence.text(), sentence.sources()));
             } else {
                 unsupportedQuotes++;
+                // 근거 구절은 공개 문서에서 베낀 것이어야 하지만 결과지 값이 섞일 수 있어 DEBUG로만 남긴다
+                log.debug("근거 구절 불일치 sources={} quote={}", sentence.sources(), sentence.quote());
             }
         }
         ExplanationValidator.Outcome outcome = validator.check(quoted, allowed, reportLines);
@@ -190,7 +199,7 @@ public class FollowupService {
                 llmMs, (System.nanoTime() - started) / 1_000_000, llmError);
         return new FollowupResult(question, decision, llmDecision == null ? null : llmDecision.name(),
                 flags.treatment(), flags.diagnosis(), sentences, notice, citations, ExplanationGuardrails.DISCLAIMER,
-                metrics);
+                reportLines, metrics);
     }
 
     private FollowupDraft generate(Map<String, ContextUnit> byLabel, String reportLines, String question) {
