@@ -1,0 +1,755 @@
+{
+ "adrBase": "https://github.com/SahmyookHealth-Jung/checkup-ai/blob/main/docs/adr/",
+ "highlights": [
+  {
+   "area": "추출",
+   "title": "결과지 수치 추출",
+   "value": "F1 0.995",
+   "detail": "Haiku 5.5 + 원문 대조 검증. 로컬 qwen3:4b는 0.925. 보고서당 5초, $0.0012",
+   "set": "처음 보는 양식 3종 30개 (두 양식은 로컬 모델 결과를 보고 검증 규칙을 고침)",
+   "status": "limit",
+   "adr": "0005-추출-모델-선택.md"
+  },
+  {
+   "area": "개인정보",
+   "title": "외부 전송 전 식별정보 제거",
+   "value": "0/90 남음",
+   "detail": "보내기 전에 이름·생년월일 등을 지운다",
+   "set": "합성 결과지 60개",
+   "status": "good",
+   "adr": "0006-LLM-호출-기록과-식별정보-제거.md"
+  },
+  {
+   "area": "추출",
+   "title": "값·단위 표기 변형",
+   "value": "조용히 지나감 5 → 0",
+   "detail": "틀린 경보도 5 → 0 (146항목). 같은 세트를 보고 고쳐서 일반화 수치가 아니다",
+   "set": "heldout-v4 10개 (본 세트)",
+   "status": "limit",
+   "adr": "0004-추출-검증-원칙.md"
+  },
+  {
+   "area": "해설",
+   "title": "위험 수치 진료 권고",
+   "value": "73/73",
+   "detail": "잘못된 권고 0 (95% 하한 약 96%). 같은 규칙을 쓰는 두 구현의 일치",
+   "set": "처음 보는 양식 30개, 2회",
+   "status": "good",
+   "adr": "0010-해설-두-경로-분리와-후속-질문.md"
+  },
+  {
+   "area": "해설",
+   "title": "판정 해설: 벡터 검색 → 항목 코드 조회",
+   "value": "비용 −27%",
+   "detail": "LLM 문장 437 → 176, LLM 지연 6.0 → 3.3~3.6초",
+   "set": "처음 보는 양식 30개, 2회",
+   "status": "good",
+   "adr": "0010-해설-두-경로-분리와-후속-질문.md"
+  },
+  {
+   "area": "채점기",
+   "title": "충실도 채점기 검증",
+   "value": "심은 오류 57/57",
+   "detail": "판정 구간 37/37, 치료·약 20/20. 사람과의 일치(κ)는 뒷받침 축 0.05~0.15로 낮다",
+   "set": "오류 심은 141문장, 보정 50문장",
+   "status": "limit",
+   "adr": "0009-의미-충실도-채점기-설계.md"
+  },
+  {
+   "area": "후속 질문",
+   "title": "문맥: 항목 범위 + 글자 2-gram BM25",
+   "value": "개발 7 → 10/10",
+   "detail": "정답 근거가 문맥에 다 실린 문항 (벡터 대비). 시험 13/18",
+   "set": "질문 60개 (개발 20 / 시험 40)",
+   "status": "good",
+   "adr": "0011-후속-질문-경로-설계.md"
+  },
+  {
+   "area": "후속 질문",
+   "title": "답하면 안 되는 질문에 답함",
+   "value": "시험 2/22",
+   "detail": "둘 다 진단 질문. 규칙 또는 LLM으로 바꾼 뒤 새 문항에서 진단 2/8에 아직 답함 (LLM 혼자면 6/8)",
+   "set": "시험 40문항 1회, 재확인 16문항 1회",
+   "status": "bad",
+   "adr": "0011-후속-질문-경로-설계.md"
+  },
+  {
+   "area": "후속 질문",
+   "title": "정답 근거를 인용해 답함",
+   "value": "시험 8~10/18",
+   "detail": "통과 기준 80% 미달. 답 문장 충실도 22/36 뒷받침, 판정 구간 틀림·치료 지시 0",
+   "set": "시험 40문항",
+   "status": "bad",
+   "adr": "0011-후속-질문-경로-설계.md"
+  }
+ ],
+ "followup": {
+  "dev": {
+   "runId": "20261112-2058_followup-answer_dev-v3",
+   "commit": "8cd97ad",
+   "dirty": false,
+   "dataset": {
+    "name": "followup-v1",
+    "split": "dev",
+    "questions": 20,
+    "frozen": "heldout30-v2.6",
+    "unitsSha256": "1534c1a1a6a5c142"
+   },
+   "modes": {
+    "selected": {
+     "answeredButShouldNot": 0,
+     "answerableGrounded": "17/20",
+     "answerableAnswered": 18,
+     "n": 40,
+     "behavior": {
+      "answerable": {
+       "ANSWER": 18,
+       "NO_EVIDENCE": 2
+      },
+      "unanswerable": {
+       "NO_EVIDENCE": 6
+      },
+      "refuse": {
+       "REFUSE_DIAGNOSIS": 4,
+       "REFUSE_TREATMENT": 6
+      },
+      "malicious": {
+       "REFUSE_DIAGNOSIS": 1,
+       "MALICIOUS": 3
+      }
+     },
+     "refuseReasonMatch": 10,
+     "forbiddenHits": 0,
+     "avgLlmMs": 1967,
+     "pass": true
+    },
+    "inferred": {
+     "answeredButShouldNot": 0,
+     "answerableGrounded": "19/20",
+     "answerableAnswered": 20,
+     "n": 40,
+     "behavior": {
+      "answerable": {
+       "ANSWER": 20
+      },
+      "unanswerable": {
+       "NO_EVIDENCE": 6
+      },
+      "refuse": {
+       "REFUSE_DIAGNOSIS": 4,
+       "REFUSE_TREATMENT": 6
+      },
+      "malicious": {
+       "REFUSE_DIAGNOSIS": 2,
+       "MALICIOUS": 2
+      }
+     },
+     "refuseReasonMatch": 10,
+     "forbiddenHits": 0,
+     "avgLlmMs": 1880,
+     "pass": true
+    }
+   }
+  },
+  "test": {
+   "runId": "20261112-2101_followup-answer_test-v3",
+   "commit": "e004ca0",
+   "dirty": false,
+   "dataset": {
+    "name": "followup-v1",
+    "split": "test",
+    "questions": 40,
+    "frozen": "heldout30-v2.6",
+    "unitsSha256": "1534c1a1a6a5c142"
+   },
+   "modes": {
+    "selected": {
+     "answeredButShouldNot": 2,
+     "answerableGrounded": "8/18",
+     "answerableAnswered": 13,
+     "n": 40,
+     "behavior": {
+      "answerable": {
+       "ANSWER": 13,
+       "NO_EVIDENCE": 4,
+       "REFUSE_DIAGNOSIS": 1
+      },
+      "unanswerable": {
+       "NO_EVIDENCE": 7,
+       "MALICIOUS": 2
+      },
+      "refuse": {
+       "ANSWER": 2,
+       "REFUSE_TREATMENT": 6,
+       "REFUSE_DIAGNOSIS": 2
+      },
+      "malicious": {
+       "MALICIOUS": 1,
+       "REFUSE_DIAGNOSIS": 1,
+       "REFUSE_TREATMENT": 1
+      }
+     },
+     "refuseReasonMatch": 8,
+     "forbiddenHits": 0,
+     "avgLlmMs": 1840,
+     "pass": false
+    },
+    "inferred": {
+     "answeredButShouldNot": 2,
+     "answerableGrounded": "10/18",
+     "answerableAnswered": 14,
+     "n": 40,
+     "behavior": {
+      "answerable": {
+       "NO_EVIDENCE": 3,
+       "ANSWER": 14,
+       "REFUSE_DIAGNOSIS": 1
+      },
+      "unanswerable": {
+       "NO_EVIDENCE": 8,
+       "MALICIOUS": 1
+      },
+      "refuse": {
+       "ANSWER": 2,
+       "REFUSE_TREATMENT": 6,
+       "REFUSE_DIAGNOSIS": 2
+      },
+      "malicious": {
+       "MALICIOUS": 1,
+       "REFUSE_DIAGNOSIS": 1,
+       "REFUSE_TREATMENT": 1
+      }
+     },
+     "refuseReasonMatch": 8,
+     "forbiddenHits": 0,
+     "avgLlmMs": 1943,
+     "pass": false
+    }
+   }
+  },
+  "recheck": {
+   "runId": "20261112-2118_followup-answer_recheck-v3-rule",
+   "commit": "3b7527f",
+   "dirty": false,
+   "dataset": {
+    "name": "followup-recheck-v1",
+    "split": "recheck",
+    "questions": 16,
+    "frozen": "heldout30-v2.6",
+    "unitsSha256": "1534c1a1a6a5c142"
+   },
+   "modes": {
+    "selected": {
+     "answeredButShouldNot": 2,
+     "answerableGrounded": "5/6",
+     "answerableAnswered": 5,
+     "n": 16,
+     "behavior": {
+      "answerable": {
+       "ANSWER": 5,
+       "NO_EVIDENCE": 1
+      },
+      "unanswerable": {},
+      "refuse": {
+       "REFUSE_DIAGNOSIS": 6,
+       "ANSWER": 2,
+       "REFUSE_TREATMENT": 2
+      },
+      "malicious": {}
+     },
+     "refuseReasonMatch": 8,
+     "forbiddenHits": 0,
+     "avgLlmMs": 2149,
+     "pass": false
+    },
+    "inferred": {
+     "answeredButShouldNot": 2,
+     "answerableGrounded": "6/6",
+     "answerableAnswered": 6,
+     "n": 16,
+     "behavior": {
+      "answerable": {
+       "ANSWER": 6
+      },
+      "unanswerable": {},
+      "refuse": {
+       "REFUSE_DIAGNOSIS": 6,
+       "ANSWER": 2,
+       "REFUSE_TREATMENT": 2
+      },
+      "malicious": {}
+     },
+     "refuseReasonMatch": 8,
+     "forbiddenHits": 0,
+     "avgLlmMs": 2129,
+     "pass": false
+    }
+   }
+  },
+  "faithfulness": {
+   "runId": "20261112-2102_faithfulness_20261112-2101_followup-answer_test-v3_off_followup-test-v3",
+   "commit": "4b6b38c",
+   "support": {
+    "supported": 22,
+    "unsupported": 1,
+    "partial": 13
+   },
+   "bandWrong": 0,
+   "treatmentPresent": 0,
+   "judged": 36,
+   "costUsd": 0.2647
+  }
+ },
+ "runs": [
+  {
+   "runId": "20261110-2331_retrieval_k4_baseline",
+   "kind": "retrieval",
+   "label": "baseline",
+   "createdAt": "2026-11-10T23:31:16",
+   "commit": "82c1cd9",
+   "dirty": false,
+   "dataset": "retrieval-queries-v1",
+   "headline": {
+    "precisionAt4": 0.5,
+    "hitAt1": 0.75,
+    "mrr": 0.875
+   }
+  },
+  {
+   "runId": "20261110-2337_explanation_heldout30-v2.5_baseline",
+   "kind": "explanation",
+   "label": "baseline",
+   "createdAt": "2026-11-10T23:37:53",
+   "commit": "82c1cd9",
+   "dirty": false,
+   "dataset": "heldout30-v2.5",
+   "headline": {
+    "endToEnd.careAdviceRecall": [
+     1.0,
+     1.0
+    ],
+    "explanationLlm.sentencePassRate": [
+     0.989,
+     0.995
+    ],
+    "forbiddenHits": 0,
+    "llmErrors": 0
+   }
+  },
+  {
+   "runId": "20261111-0034_faithfulness_20261110-2337_explanation_heldout30-v2.5_baseline_off_trial",
+   "kind": "faithfulness",
+   "label": "trial",
+   "createdAt": "2026-11-11T00:34:10",
+   "commit": "a64866d",
+   "dirty": true,
+   "dataset": "20261110-2337_explanation_heldout30-v2.5_baseline",
+   "headline": {
+    "passRate": 0.667,
+    "treatmentPresent": 0,
+    "selfConsistency.support": null,
+    "costUsd": 0.0177
+   }
+  },
+  {
+   "runId": "20261111-0034_faithfulness_20261110-2337_explanation_heldout30-v2.5_baseline_low_trial",
+   "kind": "faithfulness",
+   "label": "trial",
+   "createdAt": "2026-11-11T00:34:23",
+   "commit": "a64866d",
+   "dirty": true,
+   "dataset": "20261110-2337_explanation_heldout30-v2.5_baseline",
+   "headline": {
+    "passRate": 0.0,
+    "treatmentPresent": 0,
+    "selfConsistency.support": null,
+    "costUsd": 0.017
+   }
+  },
+  {
+   "runId": "20261111-0208_faithfulness_calibration-v1_off_calibration",
+   "kind": "faithfulness",
+   "label": "calibration",
+   "createdAt": "2026-11-11T02:08:49",
+   "commit": "2d57b5e",
+   "dirty": false,
+   "dataset": "calibration-v1",
+   "headline": {
+    "passRate": 0.527,
+    "treatmentPresent": 2,
+    "selfConsistency.support": 0.88,
+    "costUsd": 0.6792
+   }
+  },
+  {
+   "runId": "20261111-0210_faithfulness_calibration-v1_low_calibration",
+   "kind": "faithfulness",
+   "label": "calibration",
+   "createdAt": "2026-11-11T02:10:26",
+   "commit": "2d57b5e",
+   "dirty": false,
+   "dataset": "calibration-v1",
+   "headline": {
+    "passRate": 0.373,
+    "treatmentPresent": 8,
+    "selfConsistency.support": 0.98,
+    "costUsd": 0.6486
+   }
+  },
+  {
+   "runId": "20261111-0210_agreement_calibration-v1_off",
+   "kind": "agreement",
+   "label": "off",
+   "createdAt": "2026-11-11T02:10:33",
+   "commit": "2d57b5e",
+   "dirty": false,
+   "dataset": "calibration-v1",
+   "headline": {
+    "kappa.support": -0.031,
+    "kappaBinary.support": 0.042
+   }
+  },
+  {
+   "runId": "20261111-0210_agreement_calibration-v1_low",
+   "kind": "agreement",
+   "label": "low",
+   "createdAt": "2026-11-11T02:10:33",
+   "commit": "2d57b5e",
+   "dirty": false,
+   "dataset": "calibration-v1",
+   "headline": {
+    "kappa.support": -0.085,
+    "kappaBinary.support": -0.036
+   }
+  },
+  {
+   "runId": "20261111-0216_faithfulness_calibration-v1_off_calibration-v1.2",
+   "kind": "faithfulness",
+   "label": "calibration-v1.2",
+   "createdAt": "2026-11-11T02:16:41",
+   "commit": "c204eaa",
+   "dirty": false,
+   "dataset": "calibration-v1",
+   "headline": {
+    "passRate": 0.647,
+    "treatmentPresent": 5,
+    "selfConsistency.support": 0.98,
+    "costUsd": 0.6728
+   }
+  },
+  {
+   "runId": "20261111-0216_agreement_calibration-v1_off",
+   "kind": "agreement",
+   "label": "off",
+   "createdAt": "2026-11-11T02:16:50",
+   "commit": "c204eaa",
+   "dirty": false,
+   "dataset": "calibration-v1",
+   "headline": {
+    "kappa.support": 0.052,
+    "kappaBinary.support": 0.153
+   }
+  },
+  {
+   "runId": "20261111-1155_faithfulness_seeded-v1_off_seeded",
+   "kind": "faithfulness",
+   "label": "seeded",
+   "createdAt": "2026-11-11T11:55:10",
+   "commit": "faebea1",
+   "dirty": false,
+   "dataset": "seeded-v1",
+   "headline": {
+    "passRate": 0.213,
+    "treatmentPresent": 21,
+    "selfConsistency.support": null,
+    "costUsd": 0.6377
+   }
+  },
+  {
+   "runId": "20261111-1155_seeded_seeded-v1_off",
+   "kind": "seeded",
+   "label": "off",
+   "createdAt": "2026-11-11T11:55:18",
+   "commit": "faebea1",
+   "dirty": false,
+   "dataset": "seeded-v1",
+   "headline": {
+    "met.band": true,
+    "met.treatment": true,
+    "met.control": true,
+    "met.citation": true
+   }
+  },
+  {
+   "runId": "20261111-1629_notation_heldout-v4-v2.5_baseline",
+   "kind": "notation",
+   "label": "baseline",
+   "createdAt": "2026-11-11T16:29:46",
+   "commit": "c3c05d5",
+   "dirty": false,
+   "dataset": "heldout-v4-v2.5",
+   "headline": {
+    "correct": 130,
+    "flagged": 6,
+    "falseAlarm": 5,
+    "falseReassurance": 0,
+    "silent": 5,
+    "suspectReached": "32/33"
+   }
+  },
+  {
+   "runId": "20261111-1641_notation_heldout-v4-v2.5_after",
+   "kind": "notation",
+   "label": "after",
+   "createdAt": "2026-11-11T16:41:14",
+   "commit": "269f61a",
+   "dirty": false,
+   "dataset": "heldout-v4-v2.5",
+   "headline": {
+    "correct": 135,
+    "flagged": 7,
+    "falseAlarm": 0,
+    "falseReassurance": 0,
+    "silent": 4,
+    "suspectReached": "32/33"
+   }
+  },
+  {
+   "runId": "20261111-2225_notation_heldout-v4-v2.6_extraction-v2.6",
+   "kind": "notation",
+   "label": "extraction-v2.6",
+   "createdAt": "2026-11-11T22:25:41",
+   "commit": "28ef482",
+   "dirty": false,
+   "dataset": "heldout-v4-v2.6",
+   "headline": {
+    "correct": 137,
+    "flagged": 9,
+    "falseAlarm": 0,
+    "falseReassurance": 0,
+    "silent": 0,
+    "suspectReached": "33/33"
+   }
+  },
+  {
+   "runId": "20261111-2239_explanation_heldout30-v2.6_lookup-before",
+   "kind": "explanation",
+   "label": "lookup-before",
+   "createdAt": "2026-11-11T22:39:14",
+   "commit": "7888437",
+   "dirty": false,
+   "dataset": "heldout30-v2.6",
+   "headline": {
+    "endToEnd.careAdviceRecall": [
+     1.0,
+     1.0
+    ],
+    "explanationLlm.sentencePassRate": [
+     0.986,
+     0.991
+    ],
+    "forbiddenHits": 0,
+    "llmErrors": 0
+   }
+  },
+  {
+   "runId": "20261111-2257_explanation_heldout30-v2.6_lookup-after",
+   "kind": "explanation",
+   "label": "lookup-after",
+   "createdAt": "2026-11-11T22:57:02",
+   "commit": "5da98a1",
+   "dirty": false,
+   "dataset": "heldout30-v2.6",
+   "headline": {
+    "endToEnd.careAdviceRecall": [
+     1.0,
+     1.0
+    ],
+    "explanationLlm.sentencePassRate": [
+     1.0,
+     1.0
+    ],
+    "forbiddenHits": 1,
+    "llmErrors": 0
+   }
+  },
+  {
+   "runId": "20261111-2257_comparison_lookup",
+   "kind": "comparison",
+   "label": "lookup",
+   "createdAt": "2026-11-11T22:57:08",
+   "commit": "5da98a1",
+   "dirty": false,
+   "dataset": "heldout30-v2.6",
+   "headline": {
+    "changedItems": 150
+   }
+  },
+  {
+   "runId": "20261112-1519_followup-retrieval_vector-question",
+   "kind": "followup-retrieval",
+   "label": "vector-question",
+   "createdAt": "2026-11-12T15:19:50",
+   "commit": "c4bbf8f",
+   "dirty": false,
+   "dataset": "followup-v1",
+   "headline": {
+    "hitAt4": 0.607,
+    "recallAt4": 0.446,
+    "mrr": 0.492
+   }
+  },
+  {
+   "runId": "20261112-1520_followup-retrieval_vector-question+items",
+   "kind": "followup-retrieval",
+   "label": "vector-question+items",
+   "createdAt": "2026-11-12T15:20:02",
+   "commit": "c4bbf8f",
+   "dirty": false,
+   "dataset": "followup-v1",
+   "headline": {
+    "hitAt4": 0.857,
+    "recallAt4": 0.652,
+    "mrr": 0.698
+   }
+  },
+  {
+   "runId": "20261112-1631_followup-context_context",
+   "kind": "followup-context",
+   "label": "context",
+   "createdAt": "2026-11-12T16:31:17",
+   "commit": "86ab7a7",
+   "dirty": false,
+   "dataset": "followup-v1",
+   "headline": {
+    "chosenBudget": 16000,
+    "devFull:selected-8000": 9,
+    "devFull:selected-16000": 10,
+    "devFull:inferred-8000": 7,
+    "devFull:inferred-16000": 9,
+    "devFull:bm25-inferred-8000": 10,
+    "devFull:bm25-inferred-16000": 9
+   }
+  },
+  {
+   "runId": "20261112-1644_followup-context_context-bm25",
+   "kind": "followup-context",
+   "label": "context-bm25",
+   "createdAt": "2026-11-12T16:44:13",
+   "commit": "defc415",
+   "dirty": false,
+   "dataset": "followup-v1",
+   "headline": {
+    "chosenBudget": 8000,
+    "devFull:selected-bm25-8000": 10,
+    "devFull:selected-bm25-16000": 10,
+    "devFull:selected-vector-8000": 9,
+    "devFull:selected-vector-16000": 10,
+    "devFull:inferred-bm25-8000": 10,
+    "devFull:inferred-bm25-16000": 9,
+    "devFull:inferred-vector-8000": 7,
+    "devFull:inferred-vector-16000": 9
+   }
+  },
+  {
+   "runId": "20261112-1653_followup-answer_dev-v1",
+   "kind": "followup-answer",
+   "label": "dev-v1",
+   "createdAt": "2026-11-12T16:53:15",
+   "commit": "86eb086",
+   "dirty": false,
+   "dataset": "followup-v1",
+   "headline": {
+    "selected:answeredButShouldNot": 0,
+    "selected:answerableGrounded": "17/20",
+    "inferred:answeredButShouldNot": 0,
+    "inferred:answerableGrounded": "18/20",
+    "selected:pass": true,
+    "inferred:pass": true
+   }
+  },
+  {
+   "runId": "20261112-1726_followup-answer_dev-v2",
+   "kind": "followup-answer",
+   "label": "dev-v2",
+   "createdAt": "2026-11-12T17:26:57",
+   "commit": "6a4ac11",
+   "dirty": true,
+   "dataset": "followup-v1",
+   "headline": {
+    "selected:answeredButShouldNot": 0,
+    "selected:answerableGrounded": "15/20",
+    "inferred:answeredButShouldNot": 0,
+    "inferred:answerableGrounded": "16/20",
+    "selected:pass": false,
+    "inferred:pass": true
+   }
+  },
+  {
+   "runId": "20261112-2058_followup-answer_dev-v3",
+   "kind": "followup-answer",
+   "label": "dev-v3",
+   "createdAt": "2026-11-12T20:58:11",
+   "commit": "8cd97ad",
+   "dirty": false,
+   "dataset": "followup-v1",
+   "headline": {
+    "selected:answeredButShouldNot": 0,
+    "selected:answerableGrounded": "17/20",
+    "inferred:answeredButShouldNot": 0,
+    "inferred:answerableGrounded": "19/20",
+    "selected:pass": true,
+    "inferred:pass": true
+   }
+  },
+  {
+   "runId": "20261112-2101_followup-answer_test-v3",
+   "kind": "followup-answer",
+   "label": "test-v3",
+   "createdAt": "2026-11-12T21:01:11",
+   "commit": "e004ca0",
+   "dirty": false,
+   "dataset": "followup-v1",
+   "headline": {
+    "selected:answeredButShouldNot": 2,
+    "selected:answerableGrounded": "8/18",
+    "inferred:answeredButShouldNot": 2,
+    "inferred:answerableGrounded": "10/18",
+    "selected:pass": false,
+    "inferred:pass": false
+   }
+  },
+  {
+   "runId": "20261112-2102_faithfulness_20261112-2101_followup-answer_test-v3_off_followup-test-v3",
+   "kind": "faithfulness",
+   "label": "followup-test-v3",
+   "createdAt": "2026-11-12T21:02:27",
+   "commit": "4b6b38c",
+   "dirty": false,
+   "dataset": "20261112-2101_followup-answer_test-v3",
+   "headline": {
+    "passRate": 0.611,
+    "treatmentPresent": 0,
+    "selfConsistency.support": null,
+    "costUsd": 0.2647
+   }
+  },
+  {
+   "runId": "20261112-2118_followup-answer_recheck-v3-rule",
+   "kind": "followup-answer",
+   "label": "recheck-v3-rule",
+   "createdAt": "2026-11-12T21:18:32",
+   "commit": "3b7527f",
+   "dirty": false,
+   "dataset": "followup-recheck-v1",
+   "headline": {
+    "selected:answeredButShouldNot": 2,
+    "selected:answerableGrounded": "5/6",
+    "inferred:answeredButShouldNot": 2,
+    "inferred:answerableGrounded": "6/6",
+    "selected:pass": false,
+    "inferred:pass": false
+   }
+  }
+ ]
+}

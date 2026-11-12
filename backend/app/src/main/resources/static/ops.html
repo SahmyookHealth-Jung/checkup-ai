@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>운영 · 검진 결과 해설 AI</title>
+<link rel="stylesheet" href="/app.css">
+<style>
+  .chart { position: relative; }
+  .tip { position: absolute; pointer-events: none; background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+         padding: 6px 10px; font-size: 13px; box-shadow: 0 4px 14px rgba(0,0,0,.12); white-space: nowrap; }
+  .tip b { display: block; }
+  .tip span::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 6px; background: var(--c); }
+  .budget-track { background: var(--soft); border-radius: 4px; height: 8px; margin-top: 6px; overflow: hidden; }
+  .budget-fill { height: 100%; background: var(--series-1); }
+</style>
+</head>
+<body>
+<nav class="nav"><div><strong>검진 결과 해설 AI</strong>
+  <a href="/">소개</a><a href="/demo.html">해설 데모</a><a href="/quality.html">품질</a><a href="/ops.html" aria-current="page">운영</a>
+</div></nav>
+<main>
+  <h1>운영 <span class="tag">LLM 호출 기록</span></h1>
+  <p class="sub">앱의 모든 LLM 호출은 토큰·비용·지연·상태를 <code>llm_call_log</code>에 남깁니다(ADR 0006). 결과지 원문은 남기지 않습니다.
+    평가 스크립트가 직접 부른 채점 모델(Sonnet) 호출은 여기에 없습니다.</p>
+  <div class="controls">
+    <label for="days">기간</label>
+    <select id="days"><option value="7">최근 7일</option><option value="14" selected>최근 14일</option><option value="30">최근 30일</option></select>
+    <span class="status" id="status">불러오는 중…</span>
+  </div>
+
+  <div class="grid" style="margin-top:12px" id="tiles"></div>
+
+  <h2>날짜별 비용</h2>
+  <div class="card chart" id="chart"></div>
+  <div class="legend" id="legend"></div>
+
+  <h2>기능별</h2>
+  <div class="scroll"><table>
+    <thead><tr><th>기능</th><th class="num">호출</th><th class="num">실패</th><th class="num">입력 토큰</th><th class="num">출력 토큰</th>
+      <th class="num">비용</th><th class="num">호출당</th><th class="num">지연 중앙값</th><th class="num">지연 95%</th></tr></thead>
+    <tbody id="table"></tbody>
+  </table></div>
+  <p class="small">데모 호출(샘플 해설, 업로드 해설, 후속 질문)은 오늘 비용이 하루 상한에 닿으면 막힙니다(ADR 0012). 평가 API는 막지 않습니다.</p>
+</main>
+<script>
+  const $ = id => document.getElementById(id);
+  const el = (tag, attrs = {}, ...children) => {
+    const node = document.createElement(tag);
+    Object.entries(attrs).forEach(([k, v]) => k === 'class' ? node.className = v : node.setAttribute(k, v));
+    children.flat().forEach(c => node.append(c instanceof Node ? c : document.createTextNode(c ?? '')));
+    return node;
+  };
+  const svg = (tag, attrs = {}) => {
+    const node = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    Object.entries(attrs).forEach(([k, v]) => node.setAttribute(k, v));
+    return node;
+  };
+  // 기능을 세 묶음으로 (기준 팔레트는 세 색까지 모든 짝이 구분된다). 색은 묶음을 따라가고 순위를 따라가지 않는다
+  const GROUPS = [
+    { key: 'extraction', label: '결과지 추출', color: 'var(--series-1)', match: f => f.startsWith('report.extraction') },
+    { key: 'explanation', label: '판정 해설', color: 'var(--series-2)', match: f => f === 'report.explanation' },
+    { key: 'followup', label: '후속 질문', color: 'var(--series-3)', match: f => f.startsWith('report.followup') },
+  ];
+  const groupOf = f => GROUPS.find(g => g.match(f)) ?? { key: 'other', label: '기타', color: 'var(--series-5)' };
+  const usd = v => '$' + Number(v).toFixed(Number(v) < 1 ? 4 : 2);
+  const int = v => Number(v).toLocaleString('ko-KR');
+
+  async function load() {
+    $('status').textContent = '불러오는 중…';
+    try {
+      const data = await fetch(`/api/ops/llm-usage?days=${$('days').value}`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+      render(data);
+      $('status').textContent = `${new Date(data.since).toLocaleDateString('ko-KR')}부터`;
+    } catch (e) {
+      $('status').textContent = '불러오지 못했습니다: ' + e.message;
+    }
+  }
+
+  function render(d) {
+    const calls = d.byFeature.reduce((s, f) => s + f.calls, 0);
+    const errors = d.byFeature.reduce((s, f) => s + f.errors, 0);
+    const cost = d.byFeature.reduce((s, f) => s + Number(f.costUsd), 0);
+    const limit = Number(d.dailyBudgetUsd ?? 0);
+    const today = Number(d.todayCostUsd);
+    const used = limit > 0 ? Math.min(today / limit, 1) : 0;
+    $('tiles').replaceChildren(
+      el('div', { class: 'stat' }, el('div', { class: 'label' }, '오늘 비용 / 데모 하루 상한'),
+        el('div', { class: 'value' }, `${usd(today)}`), el('div', { class: 'note' }, limit > 0 ? `상한 ${usd(limit)} · ${Math.round(used * 100)}% 사용` : '상한 꺼짐'),
+        limit > 0 ? el('div', { class: 'budget-track' }, el('div', { class: 'budget-fill', style: `width:${used * 100}%` })) : ''),
+      el('div', { class: 'stat' }, el('div', { class: 'label' }, `${d.days}일 비용`), el('div', { class: 'value' }, usd(cost)),
+        el('div', { class: 'note' }, calls ? `호출당 ${usd(cost / calls)}` : '')),
+      el('div', { class: 'stat' }, el('div', { class: 'label' }, `${d.days}일 호출`), el('div', { class: 'value' }, int(calls)),
+        el('div', { class: 'note' }, `실패 ${int(errors)}건 (${calls ? (errors / calls * 100).toFixed(1) : 0}%)`)));
+    $('table').replaceChildren(...d.byFeature.map(f => el('tr', {},
+      el('td', {}, `${groupOf(f.feature).label} `, el('span', { class: 'small' }, f.feature)),
+      el('td', { class: 'num' }, int(f.calls)), el('td', { class: 'num' }, int(f.errors)),
+      el('td', { class: 'num' }, int(f.inputTokens)), el('td', { class: 'num' }, int(f.outputTokens)),
+      el('td', { class: 'num' }, usd(f.costUsd)), el('td', { class: 'num' }, usd(Number(f.costUsd) / Math.max(f.calls, 1))),
+      el('td', { class: 'num' }, `${(f.p50LatencyMs / 1000).toFixed(1)}초`), el('td', { class: 'num' }, `${(f.p95LatencyMs / 1000).toFixed(1)}초`))));
+    drawChart(d);
+  }
+
+  // 날짜별 쌓은 막대. 축은 하나(달러), 묶음 사이 2px 간격, 맨 위만 둥글게, 막대마다 툴팁
+  function drawChart(d) {
+    const days = [];
+    for (let t = new Date(d.since); days.length < d.days; t.setDate(t.getDate() + 1)) days.push(t.toLocaleDateString('sv-SE'));
+    const byDay = Object.fromEntries(days.map(day => [day, Object.fromEntries(GROUPS.map(g => [g.key, { cost: 0, calls: 0 }]))]));
+    d.daily.forEach(r => {
+      const g = groupOf(r.feature);
+      if (byDay[r.day] && byDay[r.day][g.key]) { byDay[r.day][g.key].cost += Number(r.costUsd); byDay[r.day][g.key].calls += r.calls; }
+    });
+    const W = 900, H = 260, L = 52, R = 8, T = 12, B = 28;
+    const max = Math.max(0.0001, ...days.map(day => GROUPS.reduce((s, g) => s + byDay[day][g.key].cost, 0)));
+    const nice = [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5].find(v => v >= max) ?? Math.ceil(max);
+    const y = v => T + (H - T - B) * (1 - v / nice);
+    const step = (W - L - R) / days.length, bw = Math.max(4, Math.min(28, step * 0.6));
+    const root = svg('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': '날짜별 LLM 비용 (기능별로 쌓은 막대)' });
+    [0, 0.5, 1].forEach(f => {
+      root.append(svg('line', { x1: L, x2: W - R, y1: y(nice * f), y2: y(nice * f), class: 'axis', 'stroke-width': 1 }));
+      const label = svg('text', { x: L - 6, y: y(nice * f) + 4, 'text-anchor': 'end' }); label.textContent = usd(nice * f); root.append(label);
+    });
+    const tip = el('div', { class: 'tip', hidden: '' });
+    days.forEach((day, i) => {
+      const x = L + step * i + (step - bw) / 2;
+      let base = 0;
+      const parts = GROUPS.filter(g => byDay[day][g.key].cost > 0);
+      parts.forEach((g, k) => {
+        const v = byDay[day][g.key].cost, top = y(base + v), bottom = y(base);
+        const h = Math.max(0, bottom - top - (k > 0 ? 2 : 0));
+        const r = k === parts.length - 1 ? Math.min(4, h / 2) : 0;
+        root.append(svg('path', { d: roundedTop(x, top, bw, h, r), fill: g.color }));
+        base += v;
+      });
+      if (i % Math.ceil(days.length / 7) === 0 || i === days.length - 1) {
+        const label = svg('text', { x: x + bw / 2, y: H - 8, 'text-anchor': 'middle' }); label.textContent = day.slice(5).replace('-', '/'); root.append(label);
+      }
+      const hit = svg('rect', { x: L + step * i, y: T, width: step, height: H - T - B, fill: 'transparent' });
+      hit.addEventListener('mouseenter', () => {
+        const total = GROUPS.reduce((s, g) => s + byDay[day][g.key].cost, 0);
+        tip.replaceChildren(el('b', {}, `${day} · ${usd(total)}`),
+          ...GROUPS.map(g => el('div', {}, el('span', { style: `--c:${g.color}` }, `${g.label} ${usd(byDay[day][g.key].cost)} · ${byDay[day][g.key].calls}회`))));
+        tip.hidden = false;
+        const box = $('chart').getBoundingClientRect(), scale = box.width / W;
+        tip.style.left = `${Math.min((L + step * i + step) * scale + 8, box.width - 190)}px`;
+        tip.style.top = '12px';
+      });
+      hit.addEventListener('mouseleave', () => { tip.hidden = true; });
+      root.append(hit);
+    });
+    $('chart').replaceChildren(root, tip);
+    $('legend').replaceChildren(...GROUPS.map(g => el('span', { style: `--c:${g.color}` }, g.label)));
+  }
+
+  function roundedTop(x, y, w, h, r) {
+    if (h <= 0) return '';
+    return `M${x},${y + h} V${y + r} Q${x},${y} ${x + r},${y} H${x + w - r} Q${x + w},${y} ${x + w},${y + r} V${y + h} Z`;
+  }
+
+  $('days').addEventListener('change', load);
+  load();
+</script>
+</body>
+</html>

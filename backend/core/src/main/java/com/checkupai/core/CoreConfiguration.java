@@ -1,12 +1,15 @@
 package com.checkupai.core;
 
 import com.checkupai.core.llm.JdbcLlmCallRecorder;
+import com.checkupai.core.llm.LlmBudget;
 import com.checkupai.core.llm.LlmCallLoggingAdvisor;
 import com.checkupai.core.llm.LlmCallRecorder;
 import com.checkupai.core.llm.LlmPricingProperties;
+import com.checkupai.core.llm.LlmUsage;
 import com.checkupai.core.privacy.PersonalInfoRedactionAdvisor;
 import com.checkupai.core.privacy.PersonalInfoRedactor;
 import com.checkupai.core.privacy.PrivacyProperties;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
@@ -22,7 +25,7 @@ import org.springframework.context.annotation.Configuration;
  * 기능 모듈은 주입받은 Builder로 ChatClient를 만들기만 하면 된다.
  */
 @Configuration(proxyBeanMethods = false)
-@EnableConfigurationProperties({LlmPricingProperties.class, PrivacyProperties.class})
+@EnableConfigurationProperties({LlmPricingProperties.class, PrivacyProperties.class, LlmBudget.Properties.class})
 public class CoreConfiguration {
 
     @Bean
@@ -33,6 +36,16 @@ public class CoreConfiguration {
     @Bean
     LlmCallRecorder llmCallRecorder(DataSource dataSource) {
         return new JdbcLlmCallRecorder(dataSource);
+    }
+
+    @Bean
+    LlmUsage llmUsage(DataSource dataSource) {
+        return new LlmUsage(dataSource, ZoneId.systemDefault());
+    }
+
+    @Bean
+    LlmBudget llmBudget(LlmUsage usage, LlmBudget.Properties properties) {
+        return new LlmBudget(() -> usage.costSince(usage.startOfToday()), properties);
     }
 
     @Bean

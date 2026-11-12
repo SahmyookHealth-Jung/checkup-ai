@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>해설 데모 · 검진 결과 해설 AI</title>
+<link rel="stylesheet" href="/app.css">
+<style>
+  .criterion { color: var(--muted); font-size: 13px; margin: 0 0 8px; }
+  .advice { border-left: 3px solid var(--s); padding: 6px 10px; margin-top: 8px; background: var(--warn-bg); color: var(--warn); border-radius: 4px; }
+  .review { border-left-color: var(--b); }
+  .noevidence { color: var(--muted); font-style: italic; }
+  .metrics { color: var(--muted); font-size: 12px; margin-top: 24px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+  .chips label { border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; font-size: 13px; cursor: pointer; background: var(--card); }
+  .chips input { margin: 0 4px 0 0; padding: 0; }
+  .examples { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; }
+  .examples button { font-size: 13px; padding: 2px 10px; }
+  .answer-head { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 6px; }
+  .d-ANSWER { background: var(--ok-bg); color: var(--ok); }
+  .d-NO_EVIDENCE { background: var(--soft); color: var(--muted); }
+  .d-REFUSE_DIAGNOSIS, .d-REFUSE_TREATMENT, .d-MALICIOUS { background: var(--warn-bg); color: var(--warn); }
+</style>
+</head>
+<body>
+<nav class="nav"><div><strong>검진 결과 해설 AI</strong>
+  <a href="/">소개</a><a href="/demo.html" aria-current="page">해설 데모</a><a href="/quality.html">품질</a><a href="/ops.html">운영</a>
+</div></nav>
+<main>
+  <h1>검진 결과 해설 <span class="tag">합성 데이터 데모</span></h1>
+  <p class="sub">합성 결과지를 골라 추출 → 국가건강검진 기준 판정 → 항목별 근거 조회 → 출처 붙은 해설 순서를 확인합니다. 실제 결과지는 올리지 마세요.</p>
+  <div class="disclaimer" id="disclaimer">이 내용은 의료 진단이 아니며, 정확한 판단은 의료진과 상담하세요.</div>
+
+  <div class="controls">
+    <label for="sample">합성 샘플</label>
+    <select id="sample"><option>불러오는 중…</option></select>
+    <button id="run" type="button">해설 보기</button>
+    <span class="status" id="status"></span>
+  </div>
+
+  <section id="result" hidden>
+    <div id="review"></div>
+    <h2>결과 표</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>항목</th><th>결과지 항목명</th><th>결과</th><th>결과지 판정</th><th>국가 기준 판정</th></tr></thead>
+      <tbody id="table"></tbody>
+    </table></div>
+    <h2>항목별 해설</h2>
+    <div id="items"></div>
+    <h2>출처</h2>
+    <div id="citations"></div>
+    <div class="metrics" id="metrics"></div>
+
+    <h2>후속 질문 <span class="tag">ADR 0011</span></h2>
+    <div class="card">
+      <p class="small" style="margin-top:0">이 결과지에 대해 궁금한 점을 물어보세요. 공개 문서 9편에서 근거를 찾아 출처와 함께 답합니다.
+        진단·약·치료를 정해 달라는 질문, 근거가 없는 질문에는 정해진 문구로 답하지 않습니다.</p>
+      <div class="warn small" style="margin:8px 0">알려진 한계: 질환 이름 없이 묻는 진단 질문(예: "콩팥이 망가지기 시작한 단계인가요?")은 거절하지 못하고 답할 수 있습니다.
+        재확인에서 진단 질문 8개 중 2개를 놓쳤습니다. <a href="/quality.html#followup">품질 화면</a> 참고.</div>
+      <div class="small">항목 고르기 (선택, 고르지 않으면 질문과 결과지로 정합니다)</div>
+      <div class="chips" id="fq-items"></div>
+      <div class="examples" id="fq-examples"></div>
+      <textarea id="fq-question" maxlength="300" placeholder="예: 공복혈당이 경계로 나왔는데 무슨 뜻인가요?"></textarea>
+      <div class="controls" style="border:0;padding:8px 0 0;background:none">
+        <button id="fq-run" type="button">질문하기</button>
+        <span class="status" id="fq-status"></span>
+      </div>
+    </div>
+    <div id="fq-answers"></div>
+  </section>
+</main>
+<script>
+  const $ = id => document.getElementById(id);
+  const el = (tag, attrs = {}, ...children) => {
+    const node = document.createElement(tag);
+    Object.entries(attrs).forEach(([k, v]) => k === 'class' ? node.className = v : node.setAttribute(k, v));
+    children.flat().forEach(child => node.append(child instanceof Node ? child : document.createTextNode(child ?? '')));
+    return node;
+  };
+
+  async function loadSamples() {
+    const ids = await fetch('/api/demo/samples').then(r => r.json());
+    $('sample').replaceChildren(...ids.map(id => el('option', { value: id }, id)));
+    if (!ids.length) $('status').textContent = '샘플 PDF가 없습니다 (eval/에서 생성기로 만드세요).';
+  }
+
+  async function run() {
+    const id = $('sample').value;
+    $('run').disabled = true;
+    $('status').textContent = '추출하고 해설하는 중… (10초 안팎)';
+    try {
+      const response = await fetch(`/api/demo/samples/${encodeURIComponent(id)}/explain`, { method: 'POST' });
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.detail ?? `${response.status}`);
+      }
+      render(await response.json());
+      $('status').textContent = '';
+    } catch (e) {
+      $('status').textContent = '실패: ' + e.message;
+    } finally {
+      $('run').disabled = false;
+    }
+  }
+
+  function render(data) {
+    const x = data.explanation;
+    $('disclaimer').textContent = x.disclaimer;
+    $('review').replaceChildren(...x.needsReview.map(r =>
+      el('div', { class: 'advice review' }, `확인 필요: ${r.rawName ?? r.code} ${r.value} — ${r.reason ? r.reason + '. ' : ''}${r.advice}`)));
+    $('table').replaceChildren(...x.judgments.map(j => el('tr', {},
+      el('td', {}, j.name), el('td', {}, j.rawName ?? ''), el('td', {}, `${j.value}${j.unit ? ' ' + j.unit : ''}`),
+      el('td', {}, j.centerJudgment ?? '-'), el('td', { class: `j j-${j.judgment}` }, j.judgmentLabel))));
+    $('items').replaceChildren(...(x.items.length ? x.items.map(item => el('div', { class: 'card' },
+      el('h3', {}, `${item.name} ${item.value}${item.unit ? ' ' + item.unit : ''} `,
+        el('span', { class: `j j-${item.judgment}` }, item.judgmentLabel)),
+      el('p', { class: 'criterion' }, `판정 기준: ${item.criterion ?? '-'} (${item.criterionSource ?? ''})`),
+      item.noEvidence ? el('p', { class: 'noevidence' }, '이 항목을 설명할 근거를 공개 문서에서 찾지 못했습니다.')
+        : el('p', {}, ...item.sentences.map(s => [s.text, ...s.citations.map(n =>
+            el('sup', {}, el('a', { href: `#cite-${n}` }, `[${n}]`))), ' '])),
+      item.careAdvice ? el('div', { class: 'advice' }, item.careAdvice) : ''
+    )) : [el('p', { class: 'sub' }, '정상B(경계)·질환의심 항목이 없어 해설할 항목이 없습니다.')]));
+    $('citations').replaceChildren(...x.citations.map(c => el('details', { id: `cite-${c.number}` },
+      el('summary', {}, `[${c.number}] ${c.title} · ${c.publisher} · ${c.edition} · ${c.section} `,
+        c.url ? el('a', { href: c.url, target: '_blank', rel: 'noopener' }, '원문') : ''),
+      el('p', {}, c.text), el('p', {}, `이용 조건: ${c.license ?? '-'}`))));
+    const m = x.metrics;
+    $('metrics').textContent = `해설 대상 ${m.targets}개 (근거 있음 ${m.targetsWithEvidence}) · 문장 ${m.sentencesKept}/${m.sentencesGenerated} 통과`
+      + ` · 근거 조회 ${m.retrievalMs}ms · 생성 ${m.llmMs}ms · 전체 ${m.totalMs}ms` + (m.llmError ? ` · 생성 실패 ${m.llmError}` : '');
+    currentSample = data.sampleId;
+    renderFollowupItems(x.judgments);
+    $('result').hidden = false;
+  }
+
+  // 후속 질문 (ADR 0012 2절): 결과지는 서버가 추출한 샘플 것을 쓴다
+  const DECISION = {
+    ANSWER: '답', NO_EVIDENCE: '근거 없음', REFUSE_DIAGNOSIS: '진단 질문이라 답하지 않음',
+    REFUSE_TREATMENT: '약·치료 질문이라 답하지 않음', MALICIOUS: '답할 수 없는 요청'
+  };
+  const ITEM_SOURCE = { SELECTED: '고른 항목', MENTIONED: '질문 속 항목', FLAGGED: '주의 판정 항목', NONE: '없음' };
+  const EXAMPLES = ['이 판정이 무슨 뜻인가요?', '추가로 어떤 검사를 받아 보면 좋을까요?', '제가 당뇨병인가요?', '콜레스테롤 약을 먹어야 하나요?'];
+  let currentSample = null;
+
+  function renderFollowupItems(judgments) {
+    $('fq-items').replaceChildren(...judgments.filter(j => j.judgment && j.judgment !== 'NOT_JUDGED' && j.code)
+      .map(j => el('label', {}, el('input', { type: 'checkbox', value: j.code }), `${j.name} `,
+        el('span', { class: `j j-${j.judgment}` }, j.judgmentLabel))));
+    $('fq-examples').replaceChildren(...EXAMPLES.map(q => {
+      const b = el('button', { type: 'button', class: 'ghost' }, q);
+      b.addEventListener('click', () => { $('fq-question').value = q; });
+      return b;
+    }));
+    $('fq-answers').replaceChildren();
+  }
+
+  async function askFollowup() {
+    const question = $('fq-question').value.trim();
+    if (!question || !currentSample) return;
+    const itemCodes = [...document.querySelectorAll('#fq-items input:checked')].map(i => i.value);
+    $('fq-run').disabled = true;
+    $('fq-status').textContent = '근거를 찾고 답하는 중… (3초 안팎)';
+    try {
+      const response = await fetch(`/api/demo/samples/${encodeURIComponent(currentSample)}/followup`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question, itemCodes })
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.detail ?? `${response.status}`);
+      }
+      $('fq-answers').prepend(renderAnswer(await response.json()));
+      $('fq-status').textContent = '';
+    } catch (e) {
+      $('fq-status').textContent = '실패: ' + e.message;
+    } finally {
+      $('fq-run').disabled = false;
+    }
+  }
+
+  function renderAnswer(r) {
+    const overridden = r.llmDecision && r.llmDecision !== r.decision;
+    const why = !overridden ? '' : r.decision === 'REFUSE_DIAGNOSIS' && r.ruleDiagnosis
+      ? '모델은 답하려 했지만 진단 규칙이 막았습니다' : '모델은 답하려 했지만 근거로 확인된 문장이 없었습니다';
+    const m = r.metrics;
+    return el('div', { class: 'card' },
+      el('div', { class: 'answer-head' }, el('strong', {}, `Q. ${r.question}`),
+        el('span', { class: `pill d-${r.decision}` }, DECISION[r.decision] ?? r.decision),
+        why ? el('span', { class: 'small' }, why) : ''),
+      r.sentences.length ? el('p', {}, ...r.sentences.map(s => [s.text, ...s.citations.map(n => el('sup', {}, `[${n}]`)), ' '])) : '',
+      r.notice ? el('p', { class: r.decision === 'ANSWER' ? 'small' : '' }, r.notice) : '',
+      r.citations.length ? el('div', { class: 'small' }, ...r.citations.map(c => el('div', {}, `[${c.number}] ${c.title} · ${c.section ?? ''}`))) : '',
+      el('p', { class: 'small' }, r.disclaimer),
+      el('div', { class: 'metrics', style: 'margin-top:4px' },
+        `항목: ${ITEM_SOURCE[m.itemSource] ?? m.itemSource} · 근거 ${m.contextUnits}개 ${m.contextChars.toLocaleString()}자 · 문장 ${m.sentencesKept}/${m.sentencesGenerated} 통과`
+        + (m.unsupportedQuotes ? ` (근거 구절 불일치 ${m.unsupportedQuotes})` : '') + ` · 생성 ${m.llmMs}ms · ${m.promptVersion}`));
+  }
+
+  $('fq-run').addEventListener('click', askFollowup);
+  $('run').addEventListener('click', run);
+  loadSamples().catch(e => $('status').textContent = '샘플 목록을 불러오지 못했습니다: ' + e.message);
+</script>
+</body>
+</html>

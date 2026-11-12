@@ -3,135 +3,69 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>검진 결과 해설 데모</title>
+<title>검진 결과 해설 AI</title>
+<link rel="stylesheet" href="/app.css">
 <style>
-  :root {
-    --bg: #f7f7f5; --card: #ffffff; --text: #1d1d1f; --muted: #6b6b70; --line: #e3e3e0;
-    --a: #2f7d4f; --b: #b07a10; --s: #b8323a; --none: #8a8a8f; --accent: #2557a7; --warn-bg: #fff4e5; --warn: #8a5300;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg: #161618; --card: #202023; --text: #ececee; --muted: #a0a0a6; --line: #34343a;
-            --a: #5cc185; --b: #e2b04a; --s: #f07a80; --none: #8a8a8f; --accent: #7aa7ff; --warn-bg: #3a2c12; --warn: #f3c46b; }
-  }
-  * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.6 -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
-  main { max-width: 900px; margin: 0 auto; padding: 24px 16px 64px; }
-  h1 { font-size: 22px; margin: 0 0 4px; }
-  h2 { font-size: 17px; margin: 28px 0 10px; }
-  .sub { color: var(--muted); margin: 0 0 16px; }
-  .tag { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
-  .disclaimer { background: var(--warn-bg); color: var(--warn); border-radius: 8px; padding: 10px 14px; margin: 12px 0; }
-  .controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
-  select, button { font: inherit; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: var(--text); }
-  button { background: var(--accent); color: #fff; border-color: var(--accent); cursor: pointer; }
-  button:disabled { opacity: .5; cursor: progress; }
-  .status { color: var(--muted); }
-  table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
-  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); font-size: 14px; }
-  th { color: var(--muted); font-weight: 600; }
-  .scroll { overflow-x: auto; }
-  .j { font-weight: 600; white-space: nowrap; }
-  .j-NORMAL_A { color: var(--a); } .j-NORMAL_B { color: var(--b); } .j-SUSPECT { color: var(--s); } .j-NOT_JUDGED { color: var(--none); font-weight: 400; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin: 10px 0; }
-  .card h3 { margin: 0 0 6px; font-size: 16px; }
-  .criterion { color: var(--muted); font-size: 13px; margin: 0 0 8px; }
-  .advice { border-left: 3px solid var(--s); padding: 6px 10px; margin-top: 8px; background: var(--warn-bg); color: var(--warn); border-radius: 4px; }
-  .review { border-left-color: var(--b); }
-  .noevidence { color: var(--muted); font-style: italic; }
-  sup a { color: var(--accent); text-decoration: none; font-weight: 600; }
-  details { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; margin: 6px 0; }
-  details summary { cursor: pointer; }
-  details p { white-space: pre-wrap; font-size: 13px; color: var(--muted); }
-  .metrics { color: var(--muted); font-size: 12px; margin-top: 24px; }
+  .hero { padding: 16px 0 4px; }
+  .hero h1 { font-size: 30px; line-height: 1.3; }
+  .hero p { font-size: 16px; max-width: 680px; }
+  .flow { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin: 12px 0; }
+  .flow div { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: 14px; }
+  .flow b { display: block; font-size: 13px; }
+  .flow .who { font-size: 12px; color: var(--muted); }
+  .flow .llm { border-color: var(--accent); }
+  .cta { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0 0; }
+  .cta a { display: inline-block; padding: 8px 14px; border-radius: 8px; text-decoration: none; border: 1px solid var(--accent); }
+  .cta a.primary { background: var(--accent); color: #fff; }
+  ul.tight { margin: 6px 0; padding-left: 20px; } ul.tight li { margin: 4px 0; }
 </style>
 </head>
 <body>
+<nav class="nav"><div><strong>검진 결과 해설 AI</strong>
+  <a href="/" aria-current="page">소개</a><a href="/demo.html">해설 데모</a><a href="/quality.html">품질</a><a href="/ops.html">운영</a>
+</div></nav>
 <main>
-  <h1>검진 결과 해설 <span class="tag">합성 데이터 데모</span></h1>
-  <p class="sub">합성 결과지를 골라 추출 → 국가건강검진 기준 판정 → 항목별 근거 조회 → 출처 붙은 해설 순서를 확인합니다. 실제 결과지는 올리지 마세요.</p>
-  <div class="disclaimer" id="disclaimer">이 내용은 의료 진단이 아니며, 정확한 판단은 의료진과 상담하세요.</div>
+  <section class="hero">
+    <span class="tag">포트폴리오 · 합성 데이터만 사용</span>
+    <h1>건강검진 결과지를 읽고, 기준으로 판정하고,<br>공개 문서를 근거로 설명합니다</h1>
+    <p class="sub">LLM은 결과지의 값을 베끼고, 근거가 있는 곳에서만 문장을 씁니다. 판정, 진료 권고, 고지, 받아들일지 여부는 코드가 정합니다.
+      어디에 LLM을 쓰고 어디에 쓰지 않을지는 측정으로 정했습니다. <b>진단은 하지 않습니다.</b></p>
+    <div class="cta"><a class="primary" href="/demo.html">해설 데모 보기</a><a href="/quality.html">품질 수치</a><a href="/ops.html">운영 기록</a></div>
+  </section>
 
-  <div class="controls">
-    <label for="sample">합성 샘플</label>
-    <select id="sample"><option>불러오는 중…</option></select>
-    <button id="run" type="button">해설 보기</button>
-    <span class="status" id="status"></span>
+  <h2>처리 순서</h2>
+  <div class="flow">
+    <div class="llm"><b>1. 추출</b>결과지 PDF → 항목·값·단위<div class="who">LLM (Haiku 5.5), 구조화 출력</div></div>
+    <div><b>2. 원문 대조 검증</b>원문에 없는 값은 받지 않음<div class="who">코드</div></div>
+    <div><b>3. 기준 판정</b>보건복지부 고시 판정기준표<div class="who">코드</div></div>
+    <div><b>4. 근거 조회</b>항목 코드로 공개 문서 절을 찾음<div class="who">코드</div></div>
+    <div class="llm"><b>5. 해설 문장</b>근거를 인용한 문장만 남김<div class="who">LLM + 인용·숫자 검증</div></div>
+    <div><b>6. 진료 권고·고지</b>위험 수치는 진료 권고<div class="who">코드</div></div>
+  </div>
+  <p class="small">결과를 본 뒤 묻는 <b>후속 질문</b>은 항목으로 범위를 좁혀 근거를 찾고(글자 2-gram BM25), 진단·약 질문과 근거 없는 질문은 정해진 문구로 답하지 않습니다.</p>
+
+  <h2>대표 수치</h2>
+  <div class="grid">
+    <div class="stat"><div class="label">결과지 수치 추출 F1</div><div class="value">0.995</div><div class="note">처음 보는 양식 30개 · 보고서당 $0.0012</div></div>
+    <div class="stat"><div class="label">위험 수치 진료 권고</div><div class="value">73/73</div><div class="note">잘못된 권고 0</div></div>
+    <div class="stat"><div class="label">외부 전송 전 식별정보 남음</div><div class="value">0/90</div><div class="note">합성 결과지 60개</div></div>
+    <div class="stat"><div class="label">판정 해설 비용 (검색 → 조회)</div><div class="value">−27%</div><div class="note">LLM 지연 6.0 → 3.3~3.6초</div></div>
   </div>
 
-  <section id="result" hidden>
-    <div id="review"></div>
-    <h2>결과 표</h2>
-    <div class="scroll"><table>
-      <thead><tr><th>항목</th><th>결과지 항목명</th><th>결과</th><th>결과지 판정</th><th>국가 기준 판정</th></tr></thead>
-      <tbody id="table"></tbody>
-    </table></div>
-    <h2>항목별 해설</h2>
-    <div id="items"></div>
-    <h2>출처</h2>
-    <div id="citations"></div>
-    <div class="metrics" id="metrics"></div>
-  </section>
+  <h2>못 한 것과 한계</h2>
+  <div class="warn">
+    <ul class="tight">
+      <li><b>후속 질문은 시험 통과 규칙을 채우지 못했습니다.</b> 진단 질문 2건에 답했고, 진단 규칙을 더한 뒤에도 새 문항 8개 중 2개를 놓쳤습니다.</li>
+      <li>결과지는 모두 합성 데이터입니다. 글자 층이 있는 PDF만 다루고 스캔 이미지는 다루지 않습니다.</li>
+      <li>라벨러는 개발자 1명이고 의료인이 아닙니다. 채점기와 리뷰에 같은 계열 모델(Claude)이 많습니다.</li>
+    </ul>
+    <a href="/quality.html">자세한 수치와 실패 기록</a>
+  </div>
+
+  <h2>기술</h2>
+  <p class="small">Java 21 · Spring Boot 4 · Spring AI 2 · PostgreSQL 18 + pgvector · Claude Haiku 5.5 · Ollama(bge-m3 임베딩, 오프라인 모드 qwen3:4b) · Python 평가 스크립트.
+    모든 LLM 호출은 토큰·비용·지연을 기록하고, 보내기 전에 식별정보를 지웁니다. 데모 호출은 하루 예산 상한을 지킵니다.</p>
+  <div class="disclaimer">이 서비스의 내용은 의료 진단이 아니며, 정확한 판단은 의료진과 상담하세요.</div>
 </main>
-<script>
-  const $ = id => document.getElementById(id);
-  const el = (tag, attrs = {}, ...children) => {
-    const node = document.createElement(tag);
-    Object.entries(attrs).forEach(([k, v]) => k === 'class' ? node.className = v : node.setAttribute(k, v));
-    children.flat().forEach(child => node.append(child instanceof Node ? child : document.createTextNode(child ?? '')));
-    return node;
-  };
-
-  async function loadSamples() {
-    const ids = await fetch('/api/demo/samples').then(r => r.json());
-    $('sample').replaceChildren(...ids.map(id => el('option', { value: id }, id)));
-    if (!ids.length) $('status').textContent = '샘플 PDF가 없습니다 (eval/에서 생성기로 만드세요).';
-  }
-
-  async function run() {
-    const id = $('sample').value;
-    $('run').disabled = true;
-    $('status').textContent = '추출하고 해설하는 중… (10초 안팎)';
-    try {
-      const response = await fetch(`/api/demo/samples/${encodeURIComponent(id)}/explain`, { method: 'POST' });
-      if (!response.ok) throw new Error(`${response.status} ${await response.text()}`);
-      render(await response.json());
-      $('status').textContent = '';
-    } catch (e) {
-      $('status').textContent = '실패: ' + e.message;
-    } finally {
-      $('run').disabled = false;
-    }
-  }
-
-  function render(data) {
-    const x = data.explanation;
-    $('disclaimer').textContent = x.disclaimer;
-    $('review').replaceChildren(...x.needsReview.map(r =>
-      el('div', { class: 'advice review' }, `확인 필요: ${r.rawName ?? r.code} ${r.value} — ${r.reason ? r.reason + '. ' : ''}${r.advice}`)));
-    $('table').replaceChildren(...x.judgments.map(j => el('tr', {},
-      el('td', {}, j.name), el('td', {}, j.rawName ?? ''), el('td', {}, `${j.value}${j.unit ? ' ' + j.unit : ''}`),
-      el('td', {}, j.centerJudgment ?? '-'), el('td', { class: `j j-${j.judgment}` }, j.judgmentLabel))));
-    $('items').replaceChildren(...(x.items.length ? x.items.map(item => el('div', { class: 'card' },
-      el('h3', {}, `${item.name} ${item.value}${item.unit ? ' ' + item.unit : ''} `,
-        el('span', { class: `j j-${item.judgment}` }, item.judgmentLabel)),
-      el('p', { class: 'criterion' }, `판정 기준: ${item.criterion ?? '-'} (${item.criterionSource ?? ''})`),
-      item.noEvidence ? el('p', { class: 'noevidence' }, '이 항목을 설명할 근거를 공개 문서에서 찾지 못했습니다.')
-        : el('p', {}, ...item.sentences.map(s => [s.text, ...s.citations.map(n =>
-            el('sup', {}, el('a', { href: `#cite-${n}` }, `[${n}]`))), ' '])),
-      item.careAdvice ? el('div', { class: 'advice' }, item.careAdvice) : ''
-    )) : [el('p', { class: 'sub' }, '정상B(경계)·질환의심 항목이 없어 해설할 항목이 없습니다.')]));
-    $('citations').replaceChildren(...x.citations.map(c => el('details', { id: `cite-${c.number}` },
-      el('summary', {}, `[${c.number}] ${c.title} · ${c.publisher} · ${c.edition} · ${c.section} `,
-        c.url ? el('a', { href: c.url, target: '_blank', rel: 'noopener' }, '원문') : ''),
-      el('p', {}, c.text), el('p', {}, `이용 조건: ${c.license ?? '-'}`))));
-    const m = x.metrics;
-    $('metrics').textContent = `해설 대상 ${m.targets}개 (근거 있음 ${m.targetsWithEvidence}) · 문장 ${m.sentencesKept}/${m.sentencesGenerated} 통과`
-      + ` · 근거 조회 ${m.retrievalMs}ms · 생성 ${m.llmMs}ms · 전체 ${m.totalMs}ms` + (m.llmError ? ` · 생성 실패 ${m.llmError}` : '');
-    $('result').hidden = false;
-  }
-
-  $('run').addEventListener('click', run);
-  loadSamples().catch(e => $('status').textContent = '샘플 목록을 불러오지 못했습니다: ' + e.message);
-</script>
 </body>
 </html>
