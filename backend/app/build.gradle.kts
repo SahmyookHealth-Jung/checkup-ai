@@ -6,6 +6,7 @@ plugins {
 dependencies {
     implementation(project(":core"))
     implementation(project(":report"))
+    implementation(project(":stats"))
 
     implementation(libs.spring.boot.starter.webmvc)
     implementation(libs.spring.boot.starter.actuator)

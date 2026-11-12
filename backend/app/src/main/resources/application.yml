@@ -8,6 +8,11 @@ spring:
     username: ${POSTGRES_USER:checkup}
     password: ${POSTGRES_PASSWORD}
 
+  flyway:
+    placeholders:
+      # 기능 2 읽기 전용 계정 비밀번호 (V4 마이그레이션, ADR 0013). 값은 .env에만 둔다
+      statsReaderPassword: ${STATS_READER_PASSWORD}
+
   ai:
     # 모델 공급자 선택. 코드는 ChatModel/EmbeddingModel 인터페이스만 쓰므로 여기만 바꾸면 교체된다.
     model:
@@ -84,6 +89,14 @@ checkupai:
   eval:
     # 저장한 추출 결과로 해설만 돌리는 평가 API (ADR 0008). 추출 검증을 거치지 않은 값이 LLM에 가므로 공개 배포에서는 끈다
     endpoints-enabled: ${EVAL_ENDPOINTS_ENABLED:true}
+  stats:
+    # 기능 2 Text-to-SQL (ADR 0013). LLM이 쓴 SQL은 stats 스키마만 SELECT할 수 있는 읽기 전용 계정으로 실행한다
+    url: jdbc:postgresql://localhost:${POSTGRES_PORT:5433}/${POSTGRES_DB:checkup}
+    username: stats_reader
+    password: ${STATS_READER_PASSWORD}
+    max-rows: 200              # 결과 행 상한
+    min-group-size: 10         # 사람 수가 이보다 적은 집단의 값은 숨긴다
+    max-tokens: 1200
   demo:
     # 화면의 합성 샘플 결과지 폴더 (PDF는 gitignore, 생성기로 다시 만든다). 공개 데모는 샘플만 쓴다 (ADR 0007 7절)
     samples-dir: ${DEMO_SAMPLES_DIR:../../data/synthetic/extraction/v1}
