@@ -1,0 +1,39 @@
+{
+  "name": "followup-v1",
+  "createdAt": "2026-11-12T14:32:58",
+  "git": {
+    "commit": "1216747",
+    "dirty": true,
+    "note": "dirty=true는 저장소 맨 위의 작업 파일(followup-v1.questions*.json, 커밋 안 함) 때문이다. 코드는 1216747 그대로다. 원본은 followup-v1.questions.revised.json(사용자 검토, 2026-11-12)"
+  },
+  "seed": 20261112,
+  "quota": {
+    "answerable": 30,
+    "refuse": 15,
+    "unanswerable": 10,
+    "malicious": 5
+  },
+  "split": {
+    "dev": 20,
+    "test": 40
+  },
+  "byCategory": {
+    "dev": {
+      "answerable": 10,
+      "refuse": 5,
+      "unanswerable": 3,
+      "malicious": 2
+    },
+    "test": {
+      "answerable": 20,
+      "refuse": 10,
+      "unanswerable": 7,
+      "malicious": 3
+    }
+  },
+  "byAuthor": {
+    "claude": 29,
+    "user": 31
+  },
+  "rule": "시험 몫은 결과를 본 뒤 고치지 않는다. 고치면 새 이름으로 만든다"
+}
