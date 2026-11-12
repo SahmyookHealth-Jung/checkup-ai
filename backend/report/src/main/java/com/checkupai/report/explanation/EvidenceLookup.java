@@ -2,14 +2,12 @@ package com.checkupai.report.explanation;
 
 import com.checkupai.report.extraction.ItemCode;
 import com.checkupai.report.retrieval.GuidelineChunks;
-import com.checkupai.report.retrieval.GuidelineProperties;
+import com.checkupai.report.retrieval.GuidelineCorpus;
 import com.checkupai.report.retrieval.RetrievedChunk;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -34,7 +32,7 @@ import tools.jackson.databind.json.JsonMapper;
  *   <li>조회표에 글이 있는 항목(혈압 2, 공복혈당, 지질 4): 판정 구분 정의 하나와 정해 둔 절의 청크. 이 항목만 LLM이 문장을 쓴다</li>
  *   <li>나머지: 근거가 기준표 행뿐이라 코드 문구로 답한다 (ADR 0008 1절)</li>
  * </ul>
- * 청크는 근거 청크 파일에서 바로 읽는다. 파일이 바뀌면 다시 읽는다.
+ * 청크는 근거 청크 파일에서 바로 읽는다(GuidelineCorpus). 파일이 바뀌면 다시 읽는다.
  *
  * <p>LLM에 보낼지는 조회표가 아니라 실제로 찾은 글 청크로 정한다 ({@link Evidence#guideline()}). 조회표에 적힌 항목이어도
  * 청크 파일에 그 절이 없으면 코드 문구로 답한다. 2026-11-11 Codex 리뷰: 조회표만 보면 청크를 다시 만들거나 다른 파일을
@@ -66,25 +64,21 @@ public class EvidenceLookup {
     public record Evidence(List<RetrievedChunk> chunks, boolean guideline) {
     }
 
-    private record Loaded(FileTime modified, List<RetrievedChunk> chunks) {
-    }
-
     private final Table table;
-    private final Path chunksFile;
-    private volatile Loaded loaded;
+    private final GuidelineCorpus corpus;
 
     @Autowired
-    public EvidenceLookup(GuidelineProperties properties) {
-        this(Path.of(properties.chunksFile()));
-    }
-
-    EvidenceLookup(Path chunksFile) {
-        this.chunksFile = chunksFile;
+    public EvidenceLookup(GuidelineCorpus corpus) {
+        this.corpus = corpus;
         try (InputStream in = new ClassPathResource(RESOURCE).getInputStream()) {
             this.table = JsonMapper.builder().build().readValue(in, Table.class);
         } catch (IOException e) {
             throw new UncheckedIOException("근거 조회표를 읽지 못했다: " + RESOURCE, e);
         }
+    }
+
+    EvidenceLookup(Path chunksFile) {
+        this(new GuidelineCorpus(chunksFile));
     }
 
     /** 조회표에 글 근거가 적혀 있다. 실제로 LLM에 보낼지는 {@link Evidence#guideline()}로 정한다 */
@@ -96,7 +90,7 @@ public class EvidenceLookup {
      * 그 항목·판정의 근거. 찾지 못한 근거는 빠진다. 기준표 행도 없으면 빈 목록이고, 해설은 "근거 없음"이 된다.
      */
     public Evidence evidence(ItemCode code, Judgment judgment) {
-        List<RetrievedChunk> chunks = chunks();
+        List<RetrievedChunk> chunks = corpus.chunks();
         List<RetrievedChunk> row = chunks.stream()
                 .filter(chunk -> GuidelineChunks.CRITERIA_ROW_SECTION.equals(chunk.metadataText("section"))
                         && hasItemCode(chunk, code))
@@ -115,7 +109,7 @@ public class EvidenceLookup {
         }
         if (guideline.isEmpty()) {
             log.warn("근거 조회표와 청크 파일이 어긋난다: {}의 절 {}이 {}에 없다. {}은 코드 문구로 답한다",
-                    document.get().docId(), document.get().sections(), chunksFile, code);
+                    document.get().docId(), document.get().sections(), corpus.chunksFile(), code);
             return new Evidence(row, false);
         }
         List<RetrievedChunk> found = new ArrayList<>(row);
@@ -141,19 +135,5 @@ public class EvidenceLookup {
     private static boolean hasItemCode(RetrievedChunk chunk, ItemCode code) {
         return chunk.metadata().get("item_codes") instanceof Collection<?> codes
                 && codes.stream().anyMatch(value -> code.name().equals(String.valueOf(value)));
-    }
-
-    private List<RetrievedChunk> chunks() {
-        try {
-            FileTime modified = Files.getLastModifiedTime(chunksFile);
-            Loaded current = loaded;
-            if (current == null || !current.modified().equals(modified)) {
-                current = new Loaded(modified, GuidelineChunks.read(chunksFile));
-                loaded = current;
-            }
-            return current.chunks();
-        } catch (IOException e) {
-            throw new IllegalStateException("근거 청크 파일을 읽지 못했다: " + chunksFile.toAbsolutePath().normalize(), e);
-        }
     }
 }
