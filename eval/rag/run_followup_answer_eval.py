@@ -16,12 +16,14 @@
 
 사용법 (eval/ 폴더에서, 앱이 떠 있는 상태):
     .venv/bin/python -m rag.run_followup_answer_eval --split dev --runs 2 --label dev-v1
+    .venv/bin/python -m rag.run_followup_answer_eval --gold followup/followup-recheck-v1.jsonl --split recheck --runs 1 --label recheck
 """
 from __future__ import annotations
 
 import argparse
 import json
 import urllib.request
+from pathlib import Path
 from collections import Counter
 
 import run_record
@@ -78,12 +80,13 @@ def main() -> None:
     parser.add_argument("--runs", type=int, default=2)
     parser.add_argument("--modes", default=",".join(MODES))
     parser.add_argument("--label", default="dev")
+    parser.add_argument("--gold", type=Path, default=GOLD, help="정답셋 파일 (기본 followup-v1, 재확인용은 followup-recheck-v1)")
     args = parser.parse_args()
     git = run_record.git_state()
     if git["dirty"]:
         print("주의: 커밋하지 않은 변경이 있다. 기록에 dirty=true로 남는다 (비교 수치로 쓰지 않는다)")
     modes = args.modes.split(",")
-    gold = [json.loads(line) for line in GOLD.read_text(encoding="utf-8").splitlines() if line.strip()]
+    gold = [json.loads(line) for line in args.gold.read_text(encoding="utf-8").splitlines() if line.strip()]
     gold = [g for g in gold if g["split"] == args.split]
     rows = []
     for run in range(1, args.runs + 1):
@@ -128,7 +131,7 @@ def main() -> None:
     info = {"promptVersion": sorted({r["promptVersion"] for r in rows if r["promptVersion"]})}
     run_id = run_record.new_run_id("followup-answer", args.label)
     out = run_record.save(run_id, "followup-answer", "rag", label=args.label,
-                          dataset={"name": "followup-v1", "split": args.split, "questions": len(gold),
+                          dataset={"name": args.gold.stem, "split": args.split, "questions": len(gold),
                                    "frozen": FROZEN.name, "unitsSha256": unit_ids_sha()},
                           config={**info, "runs": args.runs, "modes": modes}, summary=summary,
                           headline={f"{m}:{k}": summary[m]["all"][k] for m in modes
