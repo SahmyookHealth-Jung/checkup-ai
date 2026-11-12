@@ -183,7 +183,7 @@ function renderList() {
   $("list").replaceChildren();
   questions.forEach((q, index) => {
     const tags = [DATA.categories[q.category] || "범주 없음", q.reason && DATA.reasons[q.reason], q.topic && DATA.topics[q.topic],
-      q.author === "claude" ? "Claude 초안" : null].filter(Boolean);
+      q.author === "claude" ? "Claude 초안" : null, q.revisedBy === "claude" ? "Claude 수정" : null].filter(Boolean);
     const edit = el("button", { className: "link", textContent: "편집" });
     edit.onclick = () => startEdit(index);
     const del = el("button", { className: "link", textContent: "삭제" });
@@ -191,7 +191,8 @@ function renderList() {
     $("list").append(el("div", { className: "q" },
       el("div", {}, el("div", { textContent: q.question }),
         el("div", { className: "meta" }, ...tags.map((t) => el("span", { className: "tag", textContent: t })),
-          `${q.report || "결과지 없음"}${q.itemCodes?.length ? " · " + q.itemCodes.join(", ") : ""}${q.note ? " · " + q.note : ""}`)),
+          `${q.report || "결과지 없음"}${q.itemCodes?.length ? " · " + q.itemCodes.join(", ") : ""}${q.note ? " · " + q.note : ""}`
+          + (q.revision ? ` · 수정: ${q.revision}` : ""))),
       el("div", {}, edit, del)));
   });
 }
@@ -246,11 +247,19 @@ $("import").onchange = async (event) => {
   if (!file) return;
   const doc = JSON.parse(await file.text());
   const incoming = (Array.isArray(doc) ? doc : doc.questions || []).map(migrate);
-  const known = new Set(questions.map((q) => q.question));
-  const added = incoming.filter((q) => !known.has(q.question));
-  questions.push(...added);
-  save(); renderAll();
-  $("status").textContent = `${added.length}개를 더했습니다 (같은 질문 ${incoming.length - added.length}개는 건너뜀)`;
+  // 확인: 목록 전체를 파일로 바꾼다 (Claude가 고친 파일을 받을 때). 취소: 새 질문만 더한다 (초안을 더할 때)
+  if (questions.length && confirm(`지금 목록 ${questions.length}개를 이 파일의 ${incoming.length}개로 모두 바꿀까요?\n\n`
+      + "확인: 목록 전체를 파일 내용으로 바꾼다 (Claude가 고친 파일)\n취소: 목록에 없는 새 질문만 더한다 (초안 추가)")) {
+    questions = incoming;
+    save(); renderAll();
+    $("status").textContent = `목록을 파일 내용 ${incoming.length}개로 바꿨습니다`;
+  } else {
+    const known = new Set(questions.map((q) => q.question));
+    const added = incoming.filter((q) => !known.has(q.question));
+    questions.push(...added);
+    save(); renderAll();
+    $("status").textContent = `${added.length}개를 더했습니다 (같은 질문 ${incoming.length - added.length}개는 건너뜀)`;
+  }
   event.target.value = "";
 };
 

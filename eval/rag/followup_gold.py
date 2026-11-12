@@ -210,7 +210,7 @@ def freeze(rows: list[dict], name: str, seed: int) -> Path:
         r.setdefault("expectedSections", None)  # 순서 5(문서 확장) 뒤에 채운다
     OUT.mkdir(parents=True, exist_ok=True)
     keys = ("id", "split", "author", "report", "itemCodes", "question", "category", "reason", "topic",
-            "expectedSections", "note")
+            "expectedSections", "note", "revisedBy", "revision")
     out_file.write_text("".join(json.dumps({k: r.get(k) for k in keys}, ensure_ascii=False) + "\n" for r in rows),
                         encoding="utf-8")
     manifest = {"name": name, "createdAt": datetime.now().isoformat(timespec="seconds"), "git": git_state(),
