@@ -39,7 +39,7 @@ import org.springframework.stereotype.Service;
  *       검증은 세 가지다. 근거 구절이 인용한 근거 문단에 글자 그대로 있는가(followup-v2), 인용 번호가 허락된 것인가,
  *       숫자가 결과지나 인용한 근거에 있는가(ExplanationValidator).
  *       금지 표현은 세어서 기록한다. 고지문은 늘 붙인다</li>
- *   <li>약·진단 패턴 규칙은 기록만 한다 ({@link FollowupRules})</li>
+ *   <li>진단 패턴 규칙은 "규칙 또는 LLM"으로 거절을 강제하고, 약 패턴 규칙은 기록만 한다 ({@link FollowupRules})</li>
  * </ol>
  */
 @Service
@@ -177,6 +177,9 @@ public class FollowupService {
             decision = Decision.NO_EVIDENCE;  // 답이라고 했지만 근거로 검증된 문장이 없다 (가드레일 원칙 2)
         } else {
             decision = llmDecision;
+        }
+        if (flags.diagnosis() && (decision == Decision.ANSWER || decision == Decision.NO_EVIDENCE)) {
+            decision = Decision.REFUSE_DIAGNOSIS;  // 진단 거절은 규칙 또는 LLM (ADR 0011 결과, 시험 몫에서 LLM이 진단 질문에 답함)
         }
         if (decision == Decision.ANSWER) {
             for (ExplanationValidator.CheckedSentence kept : outcome.kept()) {

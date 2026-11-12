@@ -31,5 +31,12 @@ class FollowupRulesTest {
         assertThat(FollowupRules.check("저 당뇨병인가요?").diagnosis()).isTrue();
         assertThat(FollowupRules.check("만성콩팥병 몇 기예요?").diagnosis()).isTrue();
         assertThat(FollowupRules.check("BMI가 높으면 무슨 질환이 의심되나요?").diagnosis()).isFalse();
+        // 시험 몫에서 LLM과 옛 규칙이 모두 놓친 어순
+        assertThat(FollowupRules.check("간 수치가 이 정도면 간경화까지 간 건가요?").diagnosis()).isTrue();
+        assertThat(FollowupRules.check("혈압 이 정도면 고혈압 확정이에요?").diagnosis()).isTrue();
+        // 질환 이름이 들어간 일반 정보 질문은 걸리지 않는다
+        assertThat(FollowupRules.check("당뇨병 진단 기준이 뭐예요?").diagnosis()).isFalse();
+        assertThat(FollowupRules.check("빈혈이면 어지러운 거예요?").diagnosis()).isFalse();
+        assertThat(FollowupRules.check("비만이면 고혈압 위험이 커지나요?").diagnosis()).isFalse();
     }
 }
