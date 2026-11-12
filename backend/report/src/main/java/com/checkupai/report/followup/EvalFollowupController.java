@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * 후속 질문 평가 API (ADR 0011 5절). 고정한 추출 결과와 질문으로 문맥만 만든다. LLM을 부르지 않는다.
+ * 후속 질문 평가 API (ADR 0011 5절). 고정한 추출 결과와 질문으로
+ * 문맥만 만들거나(/context, LLM 호출 없음) 답까지 만든다(/answer, Haiku 1회).
  *
  * <pre>
  * curl -X POST -H 'Content-Type: application/json' localhost:8080/api/eval/followup/context \
@@ -37,26 +38,39 @@ public class EvalFollowupController {
     }
 
     private final FollowupContextBuilder builder;
+    private final FollowupService service;
     private final EvalProperties evalProperties;
     private final FollowupProperties properties;
 
-    public EvalFollowupController(FollowupContextBuilder builder, EvalProperties evalProperties,
+    public EvalFollowupController(FollowupContextBuilder builder, FollowupService service, EvalProperties evalProperties,
                                   FollowupProperties properties) {
         this.builder = builder;
+        this.service = service;
         this.evalProperties = evalProperties;
         this.properties = properties;
     }
 
     @PostMapping("/context")
     public FollowupContext context(@RequestBody ContextRequest request) {
+        check(request);
+        int budget = request.budgetChars() == null ? properties.budgetChars() : request.budgetChars();
+        return builder.build(request.report(), request.question(), request.itemCodes(), budget,
+                request.ranking() == null ? FollowupContextBuilder.Ranking.BM25 : request.ranking());
+    }
+
+    /** 답까지 만든다 (Haiku 1회). 예산과 순위는 서비스 설정 그대로다 */
+    @PostMapping("/answer")
+    public FollowupService.FollowupResult answer(@RequestBody ContextRequest request) {
+        check(request);
+        return service.answer(request.report(), request.question(), request.itemCodes());
+    }
+
+    private void check(ContextRequest request) {
         if (!evalProperties.endpointsEnabled()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         if (request == null || request.question() == null || request.question().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "question이 없다");
         }
-        int budget = request.budgetChars() == null ? properties.budgetChars() : request.budgetChars();
-        return builder.build(request.report(), request.question(), request.itemCodes(), budget,
-                request.ranking() == null ? FollowupContextBuilder.Ranking.BM25 : request.ranking());
     }
 }

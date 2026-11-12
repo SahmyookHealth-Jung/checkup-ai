@@ -48,7 +48,7 @@ public final class ExplanationGuardrails {
     private ExplanationGuardrails() {
     }
 
-    static int forbiddenHits(String text) {
+    public static int forbiddenHits(String text) {
         return (int) FORBIDDEN.stream().filter(pattern -> pattern.matcher(text).find()).count();
     }
 }
