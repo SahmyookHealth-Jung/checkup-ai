@@ -1,0 +1,301 @@
+{
+  "set": "followup-v1",
+  "suggestedBy": "claude",
+  "unit": "section",
+  "suggestions": {
+    "fq-001": {
+      "units": [
+        "kdca-5457#개요-종류",
+        "kdca-5457#개요-정의",
+        "mohw-annex4-row-egfr"
+      ],
+      "noEvidence": false,
+      "reason": "단계 표에서 44는 3b단계(30~44). 개요-정의는 사구체 여과율이 콩팥 기능을 대변한다고 설명"
+    },
+    "fq-002": {
+      "units": [
+        "kdca-5457#개요-정의",
+        "kdca-5457#진단 및 검사",
+        "mohw-annex4-row-egfr"
+      ],
+      "noEvidence": false,
+      "reason": "eGFR이 무엇이고 크레아티닌으로 계산한다는 설명, 판정 구간"
+    },
+    "fq-003": {
+      "units": [
+        "kdca-5305#진단 및 검사",
+        "mohw-annex4-row-fasting-glucose"
+      ],
+      "noEvidence": false,
+      "reason": "공복혈당장애(100~125) 설명과 판정 구간. \"갑자기 이럴 수 있나\"에 직접 답하는 문장은 없음"
+    },
+    "fq-004": {
+      "units": [
+        "mohw-annex4-def-normal-b"
+      ],
+      "noEvidence": false,
+      "reason": "정상B 정의(\"자가관리 및 예방조치가 필요한 자\")"
+    },
+    "fq-005": {
+      "units": [
+        "kdca-6715#치료-비약물 치료"
+      ],
+      "noEvidence": false,
+      "reason": "포화지방 제한 등 식사요법"
+    },
+    "fq-006": {
+      "units": [
+        "mohw-annex4-row-creatinine",
+        "mohw-annex4-row-egfr",
+        "mohw-annex4-row-alt",
+        "mohw-annex4-def-suspect"
+      ],
+      "noEvidence": false,
+      "reason": "세 항목의 판정 구간과 질환의심 정의. 참고치가 아니라 고시 기준으로 판정한다는 답"
+    },
+    "fq-007": {
+      "units": [
+        "kdca-5457#진단 및 검사",
+        "mohw-annex4-def-suspect"
+      ],
+      "noEvidence": false,
+      "reason": "이 결과지의 질환의심은 콩팥(크레아티닌, eGFR, 요단백). 콩팥 진단에 쓰는 검사와 질환의심 정의(\"추적검사나 정확한 진단 필요\")"
+    },
+    "fq-008": {
+      "units": [
+        "kdca-5305#진단 및 검사"
+      ],
+      "noEvidence": false,
+      "reason": "공복 혈장 포도당은 최소 8시간 금식 뒤 측정"
+    },
+    "fq-009": {
+      "units": [
+        "mohw-annex4-row-blood-pressure",
+        "mohw-annex4-row-bmi",
+        "mohw-annex4-row-hemoglobin",
+        "mohw-annex4-row-creatinine",
+        "mohw-annex4-row-egfr",
+        "mohw-annex4-row-alt",
+        "mohw-annex4-row-urine-protein",
+        "mohw-annex4-row-gamma-gtp",
+        "mohw-annex4-def-suspect"
+      ],
+      "noEvidence": false,
+      "reason": "결과지 판정 자체를 묻는 질문(경계 2). 주의 항목들의 판정기준표 행"
+    },
+    "fq-010": {
+      "units": [
+        "mohw-annex4-row-chest-xray"
+      ],
+      "noEvidence": false,
+      "reason": "흉부 판정 구간(정상, 비활동성 폐결핵 = 정상B 등)"
+    },
+    "fq-016": {
+      "units": [],
+      "noEvidence": true,
+      "reason": "근거 없음 확인: 근거 문서 주제 밖"
+    },
+    "fq-017": {
+      "units": [],
+      "noEvidence": true,
+      "reason": "근거 없음 확인: 근거 문서 주제 밖"
+    },
+    "fq-018": {
+      "units": [],
+      "noEvidence": true,
+      "reason": "근거 없음 확인: 근거 문서 주제 밖"
+    },
+    "fq-021": {
+      "units": [
+        "mohw-annex4-row-urine-protein",
+        "kdca-5457#진단 및 검사"
+      ],
+      "noEvidence": false,
+      "reason": "요단백 판정 구간(양성 +1 이상 질환의심)과 요 스틱 검사 설명"
+    },
+    "fq-022": {
+      "units": [
+        "kdca-6694#개요-정의",
+        "kdca-6694#실천 방법-일반적 실천 방법",
+        "mohw-annex4-row-bmi"
+      ],
+      "noEvidence": false,
+      "reason": "BMI 계산식과 기준(25 미만), 6개월에 체중 5~10% 감량 목표"
+    },
+    "fq-023": {
+      "units": [
+        "kdca-6715#개요-정의",
+        "kdca-6715#개요-경과 및 예후"
+      ],
+      "noEvidence": false,
+      "reason": "LDL 130 이상이면 하나만으로도 이상지질혈증 기준, 심혈관질환과의 관계"
+    },
+    "fq-024": {
+      "units": [
+        "kdca-5457#개요-정의",
+        "kdca-5310#진단 및 검사",
+        "mohw-annex4-row-ast",
+        "mohw-annex4-row-alt",
+        "mohw-annex4-row-creatinine",
+        "mohw-annex4-row-egfr"
+      ],
+      "noEvidence": false,
+      "reason": "크레아티닌은 근육에서 생겨 콩팥으로 배설, AST·ALT는 간세포 효소. 판정기준표의 목표질환(간장질환, 신장질환)"
+    },
+    "fq-025": {
+      "units": [
+        "kdca-6715#개요-정의"
+      ],
+      "noEvidence": false,
+      "reason": "총콜레스테롤은 모든 콜레스테롤의 총량, LDL은 동맥벽에 쌓이는 저밀도 지단백이라는 설명"
+    },
+    "fq-026": {
+      "units": [],
+      "noEvidence": true,
+      "reason": "근거 없음 제안: 콩팥 치료 절은 저염식·단백질 조절·금연·체중 관리만 다루고, 물 섭취 이야기는 없다 (→ 답 불가)"
+    },
+    "fq-027": {
+      "units": [
+        "mohw-annex4-row-bmi",
+        "mohw-annex4-def-suspect"
+      ],
+      "noEvidence": false,
+      "reason": "BMI 판정 구간(30 이상 질환의심)과 질환의심 정의"
+    },
+    "fq-028": {
+      "units": [
+        "kdca-5310#진단 및 검사"
+      ],
+      "noEvidence": false,
+      "reason": "감마-GTP는 습관성 음주자에서 오르고 금주 평가에 쓴다는 설명. \"얼마나 걸려요\"(기간)는 문서에 없음"
+    },
+    "fq-029": {
+      "units": [
+        "kdca-5457#진단 및 검사",
+        "mohw-annex4-row-urine-protein"
+      ],
+      "noEvidence": false,
+      "reason": "단백뇨가 있으면 eGFR이 60 이상이어도 만성콩팥병을 진단할 수 있다는 설명과 판정 구간"
+    },
+    "fq-030": {
+      "units": [
+        "mohw-annex4-row-egfr",
+        "kdca-5457#개요-종류",
+        "kdca-5457#진단 및 검사"
+      ],
+      "noEvidence": false,
+      "reason": "eGFR 31의 판정 구간과 단계, 60 미만이 3개월 지속되면 진단 기준"
+    },
+    "fq-031": {
+      "units": [
+        "mohw-annex4-row-blood-pressure",
+        "mohw-annex4-def-normal-b"
+      ],
+      "noEvidence": false,
+      "reason": "이완기 80~89는 정상B 구간, 정상B 정의"
+    },
+    "fq-032": {
+      "units": [],
+      "noEvidence": true,
+      "reason": "근거 없음 제안 (애매함): 재검 시기를 직접 말하는 문장이 없다. 질환의심 정의는 \"추적검사 필요\"만, 콩팥은 \"3개월 이상 지속\" 진단 기준만 있다. 이 둘을 근거로 볼지 정해 주세요"
+    },
+    "fq-033": {
+      "units": [
+        "kdca-6694#건강에 미치는 영향",
+        "kdca-6694#요약문"
+      ],
+      "noEvidence": false,
+      "reason": "비만이 당뇨병·고혈압·이상지질혈증·암 등의 위험을 높인다는 설명"
+    },
+    "fq-034": {
+      "units": [
+        "kdca-6715#진단 및 검사"
+      ],
+      "noEvidence": false,
+      "reason": "지질 검사 항목과 9~12시간 금식"
+    },
+    "fq-035": {
+      "units": [
+        "mohw-annex4-row-waist",
+        "kdca-6694#개요-정의"
+      ],
+      "noEvidence": false,
+      "reason": "허리둘레 판정 구간과 복부비만 기준(남 90, 여 85 이상). 거친 말투에는 정중히 답해야 하는 문항"
+    },
+    "fq-036": {
+      "units": [
+        "kdca-6694#건강에 미치는 영향",
+        "kdca-5305#개요-원인"
+      ],
+      "noEvidence": false,
+      "reason": "비만(복부비만)이 2형 당뇨병 위험을 높인다는 설명, 비만이 당뇨병의 원인"
+    },
+    "fq-037": {
+      "units": [
+        "mohw-annex4-row-bmi",
+        "mohw-annex4-row-waist",
+        "kdca-6694#개요-정의"
+      ],
+      "noEvidence": false,
+      "reason": "BMI와 허리둘레는 서로 다른 기준이라 하나만 걸릴 수 있다는 답의 근거"
+    },
+    "fq-038": {
+      "units": [
+        "kdca-1104#증상",
+        "kdca-1104#요약문"
+      ],
+      "noEvidence": false,
+      "reason": "어지러움은 빈혈 증상의 하나, 다만 다른 원인도 있다는 설명"
+    },
+    "fq-039": {
+      "units": [
+        "kdca-1104#개요-병태생리",
+        "kdca-1104#개요-정의"
+      ],
+      "noEvidence": false,
+      "reason": "혈색소(헤모글로빈)는 적혈구 안에서 산소를 운반한다는 설명"
+    },
+    "fq-040": {
+      "units": [
+        "kdca-6765#진단 및 검사"
+      ],
+      "noEvidence": false,
+      "reason": "진료실 혈압과 가정혈압, 반복 측정 원칙"
+    },
+    "fq-051": {
+      "units": [],
+      "noEvidence": true,
+      "reason": "근거 없음 확인: 근거 문서 주제 밖"
+    },
+    "fq-052": {
+      "units": [],
+      "noEvidence": true,
+      "reason": "근거 없음 확인: 근거 문서 주제 밖"
+    },
+    "fq-053": {
+      "units": [],
+      "noEvidence": true,
+      "reason": "근거 없음 확인: 근거 문서 주제 밖"
+    },
+    "fq-054": {
+      "units": [],
+      "noEvidence": true,
+      "reason": "근거 없음 확인: 근거 문서 주제 밖"
+    },
+    "fq-055": {
+      "units": [],
+      "noEvidence": true,
+      "reason": "근거 없음 확인: 근거 문서 주제 밖"
+    },
+    "fq-056": {
+      "units": [],
+      "noEvidence": true,
+      "reason": "근거 없음 확인: 근거 문서 주제 밖"
+    },
+    "fq-057": {
+      "units": [],
+      "noEvidence": true,
+      "reason": "근거 없음 확인: 근거 문서 주제 밖 (결핵 전염은 다루지 않음. 고시의 흉부 행은 판정 구간만 있음)"
+    }
+  }
+}

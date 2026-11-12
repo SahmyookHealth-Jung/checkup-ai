@@ -2,7 +2,7 @@
 
 사용자 결정 (2026-11-12)
 - 질문을 먼저 쓰고 문단은 나중에 라벨링한다. 질문은 근거 문서를 보지 않고 쓴다. 문서 표현을 따라 쓰면 검색이 실제보다
-  쉬워진다 (합성 결과지가 생성기 어휘를 공유했던 것과 같은 문제). "찾아야 할 청크"(expectedChunks)는 순서 5(문서 확장) 뒤에 rag.followup_evidence로 채운다.
+  쉬워진다 (합성 결과지가 생성기 어휘를 공유했던 것과 같은 문제). "찾아야 할 절"(expectedSections)은 순서 5(문서 확장) 뒤에 rag.followup_evidence로 채운다.
 - 60문항: 답 가능 30, 거절 15, 답 불가 10, 악성 5. 개발 20 / 시험 40으로 고정하고, 시험 몫은 결과를 본 뒤 고치지 않는다.
 - 절반 이상은 사용자가 직접 쓰고, 나머지는 Claude가 초안을 쓴다. 모든 문항에 작성자를 남긴다. 최종 라벨은 사용자가 정한다.
 - 근거 문서 주제: 지금 3편(고혈압, 당뇨병, 이상지질혈증) + 4편(간·지방간, 만성콩팥병, 빈혈, 비만) + 판정 기준(고시).
@@ -207,10 +207,10 @@ def freeze(rows: list[dict], name: str, seed: int) -> Path:
     rows.sort(key=lambda r: (r["split"], list(CATEGORIES).index(r["category"]), r["question"]))
     for i, r in enumerate(rows, 1):
         r["id"] = f"fq-{i:03d}"
-        r.setdefault("expectedChunks", None)  # 순서 5(문서 확장) 뒤에 채운다 (rag.followup_evidence)
+        r.setdefault("expectedSections", None)  # 순서 5(문서 확장) 뒤에 채운다 (rag.followup_evidence)
     OUT.mkdir(parents=True, exist_ok=True)
     keys = ("id", "split", "author", "report", "itemCodes", "question", "category", "reason", "topic",
-            "expectedChunks", "note", "revisedBy", "revision")
+            "expectedSections", "note", "revisedBy", "revision")
     out_file.write_text("".join(json.dumps({k: r.get(k) for k in keys}, ensure_ascii=False) + "\n" for r in rows),
                         encoding="utf-8")
     manifest = {"name": name, "createdAt": datetime.now().isoformat(timespec="seconds"), "git": git_state(),

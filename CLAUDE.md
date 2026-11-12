@@ -55,7 +55,7 @@ cd backend && ./gradlew build              # 컴파일 + 단위 테스트 (외�
 (cd ../eval && .venv/bin/python -m rag.freeze_replayed inputs --base <고정 추출> --out <폴더>/in)  # 검증 규칙만 바꿨을 때: 고정 추출의 LLM 출력을 재생 입력으로 (모델 호출 없음)
 #   → ./gradlew :report:replay --args="<폴더>/in <폴더>/out" → rag.freeze_replayed write --base <고정 추출> --replayed <폴더>/out --name <새 이름> --pipeline <버전>
 (cd ../eval && .venv/bin/python -m rag.followup_gold form)   # 후속 질문 작성 화면 → eval/.cache/labeling/followup-questions.html (check, freeze도 있음)
-(cd ../eval && .venv/bin/python -m rag.followup_evidence form)   # 정답셋의 근거 청크 라벨링 화면 (apply <JSON>으로 정답셋에 반영)
+(cd ../eval && .venv/bin/python -m rag.followup_evidence form)   # 정답셋의 근거 절 라벨링 화면, Claude 제안을 검토 (apply <JSON>으로 정답셋에 반영)
 (cd ../eval && .venv/bin/python -m rag.compare_conditions --base <기준> --new <조건> --label <이름>)  # 조건 짝비교 (전체 + 근거가 바뀐 항목)
 (cd ../eval && .venv/bin/python -m unittest discover -s rag -t .)            # 평가 지표 단위 테스트
 ```

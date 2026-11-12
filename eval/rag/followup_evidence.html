@@ -3,17 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>근거 청크 라벨링</title>
-<!-- 템플릿. followup_evidence.py form이 __DATA__ 자리에 정답셋과 청크를 넣어 eval/.cache/labeling/에 화면을 만든다 (근거 원문이 들어가므로 커밋하지 않는다) -->
+<title>근거 절 라벨링</title>
+<!-- 템플릿. followup_evidence.py form이 __DATA__ 자리에 정답셋, 절, Claude 제안을 넣어 eval/.cache/labeling/에 화면을 만든다 (근거 원문이 들어가므로 커밋하지 않는다) -->
 <style>
 :root {
   --bg: #f7f7f5; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6b66; --line: #e2e1dc;
-  --accent: #2f5bd3; --accent-ink: #ffffff; --soft: #eef2fc; --warn: #b4441c; --ok: #2d7a46; --amber: #9a6a00; --pick: #e7f4ea;
+  --accent: #2f5bd3; --accent-ink: #ffffff; --soft: #eef2fc; --warn: #b4441c; --ok: #2d7a46; --amber: #9a6a00; --pick: #e7f4ea; --hint: #fff6df;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #161615; --panel: #1f1f1d; --ink: #ecebe6; --muted: #a09f98; --line: #34332f;
-    --accent: #7c9bf0; --accent-ink: #10131c; --soft: #232a3d; --warn: #ec8a63; --ok: #6cc58a; --amber: #e0b44f; --pick: #1d3324;
+    --accent: #7c9bf0; --accent-ink: #10131c; --soft: #232a3d; --warn: #ec8a63; --ok: #6cc58a; --amber: #e0b44f; --pick: #1d3324; --hint: #2e2716;
   }
 }
 * { box-sizing: border-box; }
@@ -25,36 +25,39 @@ header { position: sticky; top: 0; z-index: 3; background: var(--bg); border-bot
 .spacer { flex: 1; }
 button, .filebtn { font: inherit; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
 button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-.layout { max-width: 1280px; margin: 0 auto; padding: 16px; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 16px; }
+button.link { border: 0; background: none; color: var(--accent); padding: 0; font-size: 13px; }
+.layout { max-width: 1280px; margin: 0 auto; padding: 16px; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 16px; }
 @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } nav { max-height: 200px; } }
 nav { position: sticky; top: 64px; align-self: start; max-height: calc(100vh - 80px); overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 6px; }
 nav button { display: block; width: 100%; text-align: left; border: 0; border-radius: 6px; padding: 6px 8px; font-size: 13px; background: none; }
 nav button.current { background: var(--soft); }
 nav .done::before { content: "● "; color: var(--ok); }
 nav .todo::before { content: "○ "; color: var(--muted); }
-nav .none::before { content: "◌ "; color: var(--amber); }
 section { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
 .question { font-size: 19px; margin: 4px 0 8px; }
 .tag { display: inline-block; font-size: 12px; border-radius: 6px; padding: 0 6px; margin-right: 4px; background: var(--soft); }
+.tag.hint { background: var(--hint); }
 .j-SUSPECT { color: var(--warn); font-weight: 600; }
 .j-NORMAL_B { color: var(--amber); font-weight: 600; }
+.suggest { background: var(--hint); border-radius: 10px; padding: 10px 12px; margin-top: 10px; font-size: 14px; }
 .controls { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin-top: 10px; }
 input[type=text], input[type=search] { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; }
 .note { flex: 1; min-width: 200px; }
 .picked { margin-top: 8px; font-size: 13px; }
+.rule { font-size: 13px; color: var(--muted); }
 h3.doc { font-size: 15px; margin: 18px 0 6px; }
-.chunk { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin: 8px 0; display: grid; grid-template-columns: auto 1fr; gap: 10px; cursor: pointer; }
-.chunk.on { background: var(--pick); border-color: var(--ok); }
-.chunk .id { font-size: 12px; color: var(--muted); }
-.chunk .text { white-space: pre-wrap; }
-.nav-row { display: flex; gap: 8px; margin-top: 12px; }
+.unit { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin: 8px 0; display: grid; grid-template-columns: auto 1fr; gap: 10px; cursor: pointer; }
+.unit.on { background: var(--pick); border-color: var(--ok); }
+.unit .head { font-size: 14px; font-weight: 600; }
+.unit .text { white-space: pre-wrap; font-size: 14px; }
+.nav-row { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
 .status { color: var(--muted); font-size: 13px; }
 </style>
 </head>
 <body>
 <header>
   <div class="bar">
-    <h1>근거 청크 라벨링</h1>
+    <h1>근거 절 라벨링</h1>
     <span class="muted" id="progress"></span>
     <span class="spacer"></span>
     <span class="status" id="status"></span>
@@ -66,48 +69,55 @@ h3.doc { font-size: 15px; margin: 18px 0 6px; }
   <nav id="nav"></nav>
   <main>
     <section>
-      <div class="muted">질문마다 답의 근거가 되는 청크를 모두 고른다. 일부만 뒷받침해도 고른다. 근거가 정말 없으면 "근거 없음". 답 불가 문항은 근거가 정말 없는지 확인한다.</div>
+      <div class="rule">기준: 그 절만 읽고 질문의 <b>핵심 답</b>을 말할 수 있으면 고른다. 배경 설명만 되면 고르지 않는다. 근거가 없으면 "근거 없음". Claude 제안이 미리 체크되어 있다. 맞으면 그대로, 아니면 고친 뒤 "확인"을 누른다.</div>
       <div id="meta" style="margin-top:8px"></div>
       <p class="question" id="question"></p>
       <div id="context" class="muted"></div>
+      <div class="suggest" id="suggest"></div>
       <div class="controls">
         <label><input type="checkbox" id="noEvidence"> 근거 없음</label>
         <label><input type="checkbox" id="allDocs"> 전체 문서 보기</label>
-        <input type="search" id="search" placeholder="청크 안에서 찾기">
-        <input type="text" class="note" id="note" placeholder="메모 (선택)">
+        <input type="search" id="search" placeholder="절 안에서 찾기">
+        <input type="text" class="note" id="note" placeholder="메모 (고친 이유 등, 선택)">
       </div>
       <div class="picked" id="picked"></div>
-      <div class="nav-row"><button id="prev">← 이전</button><button id="next" class="primary">다음 →</button></div>
+      <div class="nav-row">
+        <button id="prev">← 이전</button>
+        <button id="confirm" class="primary">확인하고 다음 →</button>
+        <button id="reset" class="link">Claude 제안으로 되돌리기</button>
+      </div>
     </section>
-    <section id="chunks"></section>
+    <section id="units"></section>
   </main>
 </div>
 <script>
 const DATA = __DATA__;
-const STORE = `checkup-ai:${DATA.set}:evidence:${DATA.chunksSha256}`;
+const STORE = `checkup-ai:${DATA.set}:evidence-sections:${DATA.unitsSha256}`;
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const n = Object.assign(document.createElement(tag), props); n.append(...kids); return n; };
 const JUDGMENT = { SUSPECT: "질환의심", NORMAL_B: "정상B(경계)" };
+const UNIT = Object.fromEntries(DATA.units.map((u) => [u.id, u]));
+// 고시는 행마다 항목이나 판정 구분 이름을 보여 준다 ("검사항목: 에이에스티(AST(SGOT))", "판정 구분 정상B(경계)")
+const annexHead = (u) => { const item = u.text.match(/검사항목: ([^/]+?) \//); if (item) return `고시 · 판정기준 ${item[1]}`;
+  const def = u.text.match(/판정 구분 — ([^:]+):/); return def ? `고시 · 판정 구분 ${def[1]}` : `고시 · ${u.section}`; };
+const unitHead = (u) => u.doc === "mohw-2026-6-annex4" ? annexHead(u) : `${u.title} · ${u.section}`;
 let labels = {};
 try { labels = JSON.parse(localStorage.getItem(STORE) || "{}"); } catch (e) { labels = {}; }
 const save = () => { try { localStorage.setItem(STORE, JSON.stringify(labels)); }
   catch (e) { $("status").textContent = "자동 저장이 안 됩니다. 자주 내려받아 주세요"; } };
 let index = 0;
 const q = () => DATA.questions[index];
-const label = () => (labels[q().id] ||= { chunks: [], noEvidence: false, note: "" });
-const isDone = (id) => labels[id] && (labels[id].noEvidence || labels[id].chunks.length > 0);
+const fromSuggestion = (x) => ({ units: [...(x.suggestion?.units || [])], noEvidence: !!x.suggestion?.noEvidence, note: "", confirmed: false });
+const label = () => (labels[q().id] ||= fromSuggestion(q()));
 
 function renderNav() {
   $("nav").replaceChildren(...DATA.questions.map((x, i) => {
-    const l = labels[x.id];
-    const cls = !isDone(x.id) ? "todo" : l.noEvidence ? "none" : "done";
-    const b = el("button", { className: `${cls}${i === index ? " current" : ""}`,
-      textContent: `${x.id} ${DATA.categories[x.category]} · ${x.question.slice(0, 18)}` });
-    b.onclick = () => { index = i; render(); };
+    const b = el("button", { className: `${labels[x.id]?.confirmed ? "done" : "todo"}${i === index ? " current" : ""}`,
+      textContent: `${x.id} ${DATA.categories[x.category]} · ${x.question.slice(0, 16)}` });
+    b.onclick = () => { index = i; $("search").value = ""; render(); };
     return b;
   }));
-  const done = DATA.questions.filter((x) => isDone(x.id)).length;
-  $("progress").textContent = `${done} / ${DATA.questions.length} 완료`;
+  $("progress").textContent = `${DATA.questions.filter((x) => labels[x.id]?.confirmed).length} / ${DATA.questions.length} 확인`;
 }
 
 function render() {
@@ -121,57 +131,74 @@ function render() {
   $("context").replaceChildren(
     x.report ? `${x.report} · 주의 항목: ` : "결과지 없음",
     ...(x.flagged || []).flatMap((i, n) => [n ? ", " : "", el("span", { className: `j-${i.judgment}`, textContent: `${i.name} ${i.value} ${i.unit} (${JUDGMENT[i.judgment]})` })]),
-    x.itemCodes?.length ? ` · 질문 항목: ${x.itemCodes.join(", ")}` : "",
-    x.revision ? ` · 수정 이력: ${x.revision}` : "");
+    x.itemCodes?.length ? ` · 질문 항목: ${x.itemCodes.join(", ")}` : "");
+  const s = x.suggestion;
+  $("suggest").replaceChildren(el("b", { textContent: "Claude 제안: " }),
+    s ? (s.noEvidence ? "근거 없음" : s.units.map((u) => unitHead(UNIT[u])).join(" / ")) : "없음",
+    s?.reason ? el("div", { textContent: `이유: ${s.reason}` }) : "");
   $("noEvidence").checked = l.noEvidence;
   $("note").value = l.note || "";
-  $("allDocs").checked = !x.candidateDocs.length || $("allDocs").dataset.forced === "1";
-  renderChunks(); renderNav();
+  $("allDocs").checked = !x.candidates.length;
+  renderUnits(); renderNav();
 }
 
-function renderChunks() {
+function renderUnits() {
   const x = q(), l = label();
-  const all = $("allDocs").checked || !x.candidateDocs.length;
-  const docs = all ? Object.keys(DATA.docs) : x.candidateDocs;
+  const ids = $("allDocs").checked || !x.candidates.length ? DATA.units.map((u) => u.id) : x.candidates;
   const term = $("search").value.trim();
-  const box = $("chunks"); box.replaceChildren();
-  for (const doc of docs) {
-    const items = DATA.chunks.filter((c) => c.doc === doc && (!term || c.text.includes(term)));
-    if (!items.length) continue;
-    box.append(el("h3", { className: "doc", textContent: `${DATA.docs[doc]} (${doc}) · ${items.length}개` }));
-    for (const c of items) {
-      const on = l.chunks.includes(c.id);
-      const check = el("input", { type: "checkbox", checked: on });
-      const card = el("div", { className: "chunk" + (on ? " on" : "") }, check,
-        el("div", {}, el("div", { className: "id", textContent: `${c.id} · ${c.section}` }), el("div", { className: "text", textContent: c.text })));
-      card.onclick = (event) => {
-        if (event.target.tagName !== "INPUT") check.checked = !check.checked;
-        const set = new Set(l.chunks);
-        if (check.checked) set.add(c.id); else set.delete(c.id);
-        l.chunks = [...set]; if (l.chunks.length) l.noEvidence = false;
-        card.classList.toggle("on", check.checked); $("noEvidence").checked = l.noEvidence;
-        save(); renderPicked(); renderNav();
-      };
-      box.append(card);
-    }
+  const box = $("units"); box.replaceChildren();
+  let lastDoc = null;
+  for (const id of ids) {
+    const u = UNIT[id];
+    if (term && !u.text.includes(term) && !u.section.includes(term)) continue;
+    if (u.doc !== lastDoc) { box.append(el("h3", { className: "doc", textContent: u.doc === "mohw-2026-6-annex4" ? "고시 (판정기준표·판정 구분)" : `${u.title} (${u.doc})` })); lastDoc = u.doc; }
+    const on = l.units.includes(id);
+    const check = el("input", { type: "checkbox", checked: on });
+    const long = u.text.length > 420;
+    const text = el("div", { className: "text", textContent: long ? u.text.slice(0, 420) + " …" : u.text });
+    const more = long ? el("button", { className: "link", textContent: "전체 보기" }) : "";
+    if (long) more.onclick = (event) => { event.stopPropagation(); const open = more.textContent === "전체 보기";
+      text.textContent = open ? u.text : u.text.slice(0, 420) + " …"; more.textContent = open ? "접기" : "전체 보기"; };
+    const suggested = x.suggestion?.units?.includes(id);
+    const card = el("div", { className: "unit" + (on ? " on" : "") }, check,
+      el("div", {}, el("div", { className: "head" }, unitHead(u), suggested ? el("span", { className: "tag hint", textContent: " Claude 제안" }) : "",
+        el("span", { className: "muted", textContent: ` · ${u.text.length}자` })), text, more));
+    card.onclick = (event) => {
+      if (event.target.tagName === "BUTTON") return;
+      if (event.target.tagName !== "INPUT") check.checked = !check.checked;
+      const set = new Set(l.units);
+      if (check.checked) set.add(id); else set.delete(id);
+      l.units = DATA.units.map((v) => v.id).filter((v) => set.has(v)); if (l.units.length) l.noEvidence = false;
+      card.classList.toggle("on", check.checked); $("noEvidence").checked = l.noEvidence;
+      save(); renderPicked();
+    };
+    box.append(card);
   }
-  if (!box.children.length) box.append(el("p", { className: "muted", textContent: "보이는 청크가 없습니다. 찾기 말을 지우거나 전체 문서 보기를 켜세요" }));
+  if (!box.children.length) box.append(el("p", { className: "muted", textContent: "보이는 절이 없습니다. 찾기 말을 지우거나 전체 문서 보기를 켜세요" }));
   renderPicked();
 }
 function renderPicked() {
   const l = label();
-  $("picked").textContent = l.noEvidence ? "근거 없음" : l.chunks.length ? `고른 청크 ${l.chunks.length}개: ${l.chunks.join(", ")}` : "아직 고르지 않음";
+  $("picked").textContent = l.noEvidence ? "근거 없음" : l.units.length ? `고른 절 ${l.units.length}개: ${l.units.map((u) => unitHead(UNIT[u])).join(" / ")}` : "아직 고르지 않음";
 }
 
-$("noEvidence").onchange = () => { const l = label(); l.noEvidence = $("noEvidence").checked; if (l.noEvidence) l.chunks = []; save(); renderChunks(); renderNav(); };
+$("noEvidence").onchange = () => { const l = label(); l.noEvidence = $("noEvidence").checked; if (l.noEvidence) l.units = []; save(); renderUnits(); };
 $("note").oninput = () => { label().note = $("note").value; save(); };
-$("allDocs").onchange = () => { $("allDocs").dataset.forced = $("allDocs").checked ? "1" : "0"; renderChunks(); };
-$("search").oninput = renderChunks;
+$("allDocs").onchange = renderUnits;
+$("search").oninput = renderUnits;
 $("prev").onclick = () => { if (index > 0) { index--; $("search").value = ""; render(); window.scrollTo(0, 0); } };
-$("next").onclick = () => { if (index < DATA.questions.length - 1) { index++; $("search").value = ""; render(); window.scrollTo(0, 0); } };
+$("confirm").onclick = () => {
+  const l = label();
+  if (!l.noEvidence && !l.units.length) { $("status").textContent = "절을 고르거나 근거 없음을 고르세요"; return; }
+  l.confirmed = true; save();
+  $("status").textContent = `${q().id} 확인`;
+  if (index < DATA.questions.length - 1) index++;
+  $("search").value = ""; render(); window.scrollTo(0, 0);
+};
+$("reset").onclick = () => { labels[q().id] = fromSuggestion(q()); save(); render(); };
 
 $("export").onclick = () => {
-  const out = { set: DATA.set, chunksSha256: DATA.chunksSha256, exportedAt: new Date().toISOString(), labels };
+  const out = { set: DATA.set, unitsSha256: DATA.unitsSha256, exportedAt: new Date().toISOString(), labels };
   el("a", { href: URL.createObjectURL(new Blob([JSON.stringify(out, null, 2)], { type: "application/json" })),
     download: `${DATA.set}.evidence.json` }).click();
 };
@@ -179,7 +206,7 @@ $("import").onchange = async (event) => {
   const file = event.target.files[0];
   if (!file) return;
   const doc = JSON.parse(await file.text());
-  if (doc.chunksSha256 !== DATA.chunksSha256 && !confirm("청크 파일이 라벨링 때와 다릅니다. 그래도 불러올까요?")) return;
+  if (doc.unitsSha256 !== DATA.unitsSha256 && !confirm("절 구성이 라벨링 때와 다릅니다. 그래도 불러올까요?")) return;
   labels = doc.labels || {}; save(); render();
   $("status").textContent = `${Object.keys(labels).length}문항의 라벨을 불러왔습니다`;
   event.target.value = "";
