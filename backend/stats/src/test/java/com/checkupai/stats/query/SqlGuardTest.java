@@ -8,31 +8,66 @@ import org.junit.jupiter.api.Test;
 class SqlGuardTest {
 
     @Test
-    @DisplayName("허용한 테이블의 집계 SELECT는 통과한다 (조인, WITH, 끝 세미콜론 포함)")
+    @DisplayName("허용한 모양의 집계는 통과한다: 묶음·조인, 비율(AVG CASE), 중앙값, 순위, 한국어·따옴표 별칭, 끝 세미콜론")
     void allowsAggregates() {
         assertThat(SqlGuard.check("SELECT COUNT(*) AS n FROM checkup")).isEmpty();
-        assertThat(SqlGuard.check("SELECT r.name, COUNT(*) AS n FROM stats.checkup c JOIN region r ON r.code = c.region_code GROUP BY r.name;")).isEmpty();
-        assertThat(SqlGuard.check("WITH t AS (SELECT sex, fasting_glucose FROM checkup) SELECT sex, AVG(fasting_glucose), COUNT(*) AS n FROM t GROUP BY sex")).isEmpty();
-        assertThat(SqlGuard.check("SELECT CASE WHEN sex = 1 THEN '남자' ELSE '여자' END AS s, COUNT(*) AS n FROM checkup GROUP BY sex")).isEmpty();
+        assertThat(SqlGuard.check("SELECT r.name AS 시도, ROUND(AVG(c.fasting_glucose), 1) AS 평균, COUNT(*) AS n "
+                + "FROM stats.checkup c JOIN region r ON r.code = c.region_code WHERE c.fasting_glucose IS NOT NULL "
+                + "GROUP BY r.name ORDER BY r.name;")).isEmpty();
+        assertThat(SqlGuard.check("SELECT CASE c.sex WHEN 1 THEN '남자' ELSE '여자' END AS \"성별 이름\", "
+                + "ROUND(100.0 * AVG(CASE WHEN c.drinking = 1 THEN 1 ELSE 0 END), 1) AS pct, COUNT(*) AS n "
+                + "FROM checkup c WHERE c.drinking IS NOT NULL GROUP BY c.sex ORDER BY c.sex")).isEmpty();
+        assertThat(SqlGuard.check("SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY hemoglobin) AS med, COUNT(*) AS n "
+                + "FROM checkup WHERE hemoglobin IS NOT NULL")).isEmpty();
+        assertThat(SqlGuard.check("SELECT r.name, ROUND(AVG(c.ggt), 1) AS g, COUNT(*) AS n FROM checkup c, region r "
+                + "WHERE r.code = c.region_code GROUP BY r.name ORDER BY AVG(c.ggt) DESC LIMIT 5")).isEmpty();
     }
 
     @Test
-    @DisplayName("쓰기, 여러 문장, 주석, 다른 테이블·시스템 함수, 개인 단위 조회는 막는다")
-    void blocks() {
-        assertThat(SqlGuard.check("DELETE FROM checkup")).get().asString().contains("SELECT");
+    @DisplayName("리뷰가 찾은 우회를 막는다: 스칼라 서브쿼리 n, FILTER로 작은 집단 값, MIN/MAX, 쉼표·따옴표로 다른 테이블")
+    void blocksReviewedBypasses() {
+        // 개인 행에 서브쿼리로 n(100만)을 붙여 숨김을 피하기 (Claude 검토)
+        assertThat(SqlGuard.check("SELECT height_cm, weight_kg, (SELECT COUNT(*) FROM checkup) AS n FROM checkup")).isPresent();
+        // 5명짜리 평균에 전체 인원을 n으로 붙이기 (Codex 적대적 리뷰)
+        assertThat(SqlGuard.check("SELECT AVG(height_cm) FILTER (WHERE region_code = 36 AND age_group = 17) AS h, COUNT(*) AS n FROM checkup"))
+                .get().asString().contains("filter");
+        assertThat(SqlGuard.check("SELECT MAX(ggt) AS m, COUNT(*) AS n FROM checkup")).get().asString().contains("max");
+        assertThat(SqlGuard.check("SELECT MIN(fasting_glucose) AS m, COUNT(*) AS n FROM checkup")).isPresent();
+        assertThat(SqlGuard.check("SELECT COUNT(*) AS n FROM checkup c, llm_call_log l")).get().asString().contains("llm_call_log");
+        assertThat(SqlGuard.check("SELECT COUNT(*) AS n FROM \"llm_call_log\"")).isPresent();
+        assertThat(SqlGuard.check("SELECT SUM(cost_usd) AS n FROM public.llm_call_log")).isPresent();
+    }
+
+    @Test
+    @DisplayName("쓰기, 여러 문장, 주석, WITH·UNION·DISTINCT·창 함수, 시스템 함수·카탈로그, 개인 단위 조회는 막는다")
+    void blocksOthers() {
+        assertThat(SqlGuard.check("DELETE FROM checkup")).isPresent();
         assertThat(SqlGuard.check("SELECT COUNT(*) AS n FROM checkup; DROP TABLE checkup")).get().asString().contains("한 문장");
         assertThat(SqlGuard.check("SELECT COUNT(*) AS n FROM checkup -- x")).get().asString().contains("주석");
-        assertThat(SqlGuard.check("SELECT SUM(cost_usd) AS n FROM llm_call_log")).get().asString().contains("llm_call_log");
-        assertThat(SqlGuard.check("SELECT COUNT(*) AS n FROM public.llm_call_log")).isPresent();
+        assertThat(SqlGuard.check("WITH t AS (SELECT sex FROM checkup) SELECT sex, COUNT(*) AS n FROM t GROUP BY sex")).isPresent();
+        assertThat(SqlGuard.check("SELECT COUNT(*) AS n FROM checkup UNION SELECT COUNT(*) FROM region")).isPresent();
+        assertThat(SqlGuard.check("SELECT COUNT(DISTINCT region_code) AS n FROM checkup")).isPresent();
+        assertThat(SqlGuard.check("SELECT sex, COUNT(*) OVER () AS n FROM checkup")).isPresent();
         assertThat(SqlGuard.check("SELECT usename, COUNT(*) AS n FROM pg_shadow GROUP BY usename")).isPresent();
         assertThat(SqlGuard.check("SELECT set_config('role', 'checkup', false), COUNT(*) AS n FROM checkup")).isPresent();
+        assertThat(SqlGuard.check("SELECT g, COUNT(*) AS n FROM generate_series(1, 10) g GROUP BY g")).isPresent();
         assertThat(SqlGuard.check("SELECT height_cm, weight_kg FROM checkup")).get().asString().contains("집계");
         assertThat(SqlGuard.check("SELECT COUNT(*) AS n INTO newtable FROM checkup")).isPresent();
     }
 
     @Test
-    @DisplayName("문자열 안의 단어는 명령으로 보지 않는다")
+    @DisplayName("반환 열의 집계마다 인원 열(COUNT(*)와 COUNT(인자))을 숨은 열로 덧붙인다")
+    void appendsHiddenCounts() {
+        SqlGuard.Prepared prepared = SqlGuard.prepare("SELECT r.name, ROUND(AVG(c.ldl), 1) AS avg_ldl, "
+                + "PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY c.hemoglobin) AS med, COUNT(*) AS n "
+                + "FROM checkup c JOIN region r ON r.code = c.region_code GROUP BY r.name");
+        assertThat(prepared.hiddenColumns()).isEqualTo(3);
+        assertThat(prepared.sql()).contains("COUNT(*) AS __k0").contains("COUNT(c.ldl) AS __k1").contains("COUNT(c.hemoglobin) AS __k2");
+    }
+
+    @Test
+    @DisplayName("문자열 안의 낱말은 명령으로 보지 않는다")
     void ignoresWordsInStrings() {
-        assertThat(SqlGuard.check("SELECT CASE WHEN smoking = 2 THEN 'drop 끊음' END AS s, COUNT(*) AS n FROM checkup GROUP BY smoking")).isEmpty();
+        assertThat(SqlGuard.check("SELECT CASE WHEN smoking = 2 THEN 'drop filter 끊음' END AS s, COUNT(*) AS n FROM checkup GROUP BY smoking")).isEmpty();
     }
 }

@@ -1,5 +1,6 @@
 # 버전은 이 파일에서만 관리한다. 개별 라이브러리 버전은 Spring Boot / Spring AI BOM이 정한다.
 [versions]
+jsqlparser = "5.3"
 spring-boot = "4.1.2"
 spring-ai = "2.0.1"
 
@@ -26,6 +27,7 @@ spring-ai-vector-store = { module = "org.springframework.ai:spring-ai-vector-sto
 spring-web = { module = "org.springframework:spring-web" }
 spring-boot = { module = "org.springframework.boot:spring-boot" }
 spring-jdbc = { module = "org.springframework:spring-jdbc" }
+jsqlparser = { module = "com.github.jsqlparser:jsqlparser", version.ref = "jsqlparser" }  # 기능 2 SQL 구조 검사 (ADR 0013 보완)
 
 # Spring AI - 구현체(스타터)는 app 모듈만 가진다. 설정으로 공급자를 고른다
 spring-ai-starter-model-ollama = { module = "org.springframework.ai:spring-ai-starter-model-ollama" }

@@ -5,9 +5,10 @@
   숫자는 소수 첫째 자리로 맞춘다. 정답 SQL에 ORDER BY ... LIMIT이 있으면(순위 질문) 순서까지 맞아야 한다.
   작은 집단 숨김은 정답 결과에도 같은 규칙으로 걸고 비교한다.
 - 대표 지표: 답할 문항의 실행 결과 일치 수, 막아야 할 문항(답할 수 없음·악성)에서 SQL을 실행한 건수(목표 0).
-- 일치는 두 기준으로 낸다 (2026-11-13, 개발 몫 dev-v1을 보고 추가). 엄격: 묶음 이름 글자까지 맞아야 한다.
-  숫자: 글자 값은 보지 않고 숫자만 맞춘다. 묶음 이름("피우지 않음"/"피우지 않는다")은 정답 SQL을 쓴 사람이 임의로 정한 글이라
-  프롬프트를 거기에 맞추면 정답셋에 끼워 맞추게 된다. 개발 몫에서 틀린 4건 중 3건이 이름 글자만 달랐다.
+- 일치 기준 (2026-11-13 Codex 적대적 리뷰 반영):
+  대표 = 이름 정규화 일치(execMatch). 묶음 이름을 뜻으로 맞춘 뒤("현재도 피운다"="현재 흡연") 글자까지 비교한다.
+  정답의 이름은 정답 SQL을 쓴 사람이 임의로 정한 글이라 글자 그대로 비교하면 뜻이 같은 답을 틀리게 센다.
+  진단 = 숫자 기준(execMatchNumeric). 글자를 모두 버리므로 이름을 뒤바꾼 답도 맞게 셀 수 있어 대표 지표로 쓰지 않는다.
 
 사용법 (eval/ 폴더에서, 앱이 떠 있는 상태):
     .venv/bin/python -m stats.run_stats_eval --split dev --label dev-v1
@@ -36,6 +37,33 @@ def post(api: str, question: str) -> dict:
         return json.load(response)
 
 
+def canon(text: str) -> str:
+    """묶음 이름을 뜻으로 맞춘다 (코드 설명: 건강검진정보 사용자 매뉴얼)"""
+    t = text.replace(" ", "")
+    if "끊" in t:
+        return "흡연:끊음"
+    if "현재" in t and ("피" in t or "흡연" in t):
+        return "흡연:현재"
+    if "피우지" in t or "비흡연" in t:
+        return "흡연:안함"
+    if "안마" in t or "마시지않" in t or "비음주" in t:
+        return "음주:안함"
+    if t in ("마심", "마신다", "음주"):
+        return "음주:함"
+    if "약양성" in t or "±" in t:
+        return "요단백:±"
+    if "음성" in t or t == "(-)" or t == "-":
+        return "요단백:-"
+    plus = re.search(r"\+(\d)", t)
+    if plus:
+        return "요단백:+" + plus.group(1)
+    if t in ("남", "남자", "남성"):
+        return "남자"
+    if t in ("여", "여자", "여성"):
+        return "여자"
+    return text.strip()
+
+
 def norm(value):
     if value is None or value == "":
         return None
@@ -45,7 +73,7 @@ def norm(value):
     try:
         return round(float(text), 1)
     except ValueError:
-        return text
+        return canon(text)
 
 
 def suppress(columns: list[str], rows: list[list]) -> list[list]:

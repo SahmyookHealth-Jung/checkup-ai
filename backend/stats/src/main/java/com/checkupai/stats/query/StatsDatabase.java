@@ -2,7 +2,9 @@ package com.checkupai.stats.query;
 
 import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
@@ -48,6 +50,18 @@ public class StatsDatabase {
             boolean truncated = rows.size() > maxRows;
             return new Rows(columns, truncated ? rows.subList(0, maxRows) : rows, truncated);
         });
+    }
+
+    private volatile Set<String> codeLabels;
+
+    /** 코드표의 이름(시도 이름, 연령대 이름). 숨긴 행에서도 보여 줄 수 있는 글자다 */
+    public Set<String> codeLabels() {
+        if (codeLabels == null) {
+            Set<String> labels = new HashSet<>(jdbc.queryForList("SELECT name FROM region", String.class));
+            labels.addAll(jdbc.queryForList("SELECT label FROM age_group", String.class));
+            codeLabels = Set.copyOf(labels);
+        }
+        return codeLabels;
     }
 
     /** LLM에 주는 스키마 설명: 컬럼 설명(COMMENT)과 코드표 값 */

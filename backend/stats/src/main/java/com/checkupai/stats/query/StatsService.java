@@ -6,7 +6,10 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.springframework.ai.chat.client.AdvisorParams;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.ChatOptions;
@@ -23,9 +26,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class StatsService {
 
-    public static final String PROMPT_VERSION = "stats-sql-v1";
+    public static final String PROMPT_VERSION = "stats-sql-v2";
     static final String FEATURE = "stats.sql";
     static final int MAX_ATTEMPTS = 2;
+    private static final Pattern STRING_LITERAL = Pattern.compile("'([^']*)'");
 
     public enum Decision { ANSWER, NO_DATA, REFUSE, FAILED }
 
@@ -72,20 +76,24 @@ public class StatsService {
                 Decision d = decision.equals("NO_DATA") ? Decision.NO_DATA : Decision.REFUSE;
                 return result(question, d, draft, null, errors, attempt, llmMs, dbMs, started);
             }
-            Optional<String> blocked = SqlGuard.check(draft.sql());
-            if (blocked.isPresent()) {
-                errors.add("검사: " + blocked.get());
+            SqlGuard.Prepared prepared;
+            try {
+                prepared = SqlGuard.prepare(draft.sql());
+            } catch (SqlGuard.Rejected e) {
+                errors.add("검사: " + e.getMessage());
                 continue;
             }
             t = System.nanoTime();
             try {
-                StatsDatabase.Rows rows = database.query(draft.sql());
+                StatsDatabase.Rows rows = database.query(prepared.sql());
                 dbMs += (System.nanoTime() - t) / 1_000_000;
-                if (ResultTable.countIndex(rows.columns()) < 0) {
+                List<String> visible = rows.columns().subList(0, rows.columns().size() - prepared.hiddenColumns());
+                if (ResultTable.countIndex(visible) < 0) {
                     errors.add("결과: 행마다 사람 수를 n 컬럼으로 내야 한다");
                     continue;
                 }
-                ResultTable table = ResultTable.suppress(rows.columns(), rows.rows(), properties.minGroupSize(), rows.truncated());
+                ResultTable table = ResultTable.suppress(rows.columns(), rows.rows(), prepared.hiddenColumns(),
+                        properties.minGroupSize(), rows.truncated(), safeLabels(draft.sql()));
                 return result(question, Decision.ANSWER, draft, table, errors, attempt, llmMs, dbMs, started);
             } catch (DataAccessException e) {
                 dbMs += (System.nanoTime() - t) / 1_000_000;
@@ -114,6 +122,16 @@ public class StatsService {
                 .advisors(advisor -> advisor.param(LlmCallContext.FEATURE, FEATURE))
                 .call()
                 .entity(new BeanOutputConverter<>(SqlDraft.class));
+    }
+
+    /** 숨긴 행에서도 보여 줄 글자: 코드표 이름과 SQL에 직접 쓴 문자열(CASE 이름표 등) */
+    private Set<String> safeLabels(String sql) {
+        Set<String> labels = new HashSet<>(database.codeLabels());
+        Matcher literal = STRING_LITERAL.matcher(sql);
+        while (literal.find()) {
+            labels.add(literal.group(1));
+        }
+        return labels;
     }
 
     private String schema() {

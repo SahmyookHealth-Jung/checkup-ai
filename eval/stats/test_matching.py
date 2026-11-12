@@ -24,11 +24,13 @@ class MatchingTest(unittest.TestCase):
         gold = {"columns": ["age", "pct", "n"], "rows": [["85세 이상", "12.5", "8"]]}
         self.assertTrue(matches(gold, {"rows": [["85세 이상", None, None]]}, ordered=False))
 
-    def test_numeric_ignores_label_wording(self):
-        gold = {"columns": ["smoking", "avg", "n"], "rows": [["피우지 않음", "27.6", "638782"]]}
-        pred = {"rows": [["피우지 않는다", 27.6, 638782]]}
-        self.assertFalse(matches(gold, pred, ordered=False))
-        self.assertTrue(matches(gold, pred, ordered=False, numeric=True))
+    def test_label_wording_normalized_but_meaning_checked(self):
+        gold = {"columns": ["smoking", "avg", "n"], "rows": [["피우지 않음", "27.6", "638782"], ["현재 흡연", "54.7", "185546"]]}
+        same = {"rows": [["피우지 않는다", 27.6, 638782], ["현재도 피운다", 54.7, 185546]]}
+        swapped = {"rows": [["현재도 피운다", 27.6, 638782], ["피우지 않는다", 54.7, 185546]]}
+        self.assertTrue(matches(gold, same, ordered=False))
+        self.assertFalse(matches(gold, swapped, ordered=False))  # 이름을 뒤바꾼 답은 틀린다
+        self.assertTrue(matches(gold, swapped, ordered=False, numeric=True))  # 숫자 기준은 못 잡는다 (진단용인 이유)
 
 
 if __name__ == "__main__":

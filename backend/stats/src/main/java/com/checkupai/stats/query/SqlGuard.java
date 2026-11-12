@@ -1,76 +1,236 @@
 package com.checkupai.stats.query;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.expression.Alias;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.Statements;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.SelectItem;
+import net.sf.jsqlparser.util.TablesNamesFinder;
 
 /**
- * LLM이 쓴 SQL을 실행 전에 거른다 (ADR 0013 1절). 진짜 방어선은 DB 권한(읽기 전용 계정)이고, 여기는 그 앞의 겹이다.
- * 걸리면 이유를 돌려주고, 서비스는 그 이유를 붙여 한 번만 다시 쓰게 한다.
+ * LLM이 쓴 SQL을 실행 전에 구조로 검사하고, 작은 집단 숨김에 쓸 인원 열을 서버가 덧붙인다 (ADR 0013 1·3절, 보완).
+ *
+ * <p>2026-11-13 Codex 적대적 리뷰: 정규식으로 "집계 함수가 어딘가에 있는지"만 보면 스칼라 서브쿼리로 n을 붙인 개인 행이
+ * 통과했고, 숨김이 LLM이 쓴 n을 믿어서 {@code AVG(x) FILTER (WHERE 5명 조건)}에 {@code COUNT(*) AS n}(100만)을 붙이면
+ * 5명짜리 값이 나갔다. 그래서 다음을 코드가 정한다.
+ * <ul>
+ *   <li>SELECT가 하나뿐인 단순 질의만 받는다 (서브쿼리, WITH, UNION, INTO, DISTINCT 금지)</li>
+ *   <li>테이블은 checkup, region, age_group만 (따옴표·쉼표 조인도 파서가 찾는다)</li>
+ *   <li>집계 질의여야 한다: GROUP BY가 있거나, 반환 열이 모두 집계다 (개인 행 금지)</li>
+ *   <li>함수는 허용 목록만: COUNT, AVG, SUM, PERCENTILE_CONT, ROUND, COALESCE, NULLIF, ABS, CAST.
+ *       FILTER, OVER, MIN, MAX는 쓸 수 없다 (한 사람의 값이나 다른 집단의 값을 내보낼 수 있다)</li>
+ *   <li>반환 열의 집계마다 그 인자의 인원 {@code COUNT(인자)}와 묶음 인원 {@code COUNT(*)}를 숨은 열로 덧붙인다.
+ *       숨김은 LLM이 쓴 n이 아니라 이 인원 중 가장 작은 값으로 정한다 ({@link ResultTable})</li>
+ * </ul>
+ * 진짜 마지막 방어선은 DB 권한(읽기 전용 계정)이다.
  */
 public final class SqlGuard {
 
     static final Set<String> TABLES = Set.of("checkup", "region", "age_group");
+    /** 덧붙이는 숨은 인원 열 이름의 머리 */
+    public static final String HIDDEN_PREFIX = "__k";
 
-    private static final Pattern WRITE_OR_ADMIN = Pattern.compile(
+    private static final Set<String> FUNCTIONS = Set.of(
+            "count", "avg", "sum", "percentile_cont", "round", "coalesce", "nullif", "abs", "cast", "numeric", "decimal");
+    /** 여는 괄호 앞에 올 수 있는 SQL 낱말 (함수가 아니다) */
+    private static final Set<String> KEYWORDS_BEFORE_PAREN = Set.of(
+            "in", "group", "and", "or", "not", "on", "then", "else", "when", "where", "having", "by", "select", "as", "case", "is");
+    private static final Pattern FORBIDDEN_WORDS = Pattern.compile(
             "\\b(insert|update|delete|merge|drop|alter|create|grant|revoke|truncate|copy|call|do|execute|prepare|"
-                    + "listen|notify|vacuum|analyze|reset|lock|comment|security|into|refresh|cluster|reindex)\\b");
-    /** 설정을 바꾸거나 서버 밖과 통하는 함수, 카탈로그 접근 */
-    private static final Pattern DANGEROUS = Pattern.compile(
-            "\\b(set_config|current_setting|pg_\\w+|dblink\\w*|lo_\\w+|query_to_xml\\w*|table_to_xml\\w*|"
-                    + "information_schema|pg_catalog|public)\\b");
-    private static final Pattern RELATION = Pattern.compile("\\b(?:from|join)\\s+([a-z_][a-z0-9_]*(?:\\.[a-z_][a-z0-9_]*)?)");
-    private static final Pattern CTE_NAME = Pattern.compile("(?:\\bwith|,)\\s*([a-z_][a-z0-9_]*)\\s+as\\s*\\(");
-    private static final Pattern AGGREGATE = Pattern.compile("\\b(count|avg|sum|min|max|percentile_cont|percentile_disc|stddev\\w*|variance)\\s*\\(");
+                    + "listen|notify|vacuum|analyze|reset|lock|comment|security|into|refresh|cluster|reindex|"
+                    + "filter|over|distinct|union|intersect|except|lateral|window|with|pg_\\w+|set_config|current_setting|"
+                    + "information_schema|pg_catalog)\\b");
+    private static final Pattern CALL = Pattern.compile("\\b([a-z_][a-z0-9_]*)\\s*\\(");
+    private static final Pattern SELECT_WORD = Pattern.compile("\\bselect\\b");
+    private static final Pattern AGGREGATE_CALL = Pattern.compile("\\b(count|avg|sum)\\s*\\(", Pattern.CASE_INSENSITIVE);
+    private static final Pattern WITHIN_GROUP = Pattern.compile("\\bwithin\\s+group\\s*\\(\\s*order\\s+by\\s+", Pattern.CASE_INSENSITIVE);
+    private static final Pattern HAS_AGGREGATE = Pattern.compile("\\b(count|avg|sum|percentile_cont)\\s*\\(", Pattern.CASE_INSENSITIVE);
+
+    /** 실행할 SQL(숨은 인원 열을 덧붙임)과 그 열 수 */
+    public record Prepared(String sql, int hiddenColumns) {
+    }
+
+    public static final class Rejected extends RuntimeException {
+        Rejected(String reason) {
+            super(reason);
+        }
+    }
 
     private SqlGuard() {
     }
 
     /** 통과하면 빈 값, 걸리면 이유 */
     public static Optional<String> check(String sql) {
+        try {
+            prepare(sql);
+            return Optional.empty();
+        } catch (Rejected e) {
+            return Optional.of(e.getMessage());
+        }
+    }
+
+    public static Prepared prepare(String sql) {
         if (sql == null || sql.isBlank()) {
-            return Optional.of("SQL이 비어 있다");
+            throw new Rejected("SQL이 비어 있다");
         }
-        String s = sql.strip().toLowerCase(Locale.ROOT);
-        if (s.endsWith(";")) {
-            s = s.substring(0, s.length() - 1).strip();
+        String body = sql.strip();
+        if (body.endsWith(";")) {
+            body = body.substring(0, body.length() - 1).strip();
         }
-        if (s.contains(";")) {
-            return Optional.of("한 문장만 쓸 수 있다");
-        }
-        if (s.contains("--") || s.contains("/*")) {
-            return Optional.of("주석을 쓰지 않는다");
-        }
-        if (!(s.startsWith("select") || s.startsWith("with"))) {
-            return Optional.of("SELECT 문만 쓸 수 있다");
-        }
-        String withoutStrings = s.replaceAll("'[^']*'", "''");
-        Matcher write = WRITE_OR_ADMIN.matcher(withoutStrings);
-        if (write.find()) {
-            return Optional.of("쓰기·관리 명령은 쓸 수 없다: " + write.group(1));
-        }
-        Matcher dangerous = DANGEROUS.matcher(withoutStrings);
-        if (dangerous.find()) {
-            return Optional.of("쓸 수 없는 함수나 스키마다: " + dangerous.group(1));
-        }
-        Set<String> ctes = new java.util.HashSet<>();
-        Matcher cte = CTE_NAME.matcher(withoutStrings);
-        while (cte.find()) {
-            ctes.add(cte.group(1));
-        }
-        Matcher relation = RELATION.matcher(withoutStrings);
-        while (relation.find()) {
-            String name = relation.group(1);
-            String table = name.startsWith("stats.") ? name.substring("stats.".length()) : name;
-            if (!TABLES.contains(table) && !ctes.contains(table)) {
-                return Optional.of("허용하지 않은 테이블이다: " + name + " (checkup, region, age_group만 쓸 수 있다)");
+        lexicalCheck(body);
+        PlainSelect select = parse(body);
+        checkTables(body);
+        if (select.getGroupBy() == null) {
+            for (SelectItem<?> item : select.getSelectItems()) {
+                if (!HAS_AGGREGATE.matcher(item.getExpression().toString()).find()) {
+                    throw new Rejected("집계 결과만 낼 수 있다 (개인 단위 행은 돌려주지 않는다). 묶어 보려면 GROUP BY를 쓴다: "
+                            + item.getExpression());
+                }
             }
         }
-        if (!AGGREGATE.matcher(withoutStrings).find()) {
-            return Optional.of("집계 결과만 낼 수 있다 (개인 단위 행은 돌려주지 않는다). COUNT·AVG 같은 집계를 쓴다");
+        List<String> hidden = hiddenCounts(select);
+        for (int i = 0; i < hidden.size(); i++) {
+            try {
+                select.addSelectItem(CCJSqlParserUtil.parseExpression(hidden.get(i)), new Alias(HIDDEN_PREFIX + i));
+            } catch (JSQLParserException e) {
+                throw new Rejected("집계 인자를 읽지 못했다: " + hidden.get(i));
+            }
         }
-        return Optional.empty();
+        return new Prepared(select.toString(), hidden.size());
+    }
+
+    private static void lexicalCheck(String body) {
+        String s = body.toLowerCase(Locale.ROOT).replaceAll("'[^']*'", "''");
+        if (s.contains(";")) {
+            throw new Rejected("한 문장만 쓸 수 있다");
+        }
+        if (s.contains("--") || s.contains("/*")) {
+            throw new Rejected("주석을 쓰지 않는다");
+        }
+        // 열 이름 별칭의 따옴표(AS "평균 혈당")만 허락한다. 다른 따옴표 이름은 테이블 검사를 흐리게 한다
+        String unquoted = s.replaceAll("\\bas\\s+\"[^\"]*\"", "as x");
+        if (unquoted.contains("\"")) {
+            throw new Rejected("따옴표로 감싼 이름은 별칭(AS \"...\")에만 쓸 수 있다");
+        }
+        if (!unquoted.startsWith("select")) {
+            throw new Rejected("SELECT 문 하나만 쓸 수 있다 (WITH 금지)");
+        }
+        Matcher selects = SELECT_WORD.matcher(unquoted);
+        int count = 0;
+        while (selects.find()) {
+            count++;
+        }
+        if (count != 1) {
+            throw new Rejected("서브쿼리·WITH·UNION 없이 SELECT 하나로 쓴다");
+        }
+        Matcher forbidden = FORBIDDEN_WORDS.matcher(unquoted);
+        if (forbidden.find()) {
+            throw new Rejected("쓸 수 없는 명령이나 기능이다: " + forbidden.group(1)
+                    + " (MIN·MAX·FILTER·OVER·DISTINCT 대신 COUNT·AVG·SUM과 CASE를 쓴다)");
+        }
+        Matcher call = CALL.matcher(unquoted);
+        while (call.find()) {
+            String name = call.group(1);
+            if (!FUNCTIONS.contains(name) && !KEYWORDS_BEFORE_PAREN.contains(name)) {
+                throw new Rejected("쓸 수 없는 함수다: " + name + " (COUNT, AVG, SUM, PERCENTILE_CONT, ROUND, COALESCE, NULLIF, ABS, CAST만)");
+            }
+        }
+    }
+
+    private static PlainSelect parse(String body) {
+        Statements statements;
+        try {
+            statements = CCJSqlParserUtil.parseStatements(body);
+        } catch (JSQLParserException e) {
+            throw new Rejected("SQL을 읽지 못했다 (PostgreSQL 문법 확인)");
+        }
+        if (statements.size() != 1) {
+            throw new Rejected("한 문장만 쓸 수 있다");
+        }
+        Statement statement = statements.get(0);
+        if (!(statement instanceof PlainSelect select)) {
+            throw new Rejected("단순 SELECT 하나만 쓸 수 있다 (WITH, UNION 금지)");
+        }
+        if (select.getWithItemsList() != null && !select.getWithItemsList().isEmpty()) {
+            throw new Rejected("WITH는 쓸 수 없다");
+        }
+        if (select.getIntoTables() != null || select.getDistinct() != null) {
+            throw new Rejected("INTO·DISTINCT는 쓸 수 없다");
+        }
+        return select;
+    }
+
+    private static void checkTables(String body) {
+        Set<String> tables;
+        try {
+            tables = TablesNamesFinder.findTables(body);
+        } catch (JSQLParserException e) {
+            throw new Rejected("SQL을 읽지 못했다");
+        }
+        for (String name : tables) {
+            String table = name.replace("\"", "").toLowerCase(Locale.ROOT);
+            table = table.startsWith("stats.") ? table.substring("stats.".length()) : table;
+            if (!TABLES.contains(table)) {
+                throw new Rejected("허용하지 않은 테이블이다: " + name + " (checkup, region, age_group만 쓸 수 있다)");
+            }
+        }
+    }
+
+    /** 반환 열의 집계마다 인원 열: 묶음 인원 COUNT(*)와 집계 인자의 COUNT(인자) */
+    static List<String> hiddenCounts(PlainSelect select) {
+        Set<String> counts = new LinkedHashSet<>();
+        counts.add("COUNT(*)");
+        for (SelectItem<?> item : select.getSelectItems()) {
+            for (String argument : aggregateArguments(item.getExpression().toString())) {
+                if (!argument.equals("*")) {
+                    counts.add("COUNT(" + argument + ")");
+                }
+            }
+        }
+        return new ArrayList<>(counts);
+    }
+
+    /** COUNT·AVG·SUM의 인자와 PERCENTILE_CONT ... WITHIN GROUP (ORDER BY x)의 x */
+    static List<String> aggregateArguments(String expression) {
+        List<String> out = new ArrayList<>();
+        Matcher call = AGGREGATE_CALL.matcher(expression);
+        while (call.find()) {
+            out.add(balanced(expression, call.end()).strip());
+        }
+        Matcher within = WITHIN_GROUP.matcher(expression);
+        while (within.find()) {
+            String argument = balanced(expression, within.end()).strip().replaceAll("(?i)\\s+(asc|desc)$", "");
+            out.add(argument);
+        }
+        return out;
+    }
+
+    /** start부터 짝이 맞는 닫는 괄호 앞까지 (여는 괄호는 start 바로 앞에 있다) */
+    private static String balanced(String text, int start) {
+        int depth = 1;
+        for (int i = start; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (c == '\'') {
+                i = text.indexOf('\'', i + 1);
+                if (i < 0) {
+                    break;
+                }
+            } else if (c == '(') {
+                depth++;
+            } else if (c == ')' && --depth == 0) {
+                return text.substring(start, i);
+            }
+        }
+        throw new Rejected("괄호 짝이 맞지 않는다");
     }
 }
