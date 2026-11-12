@@ -106,6 +106,8 @@ def portal_chunks(source: dict, drop_drugs: bool = False, dropped: list[str] | N
     chunks = []
     for block in re.split(r'<div[^>]*class="contents-Div"[^>]*>', page)[1:]:
         block = block.split('<div class="contents-Div"')[0]
+        # 요약문 블록 끝에 페이지 목차(목차 열기 버튼 + 절 이름 목록)가 붙어 있다. 본문이 아니므로 뺀다 (2026-11-12)
+        block = re.sub(r'<div class="toc-wrap">.*?</ul>', " ", block, flags=re.S)
         heading = re.search(r"<h3[^>]*>(.*?)</h3>", block, re.S)
         if not heading:
             continue

@@ -35,5 +35,25 @@
     "claude": 29,
     "user": 31
   },
-  "rule": "시험 몫은 결과를 본 뒤 고치지 않는다. 고치면 새 이름으로 만든다"
+  "rule": "시험 몫은 결과를 본 뒤 고치지 않는다. 고치면 새 이름으로 만든다",
+  "evidence": {
+    "unit": "section (고시는 행)",
+    "unitsSha256": "1534c1a1a6a5c142",
+    "labeledAt": "2026-11-12T06:08:54.410Z",
+    "appliedAt": "2026-11-12T15:13:11",
+    "suggestedBy": "claude",
+    "keptSuggestion": 35,
+    "editedSuggestion": [
+      "fq-003",
+      "fq-005",
+      "fq-023",
+      "fq-034",
+      "fq-035"
+    ],
+    "categoryChanges": [
+      "fq-026 답 가능 → 답 불가: 물 많이 먹으면 무조건 회복하나?",
+      "fq-032 답 가능 → 답 불가: 재검은 언제쯤 받는 게 좋아요?"
+    ],
+    "rule": "절 구성이 바뀌면 라벨을 다시 맞춘다"
+  }
 }

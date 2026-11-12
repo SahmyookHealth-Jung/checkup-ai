@@ -1,0 +1,346 @@
+{
+  "set": "followup-v1",
+  "unitsSha256": "1534c1a1a6a5c142",
+  "exportedAt": "2026-11-12T06:08:54.410Z",
+  "labels": {
+    "fq-001": {
+      "units": [
+        "kdca-5457#개요-종류",
+        "kdca-5457#개요-정의",
+        "mohw-annex4-row-egfr"
+      ],
+      "noEvidence": false,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-002": {
+      "units": [
+        "kdca-5457#개요-정의",
+        "kdca-5457#진단 및 검사",
+        "mohw-annex4-row-egfr"
+      ],
+      "noEvidence": false,
+      "note": "근데 내가 이 결과값이 어렵다고 한 이유는 신사구체여과율의 ml/min/m2이라는 단위가 어려워서 작성한거였어. / Claude: 부분 근거. \"단위 시간 내 걸러내는 양\"과 \"90 ml/분/1.73 m²\"는 있지만 1.73 m²(체표면적) 설명은 어느 문서에도 없다. 질문은 그대로 둔다(실제 질문도 모호하다)",
+      "confirmed": true
+    },
+    "fq-003": {
+      "units": [
+        "kdca-5305#개요",
+        "kdca-5305#진단 및 검사",
+        "mohw-annex4-row-fasting-glucose"
+      ],
+      "noEvidence": false,
+      "note": "Claude: 진단 및 검사(공복혈당장애 100~125, 1년 내 진행 5~8%)와 판정기준 행을 다시 넣음 (사용자 결정)",
+      "confirmed": true
+    },
+    "fq-004": {
+      "units": [
+        "mohw-annex4-def-normal-b"
+      ],
+      "noEvidence": false,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-005": {
+      "units": [
+        "kdca-6715#요약문",
+        "kdca-6715#치료-비약물 치료"
+      ],
+      "noEvidence": false,
+      "note": "Claude: 비약물 치료(포화지방 제한, 중성지방은 당분·음주 제한)를 다시 넣음 (사용자 결정)",
+      "confirmed": true
+    },
+    "fq-006": {
+      "units": [
+        "mohw-annex4-row-creatinine",
+        "mohw-annex4-row-egfr",
+        "mohw-annex4-row-alt",
+        "mohw-annex4-def-suspect"
+      ],
+      "noEvidence": false,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-007": {
+      "units": [
+        "kdca-5457#진단 및 검사",
+        "mohw-annex4-def-suspect"
+      ],
+      "noEvidence": false,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-008": {
+      "units": [
+        "kdca-5305#진단 및 검사"
+      ],
+      "noEvidence": false,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-009": {
+      "units": [
+        "mohw-annex4-row-blood-pressure",
+        "mohw-annex4-row-bmi",
+        "mohw-annex4-row-hemoglobin",
+        "mohw-annex4-row-creatinine",
+        "mohw-annex4-row-egfr",
+        "mohw-annex4-row-alt",
+        "mohw-annex4-row-urine-protein",
+        "mohw-annex4-row-gamma-gtp",
+        "mohw-annex4-def-suspect"
+      ],
+      "noEvidence": false,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-010": {
+      "units": [
+        "mohw-annex4-row-chest-xray"
+      ],
+      "noEvidence": false,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-016": {
+      "units": [],
+      "noEvidence": true,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-017": {
+      "units": [],
+      "noEvidence": true,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-018": {
+      "units": [],
+      "noEvidence": true,
+      "note": "위암 검진은 몇 살 부터에요는 챗봇 느낌으로 답변을 해주는 서비스로 진행해야되나",
+      "confirmed": true
+    },
+    "fq-021": {
+      "units": [
+        "mohw-annex4-row-urine-protein",
+        "kdca-5457#진단 및 검사"
+      ],
+      "noEvidence": false,
+      "note": "+1 의 값에 대한 설명은 부족한 느낌이긴해 / Claude: 부분 근거. \"1+\" 눈금의 뜻을 설명하는 문장은 없다. 판정 구간과 요 스틱 검사 설명뿐",
+      "confirmed": true
+    },
+    "fq-022": {
+      "units": [
+        "kdca-6694#개요-정의",
+        "kdca-6694#실천 방법-일반적 실천 방법",
+        "mohw-annex4-row-bmi"
+      ],
+      "noEvidence": false,
+      "note": "수검자의 키, 몸무게를 기반으로 정상 범위는 직접 계산해줄 수 없는 부분이잖아. / Claude: 계산한 숫자(몇 kg)를 답에 쓸지는 답변 생성 단계에서 정한다(ADR 0010 미정 항목)",
+      "confirmed": true
+    },
+    "fq-023": {
+      "units": [
+        "mohw-annex4-def-suspect",
+        "kdca-6715#개요-정의",
+        "kdca-6715#개요-경과 및 예후"
+      ],
+      "noEvidence": false,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-024": {
+      "units": [
+        "kdca-5457#개요-정의",
+        "kdca-5310#진단 및 검사",
+        "mohw-annex4-row-ast",
+        "mohw-annex4-row-alt",
+        "mohw-annex4-row-creatinine",
+        "mohw-annex4-row-egfr"
+      ],
+      "noEvidence": false,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-025": {
+      "units": [
+        "kdca-6715#개요-정의"
+      ],
+      "noEvidence": false,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-026": {
+      "units": [],
+      "noEvidence": true,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-027": {
+      "units": [
+        "mohw-annex4-row-bmi",
+        "mohw-annex4-def-suspect"
+      ],
+      "noEvidence": false,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-028": {
+      "units": [
+        "kdca-5310#진단 및 검사"
+      ],
+      "noEvidence": false,
+      "note": "Claude: 부분 근거. 금주 후 감마-GTP가 내려가는 기간은 문서에 없다",
+      "confirmed": true
+    },
+    "fq-029": {
+      "units": [
+        "kdca-5457#진단 및 검사",
+        "mohw-annex4-row-urine-protein"
+      ],
+      "noEvidence": false,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-030": {
+      "units": [
+        "mohw-annex4-row-egfr",
+        "kdca-5457#개요-종류",
+        "kdca-5457#진단 및 검사"
+      ],
+      "noEvidence": false,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-031": {
+      "units": [
+        "mohw-annex4-row-blood-pressure",
+        "mohw-annex4-def-normal-b"
+      ],
+      "noEvidence": false,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-032": {
+      "units": [],
+      "noEvidence": true,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-033": {
+      "units": [
+        "kdca-6694#건강에 미치는 영향",
+        "kdca-6694#요약문"
+      ],
+      "noEvidence": false,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-034": {
+      "units": [
+        "kdca-6715#요약문",
+        "kdca-6715#진단 및 검사"
+      ],
+      "noEvidence": false,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-035": {
+      "units": [
+        "mohw-annex4-row-waist",
+        "kdca-6694#요약문",
+        "kdca-6694#개요-정의"
+      ],
+      "noEvidence": false,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-036": {
+      "units": [
+        "kdca-6694#건강에 미치는 영향",
+        "kdca-5305#개요-원인"
+      ],
+      "noEvidence": false,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-037": {
+      "units": [
+        "mohw-annex4-row-bmi",
+        "mohw-annex4-row-waist",
+        "kdca-6694#개요-정의"
+      ],
+      "noEvidence": false,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-038": {
+      "units": [
+        "kdca-1104#증상",
+        "kdca-1104#요약문"
+      ],
+      "noEvidence": false,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-039": {
+      "units": [
+        "kdca-1104#개요-병태생리",
+        "kdca-1104#개요-정의"
+      ],
+      "noEvidence": false,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-040": {
+      "units": [
+        "kdca-6765#진단 및 검사"
+      ],
+      "noEvidence": false,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-051": {
+      "units": [],
+      "noEvidence": true,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-052": {
+      "units": [],
+      "noEvidence": true,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-053": {
+      "units": [],
+      "noEvidence": true,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-054": {
+      "units": [],
+      "noEvidence": true,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-055": {
+      "units": [],
+      "noEvidence": true,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-056": {
+      "units": [],
+      "noEvidence": true,
+      "note": "",
+      "confirmed": true
+    },
+    "fq-057": {
+      "units": [],
+      "noEvidence": true,
+      "note": "",
+      "confirmed": true
+    }
+  }
+}
