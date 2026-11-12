@@ -44,14 +44,16 @@ class FollowupServiceTest {
     void answerKeepsCitedSentences() throws IOException {
         var model = new ScriptedChatModel("""
                 {"decision":"ANSWER","uncovered":"","sentences":[
-                  {"text":"eGFR 44는 만성콩팥병 단계 표에서 3b단계(30~44)에 해당합니다.","sources":["S3"]},
-                  {"text":"하루 2리터 물을 드세요.","sources":["S9"]}]}""");
+                  {"text":"eGFR 44는 만성콩팥병 단계 표에서 3b단계(30~44)에 해당합니다.","sources":["S3"],
+                   "quote":"3b단계: 사구체 여과율 30~44"},
+                  {"text":"하루 2리터 물을 드세요.","sources":["S9"],"quote":"하루 2리터 물을 드세요"}]}""");
         FollowupResult result = service(model).answer(report(), "eGFR 44면 무슨 뜻이에요?", List.of(ItemCode.EGFR));
 
         assertThat(result.decision()).isEqualTo(Decision.ANSWER);
         assertThat(result.sentences()).singleElement().satisfies(s -> assertThat(s.citations()).containsExactly(1));
         assertThat(result.citations()).singleElement().satisfies(c -> assertThat(c.unitId()).isEqualTo("kdca-5457#개요-종류"));
-        assertThat(result.metrics().invalidCitations()).isEqualTo(1);
+        assertThat(result.metrics().unsupportedQuotes()).isEqualTo(1);  // S9는 없는 근거라 구절도 대조할 수 없다
+        assertThat(result.metrics().promptVersion()).isEqualTo("followup-v2");
         assertThat(result.notice()).isNull();
         assertThat(result.disclaimer()).isEqualTo(ExplanationGuardrails.DISCLAIMER);
         assertThat(model.lastPrompt).contains("eGFR 44면 무슨 뜻이에요?").contains("3b단계");
@@ -61,7 +63,7 @@ class FollowupServiceTest {
     @DisplayName("답이라고 했지만 근거로 검증된 문장이 없으면 고정 '근거 없음'으로 답한다")
     void answerWithoutValidSentencesBecomesNoEvidence() throws IOException {
         var model = new ScriptedChatModel("""
-                {"decision":"ANSWER","uncovered":"","sentences":[{"text":"물을 많이 마시면 회복됩니다.","sources":[]}]}""");
+                {"decision":"ANSWER","uncovered":"","sentences":[{"text":"물을 많이 마시면 회복됩니다.","sources":[],"quote":""}]}""");
         FollowupResult result = service(model).answer(report(), "물 많이 먹으면 회복하나?", null);
 
         assertThat(result.decision()).isEqualTo(Decision.NO_EVIDENCE);
@@ -92,12 +94,32 @@ class FollowupServiceTest {
     void partialAndUnknown() throws IOException {
         var partial = new ScriptedChatModel("""
                 {"decision":"ANSWER","uncovered":"회복 기간","sentences":[
-                  {"text":"3b단계는 사구체 여과율 30~44입니다.","sources":["S3"]}]}""");
+                  {"text":"3b단계는 사구체 여과율 30~44입니다.","sources":["S3"],"quote":"3b단계: 사구체 여과율 30~44"}]}""");
         assertThat(service(partial).answer(report(), "몇 단계이고 언제 회복돼요?", List.of(ItemCode.EGFR)).notice())
                 .isEqualTo(FollowupService.UNCOVERED_NOTICE);
 
         var unknown = new ScriptedChatModel("{\"decision\":\"MAYBE\",\"uncovered\":\"\",\"sentences\":[]}");
         assertThat(service(unknown).answer(report(), "어때요?", null).decision()).isEqualTo(Decision.NO_EVIDENCE);
+    }
+
+    @Test
+    @DisplayName("근거 구절이 인용한 근거 문단에 글자 그대로 없거나 너무 짧으면 문장을 지운다. 다 지워지면 근거 없음이다 (followup-v2)")
+    void unsupportedQuoteDropsSentence() throws IOException {
+        // 그럴듯한 근거 번호(S3)를 붙였지만 구절은 근거에 없다 (Codex 적대적 리뷰가 짚은 경우)
+        var invented = new ScriptedChatModel("""
+                {"decision":"ANSWER","uncovered":"","sentences":[
+                  {"text":"물을 충분히 마시면 콩팥 회복에 도움이 됩니다.","sources":["S3"],"quote":"물을 충분히 마시면 콩팥 회복에 도움"},
+                  {"text":"3b단계입니다.","sources":["S3"],"quote":"3b단계"}]}""");
+        FollowupResult result = service(invented).answer(report(), "물 많이 마시면 좋아져요?", List.of(ItemCode.EGFR));
+
+        assertThat(result.decision()).isEqualTo(Decision.NO_EVIDENCE);
+        assertThat(result.llmDecision()).isEqualTo("ANSWER");
+        assertThat(result.metrics().unsupportedQuotes()).isEqualTo(2);  // 근거에 없는 구절, 10자보다 짧은 구절
+        assertThat(result.sentences()).isEmpty();
+
+        // 공백과 앞뒤 따옴표가 달라도 같은 구절로 본다
+        assertThat(FollowupService.quoteSupported(new FollowupDraft.SentenceDraft("x", List.of("[S1]"), "\" 3b 단계: 사구체여과율 30~44 \""),
+                Map.of("S1", "[만성콩팥병 | 개요-종류] 3b단계: 사구체 여과율 30~44"))).isTrue();
     }
 
     private FollowupService service(ChatModel model) throws IOException {

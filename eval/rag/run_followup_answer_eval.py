@@ -65,6 +65,7 @@ def summarize(rows: list[dict]) -> dict:
             "falsePositivesOnAnswerable": sum(1 for r in answerable if r["ruleTreatment"] or r["ruleDiagnosis"]),
         },
         "forbiddenHits": sum(r["forbiddenHits"] for r in rows),
+        "unsupportedQuotes": sum(r["unsupportedQuotes"] for r in rows),
         "avgLlmMs": round(sum(r["llmMs"] for r in rows) / max(len(rows), 1)),
         "avgContextChars": round(sum(r["contextChars"] for r in rows) / max(len(rows), 1)),
     }
@@ -103,7 +104,8 @@ def main() -> None:
                        "cited": cited, "sentences": [s["text"] for s in result["sentences"]], "notice": result["notice"],
                        "itemSource": m["itemSource"], "contextChars": m["contextChars"],
                        "generated": m["sentencesGenerated"], "kept": m["sentencesKept"],
-                       "forbiddenHits": m["forbiddenHits"], "llmMs": m["llmMs"], "llmError": m["llmError"]}
+                       "forbiddenHits": m["forbiddenHits"], "unsupportedQuotes": m.get("unsupportedQuotes", 0),
+                       "promptVersion": m.get("promptVersion"), "llmMs": m["llmMs"], "llmError": m["llmError"]}
                 rows.append(row)
                 ok = "○" if row["decision"] in EXPECTED[g["category"]] else "✗"
                 print(f"[{run}] {mode:<8} {g['id']} {g['category']:<12} → {row['decision']:<17} {ok}"
@@ -119,7 +121,7 @@ def main() -> None:
         summary[mode]["pass"] = all(r["answeredButShouldNot"] == 0 for r in runs) and all(
             int(r["answerableGrounded"].split("/")[0]) >= 0.8 * int(r["answerableGrounded"].split("/")[1]) for r in runs)
     print(json.dumps({m: {k: summary[m][k] for k in ("all", "pass")} for m in modes}, ensure_ascii=False, indent=1))
-    info = {"promptVersion": "followup-v1"}
+    info = {"promptVersion": sorted({r["promptVersion"] for r in rows if r["promptVersion"]})}
     run_id = run_record.new_run_id("followup-answer", args.label)
     out = run_record.save(run_id, "followup-answer", "rag", label=args.label,
                           dataset={"name": "followup-v1", "split": args.split, "questions": len(gold),

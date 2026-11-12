@@ -2,6 +2,7 @@ package com.checkupai.report.followup;
 
 import com.checkupai.core.llm.LlmCallContext;
 import com.checkupai.report.explanation.CriteriaJudgment;
+import com.checkupai.report.explanation.ExplanationDraft;
 import com.checkupai.report.explanation.ExplanationGuardrails;
 import com.checkupai.report.explanation.ExplanationValidator;
 import com.checkupai.report.explanation.ScreeningCriteria;
@@ -32,7 +33,9 @@ import org.springframework.stereotype.Service;
  * <ol>
  *   <li>문맥: 코드가 근거를 고른다 ({@link FollowupContextBuilder})</li>
  *   <li>LLM 1회: 처리 구분과 문장별 근거 번호 (구조화 출력)</li>
- *   <li>코드 강제: 거절·악성은 LLM 문장을 버리고 고정 문구. 답이어도 인용·숫자 검증을 통과한 문장이 0개면 고정 "근거 없음".
+ *   <li>코드 강제: 거절·악성은 LLM 문장을 버리고 고정 문구. 답이어도 검증을 통과한 문장이 0개면 고정 "근거 없음".
+ *       검증은 세 가지다. 근거 구절이 인용한 근거 문단에 글자 그대로 있는가(followup-v2), 인용 번호가 허락된 것인가,
+ *       숫자가 결과지나 인용한 근거에 있는가(ExplanationValidator).
  *       금지 표현은 세어서 기록한다. 고지문은 늘 붙인다</li>
  *   <li>약·진단 패턴 규칙은 기록만 한다 ({@link FollowupRules})</li>
  * </ol>
@@ -41,7 +44,13 @@ import org.springframework.stereotype.Service;
 public class FollowupService {
 
     static final String FEATURE = "report.followup";
-    static final String PROMPT_VERSION = "followup-v1";
+    /**
+     * v2 (2026-11-12): 문장마다 근거 구절(quote)을 받아 코드가 대조한다. v1은 인용 번호와 숫자만 확인해, 근거에 없는
+     * 비수치 주장도 그럴듯한 번호를 붙이면 통과했다 (Codex 적대적 리뷰, 사용자 결정 A안)
+     */
+    static final String PROMPT_VERSION = "followup-v2";
+    /** 근거 구절의 최소 길이 (공백을 뺀 글자 수). 너무 짧은 구절("입니다")로 대조를 피하지 못하게 한다 */
+    static final int MIN_QUOTE_CHARS = 10;
     private static final int MAX_TOKENS = 1500;
     private static final String USER_TEMPLATE = """
             <결과지>
@@ -74,9 +83,13 @@ public class FollowupService {
      * @param ruleTreatment 약·치료 패턴 규칙이 걸렸는가 (기록만)
      * @param ruleDiagnosis 진단 요청 패턴 규칙이 걸렸는가 (기록만)
      */
-    public record Metrics(String itemSource, int contextChars, int contextUnits, int sentencesGenerated,
-                          int sentencesKept, int invalidCitations, int uncitedSentences, int ungroundedNumberSentences,
-                          int forbiddenHits, long llmMs, long totalMs, String llmError) {
+    /**
+     * @param unsupportedQuotes 근거 구절이 없거나 짧거나 인용한 근거 문단에 없어 지운 문장 수
+     */
+    public record Metrics(String promptVersion, String itemSource, int contextChars, int contextUnits,
+                          int sentencesGenerated, int sentencesKept, int unsupportedQuotes, int invalidCitations,
+                          int uncitedSentences, int ungroundedNumberSentences, int forbiddenHits, long llmMs,
+                          long totalMs, String llmError) {
     }
 
     public record FollowupResult(String question, Decision decision, String llmDecision, boolean ruleTreatment,
@@ -98,7 +111,8 @@ public class FollowupService {
         this.criteria = criteria;
         this.properties = properties;
         try {
-            this.systemPrompt = new ClassPathResource("prompts/report-followup-v1.st").getContentAsString(StandardCharsets.UTF_8);
+            this.systemPrompt = new ClassPathResource("prompts/report-" + PROMPT_VERSION + ".st")
+                    .getContentAsString(StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -128,8 +142,21 @@ public class FollowupService {
         Decision llmDecision = parse(draft == null ? null : draft.decision());
         Map<String, String> allowed = new LinkedHashMap<>();
         byLabel.forEach((label, unit) -> allowed.put(label, unit.text()));
-        ExplanationValidator.Outcome outcome = validator.check(
-                draft == null || draft.sentences() == null ? List.of() : draft.sentences(), allowed, reportLines);
+        // 1) 근거 구절 대조: 인용한 근거 문단에 구절이 글자 그대로 있는 문장만 남긴다 2) 인용 번호·숫자 검증
+        List<FollowupDraft.SentenceDraft> drafts = draft == null || draft.sentences() == null ? List.of() : draft.sentences();
+        List<ExplanationDraft.SentenceDraft> quoted = new ArrayList<>();
+        int unsupportedQuotes = 0;
+        for (FollowupDraft.SentenceDraft sentence : drafts) {
+            if (sentence == null || sentence.text() == null || sentence.text().isBlank()) {
+                continue;
+            }
+            if (quoteSupported(sentence, allowed)) {
+                quoted.add(new ExplanationDraft.SentenceDraft(sentence.text(), sentence.sources()));
+            } else {
+                unsupportedQuotes++;
+            }
+        }
+        ExplanationValidator.Outcome outcome = validator.check(quoted, allowed, reportLines);
 
         Decision decision;
         List<Sentence> sentences = new ArrayList<>();
@@ -157,8 +184,8 @@ public class FollowupService {
                     return new Citation(e.getValue(), unit.id(), unit.title(), unit.section());
                 })
                 .toList();
-        var metrics = new Metrics(context.itemSource().name(), context.totalChars(), byLabel.size(),
-                outcome.generated(), decision == Decision.ANSWER ? outcome.kept().size() : 0,
+        var metrics = new Metrics(PROMPT_VERSION, context.itemSource().name(), context.totalChars(), byLabel.size(),
+                drafts.size(), decision == Decision.ANSWER ? outcome.kept().size() : 0, unsupportedQuotes,
                 outcome.invalidCitations(), outcome.uncited(), outcome.ungroundedNumbers(), outcome.forbiddenHits(),
                 llmMs, (System.nanoTime() - started) / 1_000_000, llmError);
         return new FollowupResult(question, decision, llmDecision == null ? null : llmDecision.name(),
@@ -198,6 +225,28 @@ public class FollowupService {
                     + (judgment.criterion() == null ? "" : " | 기준: " + judgment.criterion()));
         }
         return lines.isEmpty() ? "(질문과 관련된 항목 없음)" : String.join("\n", lines);
+    }
+
+    /**
+     * 근거 구절이 인용한 근거 문단 중 하나에 글자 그대로 있는가. 공백과 앞뒤 따옴표·문장부호는 무시한다.
+     * 구절이 있다고 문장이 구절과 같은 말이라는 보장은 없다. 그래도 답이 근거의 특정 문장에 묶인다 (충실도는 채점기로 잰다).
+     */
+    static boolean quoteSupported(FollowupDraft.SentenceDraft sentence, Map<String, String> allowed) {
+        String quote = normalize(sentence.quote());
+        if (quote.length() < MIN_QUOTE_CHARS || sentence.sources() == null) {
+            return false;
+        }
+        return sentence.sources().stream()
+                .map(source -> source == null ? "" : source.strip().replaceAll("[\\[\\]]", ""))
+                .map(allowed::get)
+                .anyMatch(text -> text != null && normalize(text).contains(quote));
+    }
+
+    private static String normalize(String text) {
+        if (text == null) {
+            return "";
+        }
+        return text.replaceAll("\\s+", "").replaceAll("^[\"'“”‘’.,…]+|[\"'“”‘’.,…]+$", "");
     }
 
     private static Decision parse(String value) {
