@@ -75,18 +75,18 @@ details.guide dd { margin: 0; }
     <h2>결과지 맥락</h2>
     <select id="report"></select>
     <p class="muted" id="who"></p>
-    <table><thead><tr><th>항목</th><th>결과</th><th>판정</th></tr></thead><tbody id="items"></tbody></table>
-    <p class="muted">정상B·질환의심 항목이 위에 온다. 결과지 없이 쓰는 질문은 맥락을 "없음"으로 둔다.</p>
+    <table><thead><tr><th>질문</th><th>항목</th><th>결과</th><th>판정</th></tr></thead><tbody id="items"></tbody></table>
+    <p class="muted">정상B·질환의심 항목이 위에 온다. 질문에 해당하는 항목을 체크한다(여러 개 가능). 결과지 없이 쓰는 질문은 맥락을 "없음"으로 둔다.</p>
   </section>
 
   <section>
     <h2 id="formTitle">새 질문</h2>
     <label class="field">질문<textarea id="question" placeholder="예: 간 수치가 높게 나왔는데 술을 끊으면 내려가나요?"></textarea></label>
-    <label class="field">어느 항목에 대한 질문인가 (선택)<select id="item"></select></label>
+    <div class="field" style="margin-top:10px"><span>질문할 항목 <span class="muted">(선택. 왼쪽 표에서 여러 개 체크할 수 있다)</span></span><div id="picked" class="muted">없음</div></div>
     <div class="field" style="margin-top:10px"><span>범주</span><div class="chips" id="category"></div></div>
     <div class="field" id="reasonRow" style="margin-top:10px"><span>거절 이유</span><div class="chips" id="reason"></div></div>
-    <div class="field" id="topicRow" style="margin-top:10px"><span>주제</span><div class="chips" id="topic"></div></div>
-    <label class="field">메모 (애매한 이유 등, 선택)<input type="text" id="note"></label>
+    <div class="field" id="topicRow" style="margin-top:10px"><span>주제 <span class="muted">(선택. 항목을 고르면 자동으로 채워진다. 모르면 비워 둔다)</span></span><div class="chips" id="topic"></div></div>
+    <label class="field"><span id="noteLabel">메모 (애매한 이유 등, 선택)</span><input type="text" id="note"></label>
     <div style="display:flex; gap:8px; margin-top:12px; align-items:center">
       <button class="primary" id="save">추가</button>
       <button id="cancel" hidden>편집 취소</button>
@@ -107,10 +107,14 @@ const el = (tag, props = {}, ...kids) => { const n = Object.assign(document.crea
 const JUDGMENT = { SUSPECT: "질환의심", NORMAL_B: "정상B(경계)", NORMAL_A: "정상A", NOT_JUDGED: "판정 없음" };
 const ORDER = { SUSPECT: 0, NORMAL_B: 1, NORMAL_A: 2, NOT_JUDGED: 3 };
 
+// 예전 형식(itemCode 하나)을 항목 목록(itemCodes)으로 바꾼다
+const migrate = (q) => q.itemCodes ? q : (({ itemCode, ...rest }) => ({ ...rest, itemCodes: itemCode ? [itemCode] : [] }))(q);
 let questions = [];
-try { questions = JSON.parse(localStorage.getItem(STORE) || "[]"); } catch (e) { questions = []; }
+try { questions = JSON.parse(localStorage.getItem(STORE) || "[]").map(migrate); } catch (e) { questions = []; }
+let picked = new Set();  // 질문할 항목 코드
 let editing = null;
 const form = { category: null, reason: null, topic: null };
+let autoTopic = true;  // 주제를 사용자가 직접 고르기 전까지는 항목에서 자동으로 채운다
 const save = () => { try { localStorage.setItem(STORE, JSON.stringify(questions)); }
   catch (e) { $("status").textContent = "자동 저장이 안 됩니다. 자주 '내려받기'로 저장해 주세요."; } };
 
@@ -126,22 +130,28 @@ const reportOf = (key) => DATA.reports.find((r) => r.key === key);
 function renderReport() {
   const r = reportOf($("report").value);
   $("items").replaceChildren();
-  $("item").replaceChildren(el("option", { value: "", textContent: "특정 항목 없음" }));
   $("who").textContent = r ? `${r.sex === "MALE" ? "남" : r.sex === "FEMALE" ? "여" : "성별 모름"} · ${r.age ?? "?"}세` : "";
   if (!r) return;
   const items = [...r.items].sort((a, b) => ORDER[a.judgment] - ORDER[b.judgment]);
   for (const i of items) {
-    $("items").append(el("tr", {}, el("td", { textContent: i.name }), el("td", { textContent: `${i.value} ${i.unit}`.trim() }),
+    const box = el("input", { type: "checkbox", checked: picked.has(i.code) });
+    box.onchange = () => { if (box.checked) picked.add(i.code); else picked.delete(i.code); renderPicked(); autofillTopic(); };
+    $("items").append(el("tr", {}, el("td", {}, box), el("td", { textContent: i.name }),
+      el("td", { textContent: `${i.value} ${i.unit}`.trim() }),
       el("td", { className: `j-${i.judgment}`, textContent: JUDGMENT[i.judgment] || i.judgment })));
-    $("item").append(el("option", { value: i.code, textContent: `${i.name} (${JUDGMENT[i.judgment] || i.judgment})` }));
   }
+  renderPicked();
+}
+const itemName = (code) => reportOf($("report").value)?.items.find((i) => i.code === code)?.name || code;
+function renderPicked() {
+  $("picked").textContent = picked.size ? [...picked].map(itemName).join(", ") : "없음";
 }
 
 function chips(id, options, key) {
   $(id).replaceChildren();
   for (const [value, label] of Object.entries(options)) {
     const chip = el("span", { className: "chip" + (form[key] === value ? " on" : ""), textContent: label });
-    chip.onclick = () => { form[key] = form[key] === value ? null : value; renderForm(); };
+    chip.onclick = () => { form[key] = form[key] === value ? null : value; if (key === "topic") autoTopic = false; renderForm(); };
     $(id).append(chip);
   }
 }
@@ -150,13 +160,21 @@ function renderForm() {
   chips("reason", DATA.reasons, "reason");
   chips("topic", DATA.topics, "topic");
   $("reasonRow").hidden = form.category !== "refuse";
-  $("topicRow").hidden = form.category !== "answerable";
+  $("topicRow").hidden = !["answerable", "undecided"].includes(form.category);
+  $("noteLabel").textContent = form.category === "undecided" ? "메모 (무엇이 애매한지, 기타는 필수)" : "메모 (애매한 이유 등, 선택)";
+}
+function autofillTopic() {
+  // 고른 항목들의 주제가 하나로 모이면 그 주제, 여러 주제에 걸치면 비워 둔다
+  const topics = [...new Set([...picked].map((c) => DATA.itemTopics[c]).filter(Boolean))];
+  if (autoTopic) form.topic = topics.length === 1 ? topics[0] : null;
+  renderForm();
 }
 
 function renderQuota() {
   const n = (c) => questions.filter((q) => q.category === c).length;
-  $("quota").replaceChildren(...Object.entries(DATA.categories).map(([c, label]) =>
-    el("span", { className: n(c) >= DATA.quota[c] ? "full" : "", textContent: `${label} ${n(c)}/${DATA.quota[c]}` })));
+  $("quota").replaceChildren(...Object.keys(DATA.quota).map((c) =>
+    el("span", { className: n(c) >= DATA.quota[c] ? "full" : "", textContent: `${DATA.categories[c]} ${n(c)}/${DATA.quota[c]}` })),
+    el("span", { textContent: `기타 ${n("undecided")}` }));
   const mine = questions.filter((q) => q.author === "user").length;
   $("total").textContent = `${questions.length}개 (직접 ${mine}, Claude 초안 ${questions.length - mine})`;
 }
@@ -173,7 +191,7 @@ function renderList() {
     $("list").append(el("div", { className: "q" },
       el("div", {}, el("div", { textContent: q.question }),
         el("div", { className: "meta" }, ...tags.map((t) => el("span", { className: "tag", textContent: t })),
-          `${q.report || "결과지 없음"}${q.itemCode ? " · " + q.itemCode : ""}${q.note ? " · " + q.note : ""}`)),
+          `${q.report || "결과지 없음"}${q.itemCodes?.length ? " · " + q.itemCodes.join(", ") : ""}${q.note ? " · " + q.note : ""}`)),
       el("div", {}, edit, del)));
   });
 }
@@ -181,17 +199,20 @@ function renderList() {
 function startEdit(index) {
   const q = questions[index];
   editing = index;
+  picked = new Set(q.itemCodes || []);
   $("report").value = q.report || ""; renderReport();
-  $("item").value = q.itemCode || "";
   $("question").value = q.question; $("note").value = q.note || "";
   Object.assign(form, { category: q.category || null, reason: q.reason || null, topic: q.topic || null });
+  autoTopic = !q.topic;
   $("formTitle").textContent = q.author === "claude" ? "Claude 초안 검토" : "질문 편집";
   $("save").textContent = "저장"; $("cancel").hidden = false;
   renderForm(); window.scrollTo({ top: 0, behavior: "smooth" });
 }
 function resetForm() {
-  editing = null; $("question").value = ""; $("note").value = ""; $("item").value = "";
+  editing = null; $("question").value = ""; $("note").value = "";
+  picked.clear(); renderReport();
   Object.assign(form, { category: null, reason: null, topic: null });
+  autoTopic = true;
   $("formTitle").textContent = "새 질문"; $("save").textContent = "추가"; $("cancel").hidden = true;
   renderForm();
 }
@@ -200,18 +221,19 @@ $("save").onclick = () => {
   const question = $("question").value.trim();
   const missing = !question ? "질문을 쓰세요" : !form.category ? "범주를 고르세요"
     : form.category === "refuse" && !form.reason ? "거절 이유를 고르세요"
-    : form.category === "answerable" && !form.topic ? "주제를 고르세요" : null;
+    : form.category === "undecided" && !$("note").value.trim() ? "기타는 무엇이 애매한지 메모를 적어 주세요" : null;
   if (missing) { $("status").textContent = missing; return; }
   const entry = { question, category: form.category,
-    reason: form.category === "refuse" ? form.reason : null, topic: form.category === "answerable" ? form.topic : null,
-    report: $("report").value || null, itemCode: $("item").value || null, note: $("note").value.trim() || null };
+    reason: form.category === "refuse" ? form.reason : null,
+    topic: ["answerable", "undecided"].includes(form.category) ? form.topic : null,
+    report: $("report").value || null, itemCodes: [...picked], note: $("note").value.trim() || null };
   if (editing === null) questions.push({ ...entry, author: "user" });
   else questions[editing] = { ...questions[editing], ...entry, reviewed: true };  // Claude 초안은 작성자를 유지한다
   save(); resetForm(); renderAll();
   $("status").textContent = "저장했습니다";
 };
 $("cancel").onclick = resetForm;
-$("report").onchange = renderReport;
+$("report").onchange = () => { picked.clear(); renderReport(); autofillTopic(); };
 
 $("export").onclick = () => {
   const out = { set: DATA.set, exportedAt: new Date().toISOString(), questions };
@@ -223,7 +245,7 @@ $("import").onchange = async (event) => {
   const file = event.target.files[0];
   if (!file) return;
   const doc = JSON.parse(await file.text());
-  const incoming = Array.isArray(doc) ? doc : doc.questions || [];
+  const incoming = (Array.isArray(doc) ? doc : doc.questions || []).map(migrate);
   const known = new Set(questions.map((q) => q.question));
   const added = incoming.filter((q) => !known.has(q.question));
   questions.push(...added);
