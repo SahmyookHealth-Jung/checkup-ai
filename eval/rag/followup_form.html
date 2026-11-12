@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>후속 질문 작성</title>
+<!-- 템플릿. followup_gold.py form이 __DATA__ 자리에 결과지 맥락을 넣어 eval/.cache/labeling/에 화면을 만든다 -->
+<style>
+:root {
+  --bg: #f7f7f5; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6b66; --line: #e2e1dc;
+  --accent: #2f5bd3; --accent-ink: #ffffff; --soft: #eef2fc; --warn: #b4441c; --ok: #2d7a46; --amber: #9a6a00;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161615; --panel: #1f1f1d; --ink: #ecebe6; --muted: #a09f98; --line: #34332f;
+    --accent: #7c9bf0; --accent-ink: #10131c; --soft: #232a3d; --warn: #ec8a63; --ok: #6cc58a; --amber: #e0b44f;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+header { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line); padding: 10px 16px; }
+.bar { max-width: 1080px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.bar h1 { font-size: 16px; margin: 0; }
+.quota { display: flex; flex-wrap: wrap; gap: 6px 12px; color: var(--muted); font-variant-numeric: tabular-nums; font-size: 14px; }
+.quota .full { color: var(--ok); }
+.spacer { flex: 1; }
+button, .filebtn { font: inherit; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+button.link { border: 0; background: none; color: var(--accent); padding: 0 4px; }
+main { max-width: 1080px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); }
+@media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+section { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; min-width: 0; }
+h2 { font-size: 15px; margin: 0 0 10px; }
+.muted { color: var(--muted); font-size: 13px; }
+select, textarea, input[type=text] { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; width: 100%; }
+textarea { min-height: 72px; resize: vertical; }
+label.field { display: grid; gap: 4px; margin-top: 10px; font-size: 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; cursor: pointer; background: var(--panel); }
+.chip.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+td, th { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.j-SUSPECT { color: var(--warn); font-weight: 600; }
+.j-NORMAL_B { color: var(--amber); font-weight: 600; }
+.j-NORMAL_A { color: var(--muted); }
+details.guide { grid-column: 1 / -1; }
+details.guide dl { margin: 8px 0 0; display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; }
+details.guide dt { font-weight: 600; }
+details.guide dd { margin: 0; }
+.list { grid-column: 1 / -1; }
+.q { border-top: 1px solid var(--line); padding: 8px 0; display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; }
+.q:first-of-type { border-top: 0; }
+.q .meta { color: var(--muted); font-size: 13px; }
+.tag { display: inline-block; font-size: 12px; border-radius: 6px; padding: 0 6px; margin-right: 4px; background: var(--soft); }
+.status { color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <h1>후속 질문 작성</h1>
+    <div class="quota" id="quota"></div>
+    <span class="spacer"></span>
+    <label class="filebtn">불러오기<input type="file" id="import" accept="application/json" hidden></label>
+    <button class="primary" id="export">내려받기</button>
+  </div>
+</header>
+<main>
+  <details class="guide" open>
+    <summary><b>작성 기준</b> <span class="muted">(근거 문서를 찾아보지 말고 수검자처럼 쓴다)</span></summary>
+    <dl id="guide"></dl>
+  </details>
+
+  <section>
+    <h2>결과지 맥락</h2>
+    <select id="report"></select>
+    <p class="muted" id="who"></p>
+    <table><thead><tr><th>항목</th><th>결과</th><th>판정</th></tr></thead><tbody id="items"></tbody></table>
+    <p class="muted">정상B·질환의심 항목이 위에 온다. 결과지 없이 쓰는 질문은 맥락을 "없음"으로 둔다.</p>
+  </section>
+
+  <section>
+    <h2 id="formTitle">새 질문</h2>
+    <label class="field">질문<textarea id="question" placeholder="예: 간 수치가 높게 나왔는데 술을 끊으면 내려가나요?"></textarea></label>
+    <label class="field">어느 항목에 대한 질문인가 (선택)<select id="item"></select></label>
+    <div class="field" style="margin-top:10px"><span>범주</span><div class="chips" id="category"></div></div>
+    <div class="field" id="reasonRow" style="margin-top:10px"><span>거절 이유</span><div class="chips" id="reason"></div></div>
+    <div class="field" id="topicRow" style="margin-top:10px"><span>주제</span><div class="chips" id="topic"></div></div>
+    <label class="field">메모 (애매한 이유 등, 선택)<input type="text" id="note"></label>
+    <div style="display:flex; gap:8px; margin-top:12px; align-items:center">
+      <button class="primary" id="save">추가</button>
+      <button id="cancel" hidden>편집 취소</button>
+      <span class="status" id="status"></span>
+    </div>
+  </section>
+
+  <section class="list">
+    <h2>쓴 질문 <span class="muted" id="total"></span></h2>
+    <div id="list"></div>
+  </section>
+</main>
+<script>
+const DATA = __DATA__;
+const STORE = `checkup-ai:${DATA.set}:questions`;
+const $ = (id) => document.getElementById(id);
+const el = (tag, props = {}, ...kids) => { const n = Object.assign(document.createElement(tag), props); n.append(...kids); return n; };
+const JUDGMENT = { SUSPECT: "질환의심", NORMAL_B: "정상B(경계)", NORMAL_A: "정상A", NOT_JUDGED: "판정 없음" };
+const ORDER = { SUSPECT: 0, NORMAL_B: 1, NORMAL_A: 2, NOT_JUDGED: 3 };
+
+let questions = [];
+try { questions = JSON.parse(localStorage.getItem(STORE) || "[]"); } catch (e) { questions = []; }
+let editing = null;
+const form = { category: null, reason: null, topic: null };
+const save = () => { try { localStorage.setItem(STORE, JSON.stringify(questions)); }
+  catch (e) { $("status").textContent = "자동 저장이 안 됩니다. 자주 '내려받기'로 저장해 주세요."; } };
+
+for (const [term, text] of DATA.guide) $("guide").append(el("dt", { textContent: term }), el("dd", { textContent: text }));
+
+$("report").append(el("option", { value: "", textContent: "없음 (결과지 없이 쓰는 질문)" }));
+for (const r of DATA.reports) {
+  const flagged = r.items.filter((i) => i.judgment === "SUSPECT" || i.judgment === "NORMAL_B").length;
+  $("report").append(el("option", { value: r.key, textContent: `${r.key} · 주의 항목 ${flagged}개` }));
+}
+const reportOf = (key) => DATA.reports.find((r) => r.key === key);
+
+function renderReport() {
+  const r = reportOf($("report").value);
+  $("items").replaceChildren();
+  $("item").replaceChildren(el("option", { value: "", textContent: "특정 항목 없음" }));
+  $("who").textContent = r ? `${r.sex === "MALE" ? "남" : r.sex === "FEMALE" ? "여" : "성별 모름"} · ${r.age ?? "?"}세` : "";
+  if (!r) return;
+  const items = [...r.items].sort((a, b) => ORDER[a.judgment] - ORDER[b.judgment]);
+  for (const i of items) {
+    $("items").append(el("tr", {}, el("td", { textContent: i.name }), el("td", { textContent: `${i.value} ${i.unit}`.trim() }),
+      el("td", { className: `j-${i.judgment}`, textContent: JUDGMENT[i.judgment] || i.judgment })));
+    $("item").append(el("option", { value: i.code, textContent: `${i.name} (${JUDGMENT[i.judgment] || i.judgment})` }));
+  }
+}
+
+function chips(id, options, key) {
+  $(id).replaceChildren();
+  for (const [value, label] of Object.entries(options)) {
+    const chip = el("span", { className: "chip" + (form[key] === value ? " on" : ""), textContent: label });
+    chip.onclick = () => { form[key] = form[key] === value ? null : value; renderForm(); };
+    $(id).append(chip);
+  }
+}
+function renderForm() {
+  chips("category", DATA.categories, "category");
+  chips("reason", DATA.reasons, "reason");
+  chips("topic", DATA.topics, "topic");
+  $("reasonRow").hidden = form.category !== "refuse";
+  $("topicRow").hidden = form.category !== "answerable";
+}
+
+function renderQuota() {
+  const n = (c) => questions.filter((q) => q.category === c).length;
+  $("quota").replaceChildren(...Object.entries(DATA.categories).map(([c, label]) =>
+    el("span", { className: n(c) >= DATA.quota[c] ? "full" : "", textContent: `${label} ${n(c)}/${DATA.quota[c]}` })));
+  const mine = questions.filter((q) => q.author === "user").length;
+  $("total").textContent = `${questions.length}개 (직접 ${mine}, Claude 초안 ${questions.length - mine})`;
+}
+
+function renderList() {
+  $("list").replaceChildren();
+  questions.forEach((q, index) => {
+    const tags = [DATA.categories[q.category] || "범주 없음", q.reason && DATA.reasons[q.reason], q.topic && DATA.topics[q.topic],
+      q.author === "claude" ? "Claude 초안" : null].filter(Boolean);
+    const edit = el("button", { className: "link", textContent: "편집" });
+    edit.onclick = () => startEdit(index);
+    const del = el("button", { className: "link", textContent: "삭제" });
+    del.onclick = () => { if (confirm("이 질문을 지울까요?")) { questions.splice(index, 1); save(); renderAll(); } };
+    $("list").append(el("div", { className: "q" },
+      el("div", {}, el("div", { textContent: q.question }),
+        el("div", { className: "meta" }, ...tags.map((t) => el("span", { className: "tag", textContent: t })),
+          `${q.report || "결과지 없음"}${q.itemCode ? " · " + q.itemCode : ""}${q.note ? " · " + q.note : ""}`)),
+      el("div", {}, edit, del)));
+  });
+}
+
+function startEdit(index) {
+  const q = questions[index];
+  editing = index;
+  $("report").value = q.report || ""; renderReport();
+  $("item").value = q.itemCode || "";
+  $("question").value = q.question; $("note").value = q.note || "";
+  Object.assign(form, { category: q.category || null, reason: q.reason || null, topic: q.topic || null });
+  $("formTitle").textContent = q.author === "claude" ? "Claude 초안 검토" : "질문 편집";
+  $("save").textContent = "저장"; $("cancel").hidden = false;
+  renderForm(); window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function resetForm() {
+  editing = null; $("question").value = ""; $("note").value = ""; $("item").value = "";
+  Object.assign(form, { category: null, reason: null, topic: null });
+  $("formTitle").textContent = "새 질문"; $("save").textContent = "추가"; $("cancel").hidden = true;
+  renderForm();
+}
+
+$("save").onclick = () => {
+  const question = $("question").value.trim();
+  const missing = !question ? "질문을 쓰세요" : !form.category ? "범주를 고르세요"
+    : form.category === "refuse" && !form.reason ? "거절 이유를 고르세요"
+    : form.category === "answerable" && !form.topic ? "주제를 고르세요" : null;
+  if (missing) { $("status").textContent = missing; return; }
+  const entry = { question, category: form.category,
+    reason: form.category === "refuse" ? form.reason : null, topic: form.category === "answerable" ? form.topic : null,
+    report: $("report").value || null, itemCode: $("item").value || null, note: $("note").value.trim() || null };
+  if (editing === null) questions.push({ ...entry, author: "user" });
+  else questions[editing] = { ...questions[editing], ...entry, reviewed: true };  // Claude 초안은 작성자를 유지한다
+  save(); resetForm(); renderAll();
+  $("status").textContent = "저장했습니다";
+};
+$("cancel").onclick = resetForm;
+$("report").onchange = renderReport;
+
+$("export").onclick = () => {
+  const out = { set: DATA.set, exportedAt: new Date().toISOString(), questions };
+  const a = el("a", { href: URL.createObjectURL(new Blob([JSON.stringify(out, null, 2)], { type: "application/json" })),
+    download: `${DATA.set}.questions.json` });
+  a.click();
+};
+$("import").onchange = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+  const doc = JSON.parse(await file.text());
+  const incoming = Array.isArray(doc) ? doc : doc.questions || [];
+  const known = new Set(questions.map((q) => q.question));
+  const added = incoming.filter((q) => !known.has(q.question));
+  questions.push(...added);
+  save(); renderAll();
+  $("status").textContent = `${added.length}개를 더했습니다 (같은 질문 ${incoming.length - added.length}개는 건너뜀)`;
+  event.target.value = "";
+};
+
+function renderAll() { renderQuota(); renderList(); }
+renderReport(); renderForm(); renderAll();
+</script>
+</body>
+</html>
