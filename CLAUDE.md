@@ -3,7 +3,7 @@
 건강검진센터 AI 플랫폼 (AI 역량 포트폴리오). 전체 배경과 진행 단계는 [docs/PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md)에 있다. 주 단위가 아니라 단계 순서대로 진행한다.
 
 - 기능 1 (진행 중): 건강검진 결과 해설 AI. 결과지 수치 추출(Structured Output), 공개 가이드라인 RAG, 출처 인용, 가드레일, 평가 자동화. 화면은 http://localhost:8080 (소개·해설 데모·품질·운영, ADR 0012).
-- 기능 2 (7단계, 6단계 뒤에 할지 결정): 관리자용 Text-to-SQL 통계 어시스턴트.
+- 기능 2 (7단계, 진행 중): 관리자용 Text-to-SQL 통계 어시스턴트 (`stats` 모듈, ADR 0013). 공공데이터 100만 행, 읽기 전용 계정, 작은 집단 숨김.
 
 ## 절대 규칙
 
@@ -58,6 +58,9 @@ cd backend && ./gradlew build              # 컴파일 + 단위 테스트 (외�
 (cd ../eval && .venv/bin/python -m rag.followup_evidence form)   # 정답셋의 근거 절 라벨링 화면, Claude 제안을 검토 (apply <JSON>으로 정답셋에 반영)
 (cd ../eval && .venv/bin/python -m rag.compare_conditions --base <기준> --new <조건> --label <이름>)  # 조건 짝비교 (전체 + 근거가 바뀐 항목)
 (cd ../eval && .venv/bin/python -m rag.run_followup_answer_eval --split dev --runs 2 --label <이름>)  # 후속 질문 답 평가 (앱 필요, 문항마다 Haiku 1회. --gold로 재확인셋)
+(cd ../eval && .venv/bin/python -m stats.load_checkup ../data/stats/raw/nhis-checkup-2023.csv)  # 기능 2 통계 데이터 적재 (앱을 한 번 띄워 V4가 돈 뒤)
+(cd ../eval && .venv/bin/python -m stats.build_gold)        # 기능 2 정답셋 결과 고정 (정답 SQL을 읽기 전용 계정으로 실행)
+(cd ../eval && .venv/bin/python -m stats.run_stats_eval --split dev --runs 2 --label <이름>)  # 기능 2 평가 (앱 필요, 문항마다 Haiku 1~2회)
 (cd ../eval && .venv/bin/python build_dashboard_data.py)   # 품질 화면 데이터 (static/data/quality.json, 모델 호출 없음)
 (cd ../eval && .venv/bin/python -m unittest discover -s rag -t .)            # 평가 지표 단위 테스트
 ```
@@ -75,7 +78,7 @@ checkup-ai/
 │   ├── gradle/libs.versions.toml   버전은 여기서만 관리
 │   ├── core/                공통 기반: AI 호출 관측·비용, 공통 가드레일, 예외
 │   ├── report/              기능 1: 결과지 추출 + RAG 해설
-│   ├── stats/               기능 2: Text-to-SQL (7단계에 추가)
+│   ├── stats/               기능 2: Text-to-SQL 통계 어시스턴트 (ADR 0013)
 │   └── app/                 실행 모듈: 조립, 설정(application.yml), Flyway 마이그레이션, 최소 화면(정적 HTML, ADR 0007)
 ├── eval/                    Python 평가 스크립트·평가셋 (응답 캐시는 gitignore)
 ├── data/guidelines/         공개 가이드라인 출처 목록 (원문은 raw/에 내려받고 gitignore)

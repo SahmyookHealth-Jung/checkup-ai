@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>통계 질문 · 검진 결과 해설 AI</title>
+<link rel="stylesheet" href="/app.css">
+<style>
+  .ask { display: flex; gap: 8px; margin: 16px 0 8px; }
+  .ask input { flex: 1; font-size: 15px; padding: 10px 12px; }
+  .examples { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .answer { border-top: 1px solid var(--line); padding: 24px 0; }
+  .answer .q { font-weight: 600; font-size: 16px; }
+  .sql { background: var(--bg-2); border-radius: 6px; padding: 12px 14px; font: 12.5px/1.6 ui-monospace, Menlo, monospace;
+         white-space: pre-wrap; word-break: break-word; margin: 10px 0; color: var(--text-2); }
+  .hidden-cell { color: var(--muted); }
+  .d-ANSWER { color: var(--a); } .d-NO_DATA { color: var(--muted); } .d-REFUSE, .d-FAILED { color: var(--s); }
+</style>
+</head>
+<body>
+<nav class="nav"><div><a class="brand" href="/">검진 결과 해설</a><a href="/demo.html">해설 데모</a><a href="/stats.html" aria-current="page">통계</a><a href="/quality.html">품질</a><a href="/ops.html">운영</a></div></nav>
+<main>
+  <h1>통계 질문</h1>
+  <p class="sub">관리자가 한국어로 물으면 SQL로 바꿔 2023년 건강검진 표본 100만 명(국민건강보험공단 공공데이터)을 집계합니다. LLM이 쓴 SQL은 검사를 거쳐 읽기 전용 계정으로만 실행하고, 10명 미만 집단의 값은 숨깁니다.</p>
+  <div class="ask">
+    <input id="q" maxlength="300" placeholder="예: 시도별 현재 흡연자 비율" aria-label="통계 질문">
+    <button id="go" type="button">물어보기</button>
+  </div>
+  <div class="examples" id="examples"></div>
+  <span class="status" id="status"></span>
+  <div id="answers"></div>
+  <p class="small" style="margin-top:32px">시험 40문항에서 실행 결과 일치 27/34(숫자 기준), 막아야 할 요청을 실행한 건수 0. 자세한 기록은 <a href="/quality.html">품질</a>에 있습니다.</p>
+</main>
+<footer class="foot">합성 데이터로 만든 포트폴리오 데모입니다. 통계 데이터는 공공데이터포털 "국민건강보험공단_건강검진정보"(2023, 이용허락 제한 없음)입니다.</footer>
+<script>
+  const $ = id => document.getElementById(id);
+  const el = (tag, attrs = {}, ...children) => {
+    const node = document.createElement(tag);
+    Object.entries(attrs).forEach(([k, v]) => k === 'class' ? node.className = v : node.setAttribute(k, v));
+    children.flat().forEach(c => node.append(c instanceof Node ? c : document.createTextNode(c ?? '')));
+    return node;
+  };
+  const DECISION = { ANSWER: '답함', NO_DATA: '데이터에 없음', REFUSE: '막음', FAILED: '실패' };
+  const EXAMPLES = ['성별 평균 허리둘레', '시도별 현재 흡연자 비율', '연령대별 평균 LDL 콜레스테롤', '세종시 연령대별 현재 흡연자 수', '가입자 한 명씩 다 보여줘'];
+  $('examples').replaceChildren(...EXAMPLES.map(q => {
+    const b = el('button', { type: 'button', class: 'ghost' }, q);
+    b.addEventListener('click', () => { $('q').value = q; ask(); });
+    return b;
+  }));
+
+  const fmt = v => v === null || v === undefined ? '' : typeof v === 'number' ? v.toLocaleString('ko-KR') : String(v);
+
+  async function ask() {
+    const question = $('q').value.trim();
+    if (!question) return;
+    $('go').disabled = true;
+    $('status').textContent = 'SQL을 쓰고 실행하는 중… (2~5초)';
+    try {
+      const response = await fetch('/api/stats/ask', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question }) });
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.detail ?? `${response.status}`);
+      }
+      $('answers').prepend(render(await response.json()));
+      $('status').textContent = '';
+    } catch (e) {
+      $('status').textContent = '실패: ' + e.message;
+    } finally {
+      $('go').disabled = false;
+    }
+  }
+
+  function render(r) {
+    const t = r.table, m = r.metrics;
+    const nIndex = t ? t.columns.findIndex(c => c.toLowerCase() === 'n') : -1;
+    return el('div', { class: 'answer' },
+      el('div', { class: 'q' }, r.question),
+      el('div', {}, el('span', { class: `pill d-${r.decision}` }, DECISION[r.decision] ?? r.decision), ' ',
+        el('span', { class: 'small' }, r.reason ?? '')),
+      r.sql ? el('div', { class: 'sql' }, r.sql) : '',
+      t ? el('div', { class: 'scroll' }, el('table', {},
+        el('thead', {}, el('tr', {}, ...t.columns.map((c, i) => el('th', { class: i === nIndex ? 'num' : '' }, c === 'n' ? '사람 수' : c)))),
+        el('tbody', {}, ...t.rows.map(row => el('tr', {}, ...row.map((v, i) => el('td',
+          { class: (typeof v === 'number' || i === nIndex ? 'num' : '') + (v === null ? ' hidden-cell' : '') },
+          v === null && (i === nIndex || nIndex >= 0 && row[nIndex] === null) ? '숨김' : fmt(v)))))))) : '',
+      t && t.suppressedRows ? el('p', { class: 'small' }, `사람 수가 10명 미만인 ${t.suppressedRows}개 행의 값은 숨겼습니다.`) : '',
+      t && t.truncated ? el('p', { class: 'small' }, '결과가 많아 앞부분만 보여 줍니다.') : '',
+      r.errors.length ? el('p', { class: 'small' }, `다시 쓴 이유: ${r.errors.join(' / ')}`) : '',
+      el('p', { class: 'small' }, `시도 ${m.attempts}회 · SQL 생성 ${m.llmMs}ms · 실행 ${m.dbMs}ms · ${m.promptVersion}`));
+  }
+
+  $('go').addEventListener('click', ask);
+  $('q').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) ask(); });
+</script>
+</body>
+</html>

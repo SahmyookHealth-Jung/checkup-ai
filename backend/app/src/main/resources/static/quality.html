@@ -22,10 +22,10 @@
 </style>
 </head>
 <body>
-<nav class="nav"><div><a class="brand" href="/">검진 결과 해설</a><a href="/demo.html">해설 데모</a><a href="/quality.html" aria-current="page">품질</a><a href="/ops.html">운영</a></div></nav>
+<nav class="nav"><div><a class="brand" href="/">검진 결과 해설</a><a href="/demo.html">해설 데모</a><a href="/stats.html">통계</a><a href="/quality.html" aria-current="page">품질</a><a href="/ops.html">운영</a></div></nav>
 <main>
   <h1>평가 기록</h1>
-  <p class="sub">모든 수치는 합성 결과지로 쟀습니다. 아래 9개 중 <span class="good">목표를 채운 것 4개</span>, <span class="s-limit">조건이 붙은 것 3개</span>, <span class="bad">못 채운 것 2개</span>입니다. 못 채운 것도 그대로 둡니다.</p>
+  <p class="sub" id="lede">기능 1은 합성 결과지로, 기능 2(통계)는 공공데이터 표본으로 쟀습니다. 못 채운 것도 그대로 둡니다.</p>
   <p class="small">비교 수치는 커밋한 코드로만 쟀습니다(기록의 dirty=false). 데이터는 <code>eval/build_dashboard_data.py</code>가 커밋된 평가 기록에서 만듭니다.</p>
 
   <div class="scroll" style="margin-top:24px"><table class="hl">
@@ -91,6 +91,10 @@
     .catch(e => { $('highlights').textContent = '품질 데이터를 불러오지 못했습니다: ' + e.message; });
 
   function render() {
+    const by = st => data.highlights.filter(h => h.status === st).length;
+    $('lede').replaceChildren(`기능 1은 합성 결과지로, 기능 2(통계)는 공공데이터 표본으로 쟀습니다. 아래 ${data.highlights.length}개 중 `,
+      el('span', { class: 'good' }, `목표를 채운 것 ${by('good')}개`), ', ', el('span', { class: 's-limit' }, `조건이 붙은 것 ${by('limit')}개`), ', ',
+      el('span', { class: 'bad' }, `못 채운 것 ${by('bad')}개`), '입니다. 못 채운 것도 그대로 둡니다.');
     $('highlights').replaceChildren(...data.highlights.map(h => el('tr', {},
       el('td', {}, h.area),
       el('td', {}, el('div', {}, h.title), el('div', { class: 'd' }, h.detail)),

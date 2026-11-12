@@ -12,7 +12,7 @@
   --a: #1e8a4c; --b: #b07400; --s: #d1343a; --none: #8b9491;
   --a-bg: #eaf6ee; --b-bg: #fdf4e3; --s-bg: #fdecec;
   /* 차트 범주색: dataviz 기준 팔레트 1~3번 (세 개까지 모든 짝이 색각 이상 검사를 통과) */
-  --series-1: #2a78d6; --series-2: #eb6834; --series-3: #1baf7a; --series-5: #8b9491;
+  --series-1: #2a78d6; --series-2: #eb6834; --series-3: #1baf7a; --series-4: #eda100; --series-5: #8b9491;
   --font: "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
 }
 @media (prefers-color-scheme: dark) {
@@ -22,7 +22,7 @@
     --accent: #5cc3ae; --accent-bg: #16302b;
     --a: #5fcb8a; --b: #e5b54f; --s: #f0777a; --none: #7f8986;
     --a-bg: #15301f; --b-bg: #33290f; --s-bg: #3a1c1d;
-    --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70;
+    --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --series-4: #c98500;
   }
 }
 

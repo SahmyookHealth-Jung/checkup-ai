@@ -18,7 +18,7 @@
 </style>
 </head>
 <body>
-<nav class="nav"><div><a class="brand" href="/">검진 결과 해설</a><a href="/demo.html">해설 데모</a><a href="/quality.html">품질</a><a href="/ops.html" aria-current="page">운영</a></div></nav>
+<nav class="nav"><div><a class="brand" href="/">검진 결과 해설</a><a href="/demo.html">해설 데모</a><a href="/stats.html">통계</a><a href="/quality.html">품질</a><a href="/ops.html" aria-current="page">운영</a></div></nav>
 <main>
   <h1>LLM 호출 기록</h1>
   <p class="sub">앱의 모든 LLM 호출은 토큰·비용·지연·상태를 <code>llm_call_log</code>에 남깁니다(ADR 0006). 결과지 원문은 남기지 않습니다.
@@ -57,11 +57,12 @@
     Object.entries(attrs).forEach(([k, v]) => node.setAttribute(k, v));
     return node;
   };
-  // 기능을 세 묶음으로 (기준 팔레트는 세 색까지 모든 짝이 구분된다). 색은 묶음을 따라가고 순위를 따라가지 않는다
+  // 기능을 네 묶음으로 (쌓은 막대는 이웃한 색끼리만 구분되면 되고, 기준 팔레트 1~4번은 이웃 짝 검사를 통과한다. 표도 함께 둔다). 색은 묶음을 따라가고 순위를 따라가지 않는다
   const GROUPS = [
     { key: 'extraction', label: '결과지 추출', color: 'var(--series-1)', match: f => f.startsWith('report.extraction') },
     { key: 'explanation', label: '판정 해설', color: 'var(--series-2)', match: f => f === 'report.explanation' },
     { key: 'followup', label: '후속 질문', color: 'var(--series-3)', match: f => f.startsWith('report.followup') },
+    { key: 'stats', label: '통계 SQL', color: 'var(--series-4)', match: f => f.startsWith('stats.') },
   ];
   const groupOf = f => GROUPS.find(g => g.match(f)) ?? { key: 'other', label: '기타', color: 'var(--series-5)' };
   const usd = v => '$' + Number(v).toFixed(Number(v) < 1 ? 4 : 2);

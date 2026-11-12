@@ -81,6 +81,15 @@
    "set": "시험 40문항",
    "status": "bad",
    "adr": "0011-후속-질문-경로-설계.md"
+  },
+  {
+   "area": "통계",
+   "title": "관리자 통계 질문 (Text-to-SQL)",
+   "value": "27/34 일치",
+   "detail": "실행 결과 일치(숫자 기준, 엄격 기준 25/34). 막아야 할 요청을 실행한 건수 0, 답할 수 없는 질문 거절 6/6. 틀린 것은 '40대'를 5세 단위로 쪼갬, n 기준 차이 등",
+   "set": "시험 40문항 (Claude 작성), 공공데이터 100만 행",
+   "status": "limit",
+   "adr": "0013-Text-to-SQL-통계-어시스턴트-설계.md"
   }
  ],
  "followup": {
@@ -749,6 +758,35 @@
     "inferred:answerableGrounded": "6/6",
     "selected:pass": false,
     "inferred:pass": false
+   }
+  },
+  {
+   "runId": "20261113-0412_stats-sql_dev-v1",
+   "kind": "stats-sql",
+   "label": "dev-v1",
+   "createdAt": "2026-11-13T04:12:58",
+   "commit": "2b74112",
+   "dirty": false,
+   "dataset": "stats-gold-v1",
+   "headline": {
+    "execMatch": "30/34",
+    "executedButShouldNot": 0,
+    "failed": 0
+   }
+  },
+  {
+   "runId": "20261113-0414_stats-sql_test-v1",
+   "kind": "stats-sql",
+   "label": "test-v1",
+   "createdAt": "2026-11-13T04:14:44",
+   "commit": "af53333",
+   "dirty": false,
+   "dataset": "stats-gold-v1",
+   "headline": {
+    "execMatch": "25/34",
+    "execMatchNumeric": "27/34",
+    "executedButShouldNot": 0,
+    "failed": 0
    }
   }
  ]
