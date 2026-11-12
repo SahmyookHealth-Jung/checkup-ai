@@ -7,24 +7,29 @@
 <link rel="stylesheet" href="/app.css">
 <style>
   .chart { position: relative; }
-  .tip { position: absolute; pointer-events: none; background: var(--paper); border: 1px solid var(--rule-strong);
+  .tip { position: absolute; pointer-events: none; background: var(--card); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 2px 8px rgba(15,17,17,.15);
          padding: 6px 10px; font-size: 13px; white-space: nowrap; }
   .tip b { display: block; }
   .tip span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 6px; background: var(--c); }
-  .budget-track { background: var(--tint); height: 6px; margin-top: 8px; overflow: hidden; }
-  .budget-fill { height: 100%; background: var(--ink); }
+  .budget-track { background: var(--soft); border: 1px solid var(--line); border-radius: 4px; height: 10px; margin-top: 8px; overflow: hidden; }
+  .budget-fill { height: 100%; background: var(--star); }
 </style>
 </head>
 <body>
-<nav class="nav"><div><strong>검진 결과 해설 AI</strong>
-  <a href="/">소개</a><a href="/demo.html">해설 데모</a><a href="/quality.html">품질</a><a href="/ops.html" aria-current="page">운영</a>
+<nav class="nav"><div>
+  <a class="brand" href="/">검진 결과 해설 AI<small>합성 데이터 데모 · 진단하지 않음</small></a>
+  <span class="spacer"></span>
+  <a href="/demo.html"><small>결과지 고르고</small>해설 데모</a><a href="/quality.html"><small>평가 기록·실패 포함</small>품질</a><a href="/ops.html" aria-current="page"><small>비용·지연</small>운영</a>
 </div></nav>
+<div class="subnav"><div>
+  <a href="/">소개</a><a href="/demo.html">판정 해설</a><a href="/demo.html#followup">후속 질문</a><a href="/quality.html">대표 수치</a><a href="/quality.html#followup">후속 질문 평가</a><a href="/ops.html">LLM 비용·지연</a>
+</div></div>
 <main>
-  <p class="kicker" style="margin-top:36px">LLM 호출 기록</p>
-  <h1>운영</h1>
+  <p class="crumb"><a href="/">소개</a> › 운영</p>
+  <h1>운영: LLM 호출 기록</h1>
   <p class="sub">앱의 모든 LLM 호출은 토큰·비용·지연·상태를 <code>llm_call_log</code>에 남깁니다(ADR 0006). 결과지 원문은 남기지 않습니다.
     평가 스크립트가 직접 부른 채점 모델(Sonnet) 호출은 여기에 없습니다.</p>
-  <div class="controls">
+  <div class="card controls">
     <label for="days">기간</label>
     <select id="days"><option value="7">최근 7일</option><option value="14" selected>최근 14일</option><option value="30">최근 30일</option></select>
     <span class="status" id="status">불러오는 중…</span>
@@ -33,7 +38,7 @@
   <div class="grid" id="tiles"></div>
 
   <h2>날짜별 비용</h2>
-  <div class="chart" id="chart"></div>
+  <div class="card chart" id="chart"></div>
   <div class="legend" id="legend"></div>
 
   <h2>기능별</h2>
@@ -44,6 +49,7 @@
   </table></div>
   <p class="small">데모 호출(샘플 해설, 업로드 해설, 후속 질문)은 오늘 비용이 하루 상한에 닿으면 막힙니다(ADR 0012). 평가 API는 막지 않습니다.</p>
 </main>
+<footer class="foot">합성 데이터로 만든 포트폴리오 데모입니다. 이 내용은 의료 진단이 아니며, 정확한 판단은 의료진과 상담하세요. · <a href="#">맨 위로</a></footer>
 <script>
   const $ = id => document.getElementById(id);
   const el = (tag, attrs = {}, ...children) => {

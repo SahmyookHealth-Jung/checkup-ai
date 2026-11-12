@@ -6,55 +6,82 @@
 <title>품질 · 검진 결과 해설 AI</title>
 <link rel="stylesheet" href="/app.css">
 <style>
-  .hl td:first-child { color: var(--muted); font-size: 13px; white-space: nowrap; }
-  .hl .v { font: 700 17px var(--serif); white-space: nowrap; }
-  .hl .d { color: var(--ink-2); font-size: 13px; margin-top: 2px; }
+  .product { background: var(--card); border-radius: 8px; padding: 16px 18px; display: flex; flex-direction: column; gap: 4px; }
+  .product .cat { font-size: 12px; color: var(--muted); }
+  .product h3 { font-size: 15px; font-weight: 500; margin: 0; }
+  .product .price { font-size: 24px; font-weight: 500; }
+  .product p { font-size: 12px; color: var(--muted); margin: 2px 0; }
+  .product .foot2 { margin-top: auto; padding-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
   .matrix td.hit { font-weight: 700; }
-  .matrix td.unsafe { color: var(--brick); font-weight: 700; background: var(--brick-tint); }
-  .tabs { display: flex; gap: 20px; margin: 12px 0 4px; flex-wrap: wrap; border-bottom: 1px solid var(--rule); }
-  .tabs button { background: none; border: 0; border-bottom: 2px solid transparent; border-radius: 0; color: var(--muted); padding: 6px 0; }
-  .tabs button[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--ink); }
-  .tabs .sep { width: 1px; background: var(--rule); margin: 6px 0; }
-  .mono { font-family: var(--mono); font-size: 12px; }
+  .matrix td.unsafe { color: var(--deal); font-weight: 700; background: var(--deal-bg); }
+  .tabs { display: flex; gap: 6px; margin: 4px 0 12px; flex-wrap: wrap; align-items: center; }
+  .tabs button { background: var(--card); border-color: var(--line); padding: 4px 12px; font-size: 12px; }
+  .tabs button[aria-pressed="true"] { background: var(--btn); border-color: var(--btn-border); font-weight: 700; }
+  .tabs .sep { width: 1px; height: 20px; background: var(--line); margin: 0 6px; }
+  .review-sum { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 28px; }
+  .review-sum .big { font-size: 34px; font-weight: 500; line-height: 1.2; }
+  @media (max-width: 760px) { .review-sum { grid-template-columns: 1fr; } }
+  .mono { font-family: ui-monospace, Menlo, monospace; font-size: 11px; }
 </style>
 </head>
 <body>
-<nav class="nav"><div><strong>검진 결과 해설 AI</strong>
-  <a href="/">소개</a><a href="/demo.html">해설 데모</a><a href="/quality.html" aria-current="page">품질</a><a href="/ops.html">운영</a>
+<nav class="nav"><div>
+  <a class="brand" href="/">검진 결과 해설 AI<small>합성 데이터 데모 · 진단하지 않음</small></a>
+  <span class="spacer"></span>
+  <a href="/demo.html"><small>결과지 고르고</small>해설 데모</a><a href="/quality.html" aria-current="page"><small>평가 기록·실패 포함</small>품질</a><a href="/ops.html"><small>비용·지연</small>운영</a>
 </div></nav>
+<div class="subnav"><div>
+  <a href="/">소개</a><a href="/demo.html">판정 해설</a><a href="/demo.html#followup">후속 질문</a><a href="/quality.html">대표 수치</a><a href="/quality.html#followup">후속 질문 평가</a><a href="/ops.html">LLM 비용·지연</a>
+</div></div>
 <main>
-  <p class="kicker" style="margin-top:36px">평가 기록</p>
-  <h1>품질</h1>
-  <p class="sub">모든 수치는 합성 결과지로 잰 값입니다. 목표를 못 채운 것도 그대로 둡니다. 비교 수치는 커밋한 코드로만 쟀습니다(기록의 dirty=false).
-    데이터: <code>eval/build_dashboard_data.py</code>가 커밋된 평가 기록에서 만듭니다.</p>
+  <p class="crumb"><a href="/">소개</a> › 품질</p>
+  <div class="card">
+    <h1>품질과 평가 기록</h1>
+    <p class="sub">모든 수치는 합성 결과지로 잰 값입니다. 목표를 못 채운 것도 그대로 둡니다. 비교 수치는 커밋한 코드로만 쟀습니다(기록의 dirty=false).
+      데이터는 <code>eval/build_dashboard_data.py</code>가 커밋된 평가 기록에서 만듭니다.</p>
+  </div>
 
   <h2>대표 수치</h2>
-  <div class="scroll"><table class="hl">
-    <thead><tr><th>영역</th><th>무엇을</th><th>수치</th><th>평가셋</th><th>상태</th></tr></thead>
-    <tbody id="highlights"></tbody>
-  </table></div>
+  <div class="grid" id="highlights"></div>
 
-  <h2 id="followup">후속 질문: 무엇에 답하고 무엇을 막았나</h2>
-  <p class="small">행은 정답셋이 기대한 행동, 열은 최종 처리입니다. 빨간 칸은 답하면 안 되는데 답한 건수입니다.
-    "항목 고름"은 화면에서 항목을 고른 경우, "항목 안 고름"은 질문과 결과지로 항목을 정한 경우입니다.</p>
-  <div class="tabs" id="fu-tabs"></div>
-  <div class="grid" id="fu-tiles"></div>
-  <div class="scroll" style="margin-top:10px"><table class="matrix">
-    <thead><tr><th>기대 행동</th><th class="num">답</th><th class="num">근거 없음</th><th class="num">진단 거절</th><th class="num">약·치료 거절</th><th class="num">악성</th></tr></thead>
-    <tbody id="fu-matrix"></tbody>
-  </table></div>
-  <p class="small" id="fu-note"></p>
+  <div class="card" id="followup">
+    <h2 style="margin-top:0">후속 질문: 무엇에 답하고 무엇을 막았나</h2>
+    <div class="tabs" id="fu-tabs"></div>
+    <div class="review-sum">
+      <div>
+        <div class="small">기대한 대로 처리한 문항</div>
+        <div class="big" id="fu-big"></div>
+        <div id="fu-pass"></div>
+        <div id="fu-bars" style="margin-top:12px"></div>
+      </div>
+      <div>
+        <div class="grid" id="fu-tiles" style="margin-top:0"></div>
+        <div class="scroll"><table class="matrix">
+          <thead><tr><th>기대 행동</th><th class="num">답</th><th class="num">근거 없음</th><th class="num">진단 거절</th><th class="num">약·치료 거절</th><th class="num">악성</th></tr></thead>
+          <tbody id="fu-matrix"></tbody>
+        </table></div>
+        <p class="small">행은 정답셋이 기대한 행동, 열은 최종 처리입니다. 빨간 칸은 답하면 안 되는데 답한 건수입니다.
+          "항목 고름"은 화면에서 항목을 고른 경우, "항목 안 고름"은 질문과 결과지로 항목을 정한 경우입니다.</p>
+        <p id="fu-note"></p>
+      </div>
+    </div>
+  </div>
 
-  <h3 style="margin-top:28px">답 문장의 충실도 <span class="tag">시험 · 항목 고름 · Sonnet 채점</span></h3>
-  <div class="card" id="faith"></div>
+  <div class="card">
+    <h2 style="margin-top:0">답 문장의 충실도 <span class="tag">시험 · 항목 고름 · Sonnet 채점</span></h2>
+    <div id="faith"></div>
+  </div>
 
-  <h2>평가 기록 전체</h2>
-  <p class="small">dirty=true인 기록은 커밋하지 않은 변경이 있던 때라 비교 수치로 쓰지 않았습니다.</p>
-  <div class="scroll"><table>
-    <thead><tr><th>날짜</th><th>종류</th><th>이름</th><th>커밋</th><th>대표 값</th></tr></thead>
-    <tbody id="runs"></tbody>
-  </table></div>
+  <div class="card">
+    <h2 style="margin-top:0">평가 기록 전체</h2>
+    <p class="small">dirty=true인 기록은 커밋하지 않은 변경이 있던 때라 비교 수치로 쓰지 않았습니다.</p>
+    <div class="scroll"><table>
+      <thead><tr><th>날짜</th><th>종류</th><th>이름</th><th>커밋</th><th>대표 값</th></tr></thead>
+      <tbody id="runs"></tbody>
+    </table></div>
+  </div>
 </main>
+<footer class="foot">합성 데이터로 만든 포트폴리오 데모입니다. 이 내용은 의료 진단이 아니며, 정확한 판단은 의료진과 상담하세요. · <a href="#">맨 위로</a></footer>
 <script>
   const $ = id => document.getElementById(id);
   const el = (tag, attrs = {}, ...children) => {
@@ -65,6 +92,7 @@
   };
   const STATUS = { good: '목표 달성', limit: '조건 있음', bad: '목표 미달' };
   const CATEGORY = { answerable: '답 가능', unanswerable: '답 불가 (근거 없음)', refuse: '거절 (진단·약)', malicious: '악성' };
+  const SHORT = { answerable: '답 가능', unanswerable: '답 불가', refuse: '거절', malicious: '악성' };
   const SHOULD_NOT_ANSWER = ['unanswerable', 'refuse', 'malicious'];
   const EXPECTED = { answerable: ['ANSWER'], unanswerable: ['NO_EVIDENCE'], refuse: ['REFUSE_DIAGNOSIS', 'REFUSE_TREATMENT'],
                      malicious: ['MALICIOUS', 'REFUSE_DIAGNOSIS', 'REFUSE_TREATMENT'] };
@@ -80,13 +108,11 @@
     .catch(e => { $('highlights').textContent = '품질 데이터를 불러오지 못했습니다: ' + e.message; });
 
   function render() {
-    $('highlights').replaceChildren(...data.highlights.map(h => el('tr', {},
-      el('td', {}, h.area),
-      el('td', {}, el('div', {}, h.title), el('div', { class: 'd' }, h.detail)),
-      el('td', {}, el('div', { class: 'v' }, h.value)),
-      el('td', { class: 'small' }, h.set),
-      el('td', {}, el('div', { class: `pill s-${h.status}` }, STATUS[h.status]),
-        el('a', { class: 'small', href: data.adrBase + encodeURI(h.adr), target: '_blank', rel: 'noopener' }, 'ADR ' + h.adr.slice(0, 4))))));
+    $('highlights').replaceChildren(...data.highlights.map(h => el('div', { class: 'product' },
+      el('span', { class: 'cat' }, h.area), el('h3', {}, h.title), el('div', { class: 'price' }, h.value),
+      el('p', {}, h.detail), el('p', {}, `평가셋: ${h.set}`),
+      el('div', { class: 'foot2' }, el('span', { class: `pill s-${h.status}` }, STATUS[h.status]),
+        el('a', { href: data.adrBase + encodeURI(h.adr), target: '_blank', rel: 'noopener' }, `ADR ${h.adr.slice(0, 4)} ›`)))));
     renderFollowup();
     renderFaith();
     $('runs').replaceChildren(...[...data.runs].reverse().map(r => el('tr', {},
@@ -107,6 +133,15 @@
     const run = data.followup[current], m = run.modes[mode];
     const [g, n] = m.answerableGrounded.split('/').map(Number);
     const unsafeTotal = SHOULD_NOT_ANSWER.reduce((s, c) => s + Object.values(m.behavior[c] ?? {}).reduce((a, b) => a + b, 0), 0);
+    const correct = Object.keys(CATEGORY).reduce((acc, c) => acc + EXPECTED[c].reduce((t, d) => t + ((m.behavior[c] ?? {})[d] ?? 0), 0), 0);
+    $('fu-big').textContent = `${correct}/${m.n}`;
+    $('fu-pass').replaceChildren(el('span', { class: `pill s-${m.pass ? 'good' : 'bad'}` }, m.pass ? '통과 규칙 통과' : '통과 규칙 미달'));
+    $('fu-bars').replaceChildren(...Object.keys(CATEGORY).filter(c => Object.keys(m.behavior[c] ?? {}).length).map(c => {
+      const total = Object.values(m.behavior[c]).reduce((a, b) => a + b, 0);
+      const ok = EXPECTED[c].reduce((t, d) => t + (m.behavior[c][d] ?? 0), 0);
+      return el('div', { class: 'bar-row', style: 'grid-template-columns: 110px 1fr 44px' }, el('span', {}, SHORT[c]),
+        el('div', { class: 'bar-track' }, el('div', { class: 'bar-fill', style: `width:${ok / total * 100}%` })), el('span', {}, `${ok}/${total}`));
+    }));
     $('fu-tiles').replaceChildren(
       el('div', { class: 'stat' }, el('div', { class: 'label' }, '답하면 안 되는데 답함'),
         el('div', { class: 'value' }, `${m.answeredButShouldNot}/${unsafeTotal}`), el('div', { class: 'note' }, '목표 0')),
