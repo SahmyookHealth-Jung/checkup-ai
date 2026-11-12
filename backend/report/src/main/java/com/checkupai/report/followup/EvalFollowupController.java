@@ -30,8 +30,10 @@ public class EvalFollowupController {
      * @param report 고정한 추출 결과의 report (평가 API와 같은 모양)
      * @param itemCodes 화면에서 고른 항목. 비우면 질문과 결과지로 정한다
      * @param budgetChars 비우면 설정값
+     * @param ranking 범위 안 순위 방식. 비우면 서비스와 같은 BM25 (벡터는 비교 평가용)
      */
-    public record ContextRequest(CheckupReport report, String question, List<ItemCode> itemCodes, Integer budgetChars) {
+    public record ContextRequest(CheckupReport report, String question, List<ItemCode> itemCodes, Integer budgetChars,
+                                 FollowupContextBuilder.Ranking ranking) {
     }
 
     private final FollowupContextBuilder builder;
@@ -54,6 +56,7 @@ public class EvalFollowupController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "question이 없다");
         }
         int budget = request.budgetChars() == null ? properties.budgetChars() : request.budgetChars();
-        return builder.build(request.report(), request.question(), request.itemCodes(), budget);
+        return builder.build(request.report(), request.question(), request.itemCodes(), budget,
+                request.ranking() == null ? FollowupContextBuilder.Ranking.BM25 : request.ranking());
     }
 }

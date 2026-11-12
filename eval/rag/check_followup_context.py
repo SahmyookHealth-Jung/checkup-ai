@@ -65,8 +65,8 @@ def main() -> None:
             body = {"report": report, "question": g["question"]}
             if mode == "selected" and g.get("itemCodes"):
                 body["itemCodes"] = g["itemCodes"]
-            vector = post(args.api, body | {"budgetChars": args.budget})
-            whole = post(args.api, body | {"budgetChars": HUGE})
+            vector = post(args.api, body | {"budgetChars": args.budget, "ranking": "VECTOR"})
+            whole = post(args.api, body | {"budgetChars": HUGE, "ranking": "VECTOR"})
             ranked = pack(bm25_rank(whole["query"], whole["rankedUnits"]), args.budget)
             contexts = {"vector": vector["fixedUnits"] + vector["rankedUnits"], "bm25": whole["fixedUnits"] + ranked}
             ids = {k: {u["id"] for u in v} for k, v in contexts.items()}

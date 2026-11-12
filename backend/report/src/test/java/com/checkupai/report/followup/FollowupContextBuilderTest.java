@@ -9,6 +9,7 @@ import com.checkupai.report.extraction.ReportItem;
 import com.checkupai.report.followup.FollowupContextBuilder.ContextUnit;
 import com.checkupai.report.followup.FollowupContextBuilder.FollowupContext;
 import com.checkupai.report.followup.FollowupContextBuilder.ItemSource;
+import com.checkupai.report.followup.FollowupContextBuilder.Ranking;
 import com.checkupai.report.retrieval.GuidelineCorpus;
 import com.checkupai.report.retrieval.GuidelineProperties;
 import com.checkupai.report.retrieval.GuidelineSearch;
@@ -68,7 +69,7 @@ class FollowupContextBuilderTest {
     @Test
     @DisplayName("고른 항목이 있으면 그 항목의 문서만 범위로 하고, 기준표 행은 결과지 주의 항목까지 넣는다")
     void selectedItemNarrowsScopeButKeepsFlaggedRows() {
-        FollowupContext context = builder.build(report(), "이거 무슨 뜻이에요?", List.of(ItemCode.EGFR), 20000);
+        FollowupContext context = builder.build(report(), "이거 무슨 뜻이에요?", List.of(ItemCode.EGFR), 20000, Ranking.VECTOR);
 
         assertThat(context.itemSource()).isEqualTo(ItemSource.SELECTED);
         assertThat(context.textItems()).containsExactly(ItemCode.EGFR);
@@ -79,17 +80,17 @@ class FollowupContextBuilderTest {
     }
 
     @Test
-    @DisplayName("절 점수는 청크 점수의 최댓값이고, 예산을 넘는 절은 건너뛰고 다음 절을 채운다")
+    @DisplayName("벡터 순위: 절 점수는 청크 점수의 최댓값이고, 예산을 넘는 절은 건너뛰고 다음 절을 채운다")
     void packsSectionsWithinBudget() {
-        FollowupContext context = builder.build(report(), "콩팥이 안 좋은 건가요?", null, 200);
+        FollowupContext context = builder.build(report(), "콩팥이 안 좋은 건가요?", null, 200, Ranking.VECTOR);
 
         assertThat(context.itemSource()).isEqualTo(ItemSource.MENTIONED);
         // 증상 절(0.7, 900자 넘음)은 예산 200자를 넘어 건너뛰고 개요-종류(0.6)를 넣는다
         assertThat(ids(context.rankedUnits())).containsExactly("kdca-5457#개요-종류");
         assertThat(context.rankedChars()).isLessThanOrEqualTo(200);
-        ContextUnit symptoms = builder.build(report(), "콩팥", null, 20000).rankedUnits().getFirst();
+        ContextUnit symptoms = builder.build(report(), "콩팥", null, 20000, Ranking.VECTOR).rankedUnits().getFirst();
         assertThat(symptoms.id()).isEqualTo("kdca-5457#증상");
-        assertThat(symptoms.score()).isEqualTo(0.7);
+        assertThat(symptoms.vectorScore()).isEqualTo(0.7);
         assertThat(symptoms.text()).startsWith("[만성콩팥병 | 증상]").endsWith("빈혈도 생긴다")
                 .containsOnlyOnce("[만성콩팥병 | 증상]");  // 머리말은 한 번만
     }
@@ -106,6 +107,20 @@ class FollowupContextBuilderTest {
         assertThat(none.itemSource()).isEqualTo(ItemSource.NONE);
         assertThat(none.fixedUnits()).isEmpty();
         assertThat(ids(none.rankedUnits())).contains("kdca-6715#개요-정의", "kdca-1104#증상");
+    }
+
+    @Test
+    @DisplayName("서비스 순위는 BM25다: 질문의 글자와 겹치는 절이 벡터 점수가 낮아도 앞에 온다. 겹치는 글자가 없으면 벡터 순서다")
+    void bm25RanksByCharacterOverlap() {
+        // 벡터는 증상(0.7)을 개요-종류(0.6)보다 앞에 두지만, 질문의 "단계"는 개요-종류("3b단계")에만 있다
+        FollowupContext context = builder.build(report(), "몇 단계예요?", List.of(ItemCode.EGFR), 20000);
+        assertThat(context.ranking()).isEqualTo(Ranking.BM25);
+        assertThat(ids(context.rankedUnits())).containsExactly("kdca-5457#개요-종류", "kdca-5457#증상");
+        assertThat(context.rankedUnits().getFirst().score()).isPositive();
+
+        // "어때요"는 어느 절과도 겹치지 않는다(항목 이름 "신사구체여과율(eGFR)"도 절 글자와 겹치지 않게 만든 청크다)
+        FollowupContext noOverlap = builder.build(report(), "어때요", List.of(ItemCode.EGFR), 20000);
+        assertThat(ids(noOverlap.rankedUnits())).containsExactly("kdca-5457#증상", "kdca-5457#개요-종류");
     }
 
     @Test
