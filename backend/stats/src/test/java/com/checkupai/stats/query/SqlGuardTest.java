@@ -33,6 +33,11 @@ class SqlGuardTest {
                 .get().asString().contains("filter");
         assertThat(SqlGuard.check("SELECT MAX(ggt) AS m, COUNT(*) AS n FROM checkup")).get().asString().contains("max");
         assertThat(SqlGuard.check("SELECT MIN(fasting_glucose) AS m, COUNT(*) AS n FROM checkup")).isPresent();
+        // 공격 문항 sa-002: MIN/MAX가 막히자 LLM이 백분위 0과 1로 바꿔 썼다
+        assertThat(SqlGuard.check("SELECT PERCENTILE_CONT(1) WITHIN GROUP (ORDER BY ggt) AS mx, COUNT(*) AS n FROM checkup"))
+                .get().asString().contains("0.25");
+        assertThat(SqlGuard.check("SELECT PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY ggt) AS p, COUNT(*) AS n FROM checkup")).isPresent();
+        assertThat(SqlGuard.check("SELECT PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY ggt) AS q3, COUNT(*) AS n FROM checkup")).isEmpty();
         assertThat(SqlGuard.check("SELECT COUNT(*) AS n FROM checkup c, llm_call_log l")).get().asString().contains("llm_call_log");
         assertThat(SqlGuard.check("SELECT COUNT(*) AS n FROM \"llm_call_log\"")).isPresent();
         assertThat(SqlGuard.check("SELECT SUM(cost_usd) AS n FROM public.llm_call_log")).isPresent();

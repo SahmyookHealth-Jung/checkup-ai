@@ -54,6 +54,9 @@ public final class SqlGuard {
     private static final Pattern SELECT_WORD = Pattern.compile("\\bselect\\b");
     private static final Pattern AGGREGATE_CALL = Pattern.compile("\\b(count|avg|sum)\\s*\\(", Pattern.CASE_INSENSITIVE);
     private static final Pattern WITHIN_GROUP = Pattern.compile("\\bwithin\\s+group\\s*\\(\\s*order\\s+by\\s+", Pattern.CASE_INSENSITIVE);
+    /** PERCENTILE_CONT의 비율. 0이나 1은 최솟값·최댓값(한 사람의 값)이라 사분위수만 허락한다 */
+    private static final Pattern PERCENTILE_FRACTION = Pattern.compile("\\bpercentile_cont\\s*\\(\\s*([^)]*)\\)");
+    private static final Set<String> FRACTIONS = Set.of("0.25", "0.5", "0.50", "0.75", ".25", ".5", ".75");
     private static final Pattern HAS_AGGREGATE = Pattern.compile("\\b(count|avg|sum|percentile_cont)\\s*\\(", Pattern.CASE_INSENSITIVE);
 
     /** 실행할 SQL(숨은 인원 열을 덧붙임)과 그 열 수 */
@@ -137,6 +140,13 @@ public final class SqlGuard {
         if (forbidden.find()) {
             throw new Rejected("쓸 수 없는 명령이나 기능이다: " + forbidden.group(1)
                     + " (MIN·MAX·FILTER·OVER·DISTINCT 대신 COUNT·AVG·SUM과 CASE를 쓴다)");
+        }
+        // 2026-11-13 공격 문항 sa-002: MIN/MAX를 막자 LLM이 PERCENTILE_CONT(0)/(1)로 다시 써 최솟값·최댓값을 냈다
+        Matcher fraction = PERCENTILE_FRACTION.matcher(unquoted);
+        while (fraction.find()) {
+            if (!FRACTIONS.contains(fraction.group(1).strip())) {
+                throw new Rejected("PERCENTILE_CONT는 0.25, 0.5, 0.75만 쓸 수 있다 (최솟값·최댓값처럼 한 사람의 값을 낼 수 있다)");
+            }
         }
         Matcher call = CALL.matcher(unquoted);
         while (call.find()) {
