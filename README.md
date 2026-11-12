@@ -2,7 +2,7 @@
 
 건강검진 결과지를 읽어 국가건강검진 기준으로 판정하고, 공개 문서를 근거로 출처를 붙여 해설하는 AI 서비스다. 진단은 하지 않는다.
 
-> **진행 중인 포트폴리오 프로젝트(초안 README, 2026-11-12).** 아래 수치는 모두 합성 결과지로 잰 값이다. 빈칸은 다음 단계에서 채운다. 진행 기록은 [개발 일지](docs/devlog.md), 설계 결정은 [ADR](docs/adr/)에 있다.
+> **진행 중인 포트폴리오 프로젝트(README, 2026-11-12).** 아래 수치는 모두 합성 결과지로 잰 값이다. 목표를 못 채운 것도 그대로 적었다. 진행 기록은 [개발 일지](docs/devlog.md), 설계 결정은 [ADR](docs/adr/)에 있다.
 
 **설계 원칙:** LLM은 결과지의 값을 베끼고, 근거가 있는 곳에서만 문장을 쓴다. 받아들일지와 판정, 고지와 진료 권고는 코드가 정한다. LLM을 어디에 쓰고 어디에 쓰지 않을지는 측정으로 정했다.
 
@@ -61,7 +61,12 @@ cd backend && ./gradlew :app:bootRun
 curl localhost:8080/actuator/health
 ```
 
-- 화면: http://localhost:8080 (합성 샘플 결과지로 추출 → 판정 → 해설을 확인한다)
+- 화면: http://localhost:8080 ([ADR 0012](docs/adr/0012-화면-개편과-데모-예산.md))
+  - 소개 `/`: 무엇을 하고 하지 않는지, 대표 수치와 한계
+  - 해설 데모 `/demo.html`: 합성 샘플 결과지로 추출 → 판정 → 해설, 그리고 후속 질문
+  - 품질 `/quality.html`: 평가 기록(실패 포함). 평가를 새로 돌리면 `(cd eval && .venv/bin/python build_dashboard_data.py)`로 데이터를 다시 만든다
+  - 운영 `/ops.html`: LLM 호출 기록의 기능별·날짜별 호출, 비용, 지연
+- 데모 하루 예산: 오늘 LLM 비용이 `checkupai.llm.budget.daily-usd`(기본 $0.20) 이상이면 데모 호출을 429로 막는다. 0이면 끈다
 - 오프라인 모드(로컬 모델, 데이터를 밖으로 보내지 않음): `ollama pull qwen3:4b` 후 `SPRING_PROFILES_ACTIVE=offline ./gradlew :app:bootRun`. Intel CPU에서는 결과지 하나에 약 5분이 걸린다.
 - 평가 명령은 [CLAUDE.md](CLAUDE.md)의 "명령어"에 있다. 평가 결과는 `eval/results/`에 커밋 해시와 함께 남는다.
 

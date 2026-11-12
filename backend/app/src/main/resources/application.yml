@@ -68,6 +68,9 @@ checkupai:
     pricing:
       claude-haiku-5-5: { input: 0.10, output: 0.50 }
       "[qwen3:4b]": { input: 0, output: 0 }
+    budget:
+      # 데모 하루 예산 (ADR 0012 3절). 오늘 LLM 비용 합이 이 값 이상이면 데모 호출을 429로 막는다. 0이면 끈다
+      daily-usd: ${DEMO_DAILY_BUDGET_USD:0.20}
   guidelines:
     # 해설 근거 청크 파일 (eval/rag/build_chunks.py가 만든다). bootRun의 작업 폴더는 backend/app이다
     chunks-file: ${GUIDELINE_CHUNKS_FILE:../../data/guidelines/chunks/chunks.jsonl}
