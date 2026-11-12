@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>근거 청크 라벨링</title>
+<!-- 템플릿. followup_evidence.py form이 __DATA__ 자리에 정답셋과 청크를 넣어 eval/.cache/labeling/에 화면을 만든다 (근거 원문이 들어가므로 커밋하지 않는다) -->
+<style>
+:root {
+  --bg: #f7f7f5; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6b66; --line: #e2e1dc;
+  --accent: #2f5bd3; --accent-ink: #ffffff; --soft: #eef2fc; --warn: #b4441c; --ok: #2d7a46; --amber: #9a6a00; --pick: #e7f4ea;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161615; --panel: #1f1f1d; --ink: #ecebe6; --muted: #a09f98; --line: #34332f;
+    --accent: #7c9bf0; --accent-ink: #10131c; --soft: #232a3d; --warn: #ec8a63; --ok: #6cc58a; --amber: #e0b44f; --pick: #1d3324;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+header { position: sticky; top: 0; z-index: 3; background: var(--bg); border-bottom: 1px solid var(--line); padding: 10px 16px; }
+.bar { max-width: 1280px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.bar h1 { font-size: 16px; margin: 0; }
+.muted { color: var(--muted); font-size: 13px; }
+.spacer { flex: 1; }
+button, .filebtn { font: inherit; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.layout { max-width: 1280px; margin: 0 auto; padding: 16px; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 16px; }
+@media (max-width: 860px) { .layout { grid-template-columns: 1fr; } nav { max-height: 200px; } }
+nav { position: sticky; top: 64px; align-self: start; max-height: calc(100vh - 80px); overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 6px; }
+nav button { display: block; width: 100%; text-align: left; border: 0; border-radius: 6px; padding: 6px 8px; font-size: 13px; background: none; }
+nav button.current { background: var(--soft); }
+nav .done::before { content: "● "; color: var(--ok); }
+nav .todo::before { content: "○ "; color: var(--muted); }
+nav .none::before { content: "◌ "; color: var(--amber); }
+section { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+.question { font-size: 19px; margin: 4px 0 8px; }
+.tag { display: inline-block; font-size: 12px; border-radius: 6px; padding: 0 6px; margin-right: 4px; background: var(--soft); }
+.j-SUSPECT { color: var(--warn); font-weight: 600; }
+.j-NORMAL_B { color: var(--amber); font-weight: 600; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin-top: 10px; }
+input[type=text], input[type=search] { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; }
+.note { flex: 1; min-width: 200px; }
+.picked { margin-top: 8px; font-size: 13px; }
+h3.doc { font-size: 15px; margin: 18px 0 6px; }
+.chunk { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin: 8px 0; display: grid; grid-template-columns: auto 1fr; gap: 10px; cursor: pointer; }
+.chunk.on { background: var(--pick); border-color: var(--ok); }
+.chunk .id { font-size: 12px; color: var(--muted); }
+.chunk .text { white-space: pre-wrap; }
+.nav-row { display: flex; gap: 8px; margin-top: 12px; }
+.status { color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <h1>근거 청크 라벨링</h1>
+    <span class="muted" id="progress"></span>
+    <span class="spacer"></span>
+    <span class="status" id="status"></span>
+    <label class="filebtn">불러오기<input type="file" id="import" accept="application/json" hidden></label>
+    <button class="primary" id="export">내려받기</button>
+  </div>
+</header>
+<div class="layout">
+  <nav id="nav"></nav>
+  <main>
+    <section>
+      <div class="muted">질문마다 답의 근거가 되는 청크를 모두 고른다. 일부만 뒷받침해도 고른다. 근거가 정말 없으면 "근거 없음". 답 불가 문항은 근거가 정말 없는지 확인한다.</div>
+      <div id="meta" style="margin-top:8px"></div>
+      <p class="question" id="question"></p>
+      <div id="context" class="muted"></div>
+      <div class="controls">
+        <label><input type="checkbox" id="noEvidence"> 근거 없음</label>
+        <label><input type="checkbox" id="allDocs"> 전체 문서 보기</label>
+        <input type="search" id="search" placeholder="청크 안에서 찾기">
+        <input type="text" class="note" id="note" placeholder="메모 (선택)">
+      </div>
+      <div class="picked" id="picked"></div>
+      <div class="nav-row"><button id="prev">← 이전</button><button id="next" class="primary">다음 →</button></div>
+    </section>
+    <section id="chunks"></section>
+  </main>
+</div>
+<script>
+const DATA = __DATA__;
+const STORE = `checkup-ai:${DATA.set}:evidence:${DATA.chunksSha256}`;
+const $ = (id) => document.getElementById(id);
+const el = (tag, props = {}, ...kids) => { const n = Object.assign(document.createElement(tag), props); n.append(...kids); return n; };
+const JUDGMENT = { SUSPECT: "질환의심", NORMAL_B: "정상B(경계)" };
+let labels = {};
+try { labels = JSON.parse(localStorage.getItem(STORE) || "{}"); } catch (e) { labels = {}; }
+const save = () => { try { localStorage.setItem(STORE, JSON.stringify(labels)); }
+  catch (e) { $("status").textContent = "자동 저장이 안 됩니다. 자주 내려받아 주세요"; } };
+let index = 0;
+const q = () => DATA.questions[index];
+const label = () => (labels[q().id] ||= { chunks: [], noEvidence: false, note: "" });
+const isDone = (id) => labels[id] && (labels[id].noEvidence || labels[id].chunks.length > 0);
+
+function renderNav() {
+  $("nav").replaceChildren(...DATA.questions.map((x, i) => {
+    const l = labels[x.id];
+    const cls = !isDone(x.id) ? "todo" : l.noEvidence ? "none" : "done";
+    const b = el("button", { className: `${cls}${i === index ? " current" : ""}`,
+      textContent: `${x.id} ${DATA.categories[x.category]} · ${x.question.slice(0, 18)}` });
+    b.onclick = () => { index = i; render(); };
+    return b;
+  }));
+  const done = DATA.questions.filter((x) => isDone(x.id)).length;
+  $("progress").textContent = `${done} / ${DATA.questions.length} 완료`;
+}
+
+function render() {
+  const x = q(), l = label();
+  $("meta").replaceChildren(el("span", { className: "tag", textContent: x.id }),
+    el("span", { className: "tag", textContent: DATA.categories[x.category] }),
+    ...(x.topic ? [el("span", { className: "tag", textContent: DATA.topics[x.topic] })] : []),
+    el("span", { className: "tag", textContent: x.split === "test" ? "시험" : "개발" }),
+    el("span", { className: "tag", textContent: x.author === "user" ? "직접" : "Claude 초안" }));
+  $("question").textContent = x.question;
+  $("context").replaceChildren(
+    x.report ? `${x.report} · 주의 항목: ` : "결과지 없음",
+    ...(x.flagged || []).flatMap((i, n) => [n ? ", " : "", el("span", { className: `j-${i.judgment}`, textContent: `${i.name} ${i.value} ${i.unit} (${JUDGMENT[i.judgment]})` })]),
+    x.itemCodes?.length ? ` · 질문 항목: ${x.itemCodes.join(", ")}` : "",
+    x.revision ? ` · 수정 이력: ${x.revision}` : "");
+  $("noEvidence").checked = l.noEvidence;
+  $("note").value = l.note || "";
+  $("allDocs").checked = !x.candidateDocs.length || $("allDocs").dataset.forced === "1";
+  renderChunks(); renderNav();
+}
+
+function renderChunks() {
+  const x = q(), l = label();
+  const all = $("allDocs").checked || !x.candidateDocs.length;
+  const docs = all ? Object.keys(DATA.docs) : x.candidateDocs;
+  const term = $("search").value.trim();
+  const box = $("chunks"); box.replaceChildren();
+  for (const doc of docs) {
+    const items = DATA.chunks.filter((c) => c.doc === doc && (!term || c.text.includes(term)));
+    if (!items.length) continue;
+    box.append(el("h3", { className: "doc", textContent: `${DATA.docs[doc]} (${doc}) · ${items.length}개` }));
+    for (const c of items) {
+      const on = l.chunks.includes(c.id);
+      const check = el("input", { type: "checkbox", checked: on });
+      const card = el("div", { className: "chunk" + (on ? " on" : "") }, check,
+        el("div", {}, el("div", { className: "id", textContent: `${c.id} · ${c.section}` }), el("div", { className: "text", textContent: c.text })));
+      card.onclick = (event) => {
+        if (event.target.tagName !== "INPUT") check.checked = !check.checked;
+        const set = new Set(l.chunks);
+        if (check.checked) set.add(c.id); else set.delete(c.id);
+        l.chunks = [...set]; if (l.chunks.length) l.noEvidence = false;
+        card.classList.toggle("on", check.checked); $("noEvidence").checked = l.noEvidence;
+        save(); renderPicked(); renderNav();
+      };
+      box.append(card);
+    }
+  }
+  if (!box.children.length) box.append(el("p", { className: "muted", textContent: "보이는 청크가 없습니다. 찾기 말을 지우거나 전체 문서 보기를 켜세요" }));
+  renderPicked();
+}
+function renderPicked() {
+  const l = label();
+  $("picked").textContent = l.noEvidence ? "근거 없음" : l.chunks.length ? `고른 청크 ${l.chunks.length}개: ${l.chunks.join(", ")}` : "아직 고르지 않음";
+}
+
+$("noEvidence").onchange = () => { const l = label(); l.noEvidence = $("noEvidence").checked; if (l.noEvidence) l.chunks = []; save(); renderChunks(); renderNav(); };
+$("note").oninput = () => { label().note = $("note").value; save(); };
+$("allDocs").onchange = () => { $("allDocs").dataset.forced = $("allDocs").checked ? "1" : "0"; renderChunks(); };
+$("search").oninput = renderChunks;
+$("prev").onclick = () => { if (index > 0) { index--; $("search").value = ""; render(); window.scrollTo(0, 0); } };
+$("next").onclick = () => { if (index < DATA.questions.length - 1) { index++; $("search").value = ""; render(); window.scrollTo(0, 0); } };
+
+$("export").onclick = () => {
+  const out = { set: DATA.set, chunksSha256: DATA.chunksSha256, exportedAt: new Date().toISOString(), labels };
+  el("a", { href: URL.createObjectURL(new Blob([JSON.stringify(out, null, 2)], { type: "application/json" })),
+    download: `${DATA.set}.evidence.json` }).click();
+};
+$("import").onchange = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+  const doc = JSON.parse(await file.text());
+  if (doc.chunksSha256 !== DATA.chunksSha256 && !confirm("청크 파일이 라벨링 때와 다릅니다. 그래도 불러올까요?")) return;
+  labels = doc.labels || {}; save(); render();
+  $("status").textContent = `${Object.keys(labels).length}문항의 라벨을 불러왔습니다`;
+  event.target.value = "";
+};
+render();
+</script>
+</body>
+</html>
