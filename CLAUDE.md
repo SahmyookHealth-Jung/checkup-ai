@@ -43,7 +43,7 @@ cd backend && ./gradlew build              # 컴파일 + 단위 테스트 (외�
 (cd ../eval && .venv/bin/python -m rag.build_chunks)        # 해설 근거 청크 만들기 → 앱에서 POST /api/guidelines/reload
 (cd ../eval && .venv/bin/python -m rag.run_retrieval_eval)  # 검색 평가 (앱이 떠 있어야 함)
 (cd ../eval && .venv/bin/python -m rag.freeze_extractions)  # heldout 30개 추출을 eval/frozen/에 고정 (Haiku 30회, 캐시 있으면 0회)
-(cd ../eval && .venv/bin/python -m rag.run_explanation_eval --label <이름>)  # 고정한 추출로 해설만 30개 x 2회 (Haiku 60회 약 $0.10)
+(cd ../eval && .venv/bin/python -m rag.run_explanation_eval --label <이름>)  # 고정한 추출로 해설만 30개 x 2회 (Haiku 54~60회, 조회 경로에서 약 $0.05)
 (cd ../eval && .venv/bin/python -m rag.build_calibration_set)  # 충실도 보정셋 50문장 + 라벨링 화면(eval/.cache/labeling/, 커밋 안 함)
 (cd ../eval && .venv/bin/python -m rag.run_faithfulness_judge --calibration calibration-v1 --setting off --repeats 3)  # 충실도 채점 (Sonnet 5.5, 호출당 약 $0.006)
 (cd ../eval && .venv/bin/python -m rag.calibration_agreement --judge results/faithfulness/<runId>.json)  # 채점기와 사람 라벨의 κ
@@ -98,7 +98,7 @@ checkup-ai/
 - DB
   - 테이블과 컬럼은 snake_case로 짓는다.
   - 스키마는 Flyway(`app/src/main/resources/db/migration/V{n}__{설명}.sql`)로만 바꾼다.
-- LLM을 호출하는 모든 코드는 토큰, 비용, 지연시간을 기록한다. 기록 방식은 `core`에 둔다(3단계에서 구현).
+- LLM을 호출하는 모든 코드는 토큰, 비용, 지연시간을 기록한다. 기록 방식은 `core`에 둔다(`LlmCallLoggingAdvisor`, 테이블 `llm_call_log`).
 
 ## 의료 가드레일 원칙
 

@@ -35,7 +35,7 @@ public final class ExplanationGuardrails {
     public static final String NO_EVIDENCE = "이 항목을 설명할 근거를 공개 문서에서 찾지 못했습니다.";
 
     /**
-     * 원칙 1·5: 진단 단정과 치료 지시. 4단계에서는 막지 않고 위반 건수만 기록한다 (5단계에서 공격 질문 세트로 잰다).
+     * 원칙 1·5: 진단 단정과 치료 지시. 막지 않고 위반 건수만 기록한다. 이 검사의 재현율은 ADR 0010 순서 7(질문 가드레일 시험)에서 잰다.
      * 판정 구분 이름("질환의심")과 근거 문장의 일반 설명은 걸리지 않게 단정·지시 형태만 본다.
      */
     static final List<Pattern> FORBIDDEN = List.of(

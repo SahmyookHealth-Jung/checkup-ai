@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 /**
  * 업로드된 결과지 파일을 LLM에 넘길 텍스트로 바꾼다.
  *
- * <p>지원 형식: 텍스트(.txt), 글자 층이 있는 PDF. 이미지(스캔)는 3주차 이후 지원 (ADR 0003).
+ * <p>지원 형식: 텍스트(.txt), 글자 층이 있는 PDF. 이미지(스캔)는 지원하지 않는다 (ADR 0003, 한계).
  */
 @Component
 public class ReportTextReader {

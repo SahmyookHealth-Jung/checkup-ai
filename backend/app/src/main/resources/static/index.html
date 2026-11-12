@@ -48,7 +48,7 @@
 <body>
 <main>
   <h1>검진 결과 해설 <span class="tag">합성 데이터 데모</span></h1>
-  <p class="sub">합성 결과지를 골라 추출 → 국가건강검진 기준 판정 → 공개 문서 근거 검색 → 출처 붙은 해설 순서를 확인합니다. 실제 결과지는 올리지 마세요.</p>
+  <p class="sub">합성 결과지를 골라 추출 → 국가건강검진 기준 판정 → 항목별 근거 조회 → 출처 붙은 해설 순서를 확인합니다. 실제 결과지는 올리지 마세요.</p>
   <div class="disclaimer" id="disclaimer">이 내용은 의료 진단이 아니며, 정확한 판단은 의료진과 상담하세요.</div>
 
   <div class="controls">
@@ -126,7 +126,7 @@
       el('p', {}, c.text), el('p', {}, `이용 조건: ${c.license ?? '-'}`))));
     const m = x.metrics;
     $('metrics').textContent = `해설 대상 ${m.targets}개 (근거 있음 ${m.targetsWithEvidence}) · 문장 ${m.sentencesKept}/${m.sentencesGenerated} 통과`
-      + ` · 검색 ${m.retrievalMs}ms · 생성 ${m.llmMs}ms · 전체 ${m.totalMs}ms` + (m.llmError ? ` · 생성 실패 ${m.llmError}` : '');
+      + ` · 근거 조회 ${m.retrievalMs}ms · 생성 ${m.llmMs}ms · 전체 ${m.totalMs}ms` + (m.llmError ? ` · 생성 실패 ${m.llmError}` : '');
     $('result').hidden = false;
   }
 
