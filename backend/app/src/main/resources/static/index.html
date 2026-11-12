@@ -6,117 +6,96 @@
 <title>검진 결과 해설 AI</title>
 <link rel="stylesheet" href="/app.css">
 <style>
-  .banner { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 24px; align-items: center;
-            background: linear-gradient(180deg, var(--card) 0%, var(--card) 100%); border-radius: 8px; padding: 28px 28px; }
-  .banner h1 { font-size: 28px; font-weight: 700; }
-  .banner p { font-size: 15px; color: var(--muted); max-width: 620px; }
-  .banner .cta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
-  .banner aside { border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; font-size: 13px; }
-  .banner aside b { display: block; font-size: 15px; margin-bottom: 4px; }
-  .banner aside li { margin: 3px 0; }
-  .product { background: var(--card); border-radius: 8px; padding: 16px 18px; display: flex; flex-direction: column; gap: 4px; }
-  .product .cat { font-size: 12px; color: var(--muted); }
-  .product h3 { font-size: 16px; font-weight: 500; margin: 0; }
-  .product .price { font-size: 26px; font-weight: 500; margin-top: 4px; }
-  .product .price small { font-size: 13px; color: var(--muted); margin-left: 4px; }
-  .product p { font-size: 13px; color: var(--muted); margin: 2px 0 8px; }
-  .product .more { margin-top: auto; font-size: 13px; }
-  .steps { display: grid; gap: 12px; grid-template-columns: repeat(6, 1fr); }
-  .grid.four { grid-template-columns: repeat(4, 1fr); }
-  @media (max-width: 900px) { .steps { grid-template-columns: repeat(3, 1fr); } .grid.four { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 520px) { .steps, .grid.four { grid-template-columns: 1fr 1fr; } }
-  .step { background: var(--card); border-radius: 8px; padding: 12px 14px; font-size: 13px; }
-  .step b { display: block; font-size: 14px; margin: 4px 0 2px; }
-  .badge-llm { background: #232f3e; color: #fff; }
-  .badge-code { background: var(--soft); color: var(--muted); border: 1px solid var(--line); }
-  @media (max-width: 760px) { .banner { grid-template-columns: 1fr; } }
+  .hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 48px; align-items: start; padding-top: 24px; }
+  .hero h1 { margin-top: 12px; }
+  .hero .actions { display: flex; gap: 8px; margin-top: 24px; flex-wrap: wrap; }
+  .sample { background: var(--bg-2); border-radius: 8px; padding: 20px; font-size: 14px; }
+  .sample .head { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .sample table { margin-bottom: 14px; }
+  .sample td { padding: 6px 10px 6px 0; font-size: 13px; }
+  .sample .say { border-left: 2px solid var(--line-2); padding-left: 12px; margin: 12px 0; }
+  .sample .src { font-size: 12px; color: var(--muted); }
+  .sample .q { font-weight: 600; margin-top: 14px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  .two ul { margin: 8px 0; padding-left: 18px; } .two li { margin: 8px 0; }
+  .two li b { font-variant-numeric: tabular-nums; }
+  .who { display: grid; grid-template-columns: 1fr 2fr; gap: 40px; }
+  .who ol { margin: 8px 0; padding-left: 20px; } .who li { margin: 6px 0; }
+  @media (max-width: 760px) { .hero, .two, .who { grid-template-columns: 1fr; gap: 24px; } }
 </style>
 </head>
 <body>
-<nav class="nav"><div>
-  <a class="brand" href="/" aria-current="page">검진 결과 해설 AI<small>합성 데이터 데모 · 진단하지 않음</small></a>
-  <span class="spacer"></span>
-  <a href="/demo.html"><small>결과지 고르고</small>해설 데모</a><a href="/quality.html"><small>평가 기록·실패 포함</small>품질</a><a href="/ops.html"><small>비용·지연</small>운영</a>
-</div></nav>
-<div class="subnav"><div>
-  <a href="/">소개</a><a href="/demo.html">판정 해설</a><a href="/demo.html#followup">후속 질문</a><a href="/quality.html">대표 수치</a><a href="/quality.html#followup">후속 질문 평가</a><a href="/ops.html">LLM 비용·지연</a>
-</div></div>
+<nav class="nav"><div><a class="brand" href="/" aria-current="page">검진 결과 해설</a><a href="/demo.html">해설 데모</a><a href="/quality.html">품질</a><a href="/ops.html">운영</a></div></nav>
 <main>
-  <section class="banner">
+  <section class="hero">
     <div>
-      <span class="tag">합성 데이터 데모</span>
-      <h1>검진 결과지를 올리면, 국가 기준으로 판정하고 근거와 함께 설명합니다</h1>
-      <p>LLM은 결과지의 값을 베끼고 근거가 있는 곳에서만 문장을 씁니다. 판정, 진료 권고, 고지는 코드가 정합니다. 진단은 하지 않습니다.</p>
-      <div class="cta">
-        <button type="button" onclick="location.href='/demo.html'">샘플 결과지로 해설 보기</button>
-        <button type="button" class="alt" onclick="location.href='/quality.html'">품질 수치 보기</button>
+      <p class="kicker">합성 데이터로 만든 포트폴리오 · 2026</p>
+      <h1>검진 결과지를 읽고, 국가 기준으로 판정하고, 근거가 있는 말만 합니다</h1>
+      <p class="sub">처음 보는 양식의 결과지 30장에서 수치 추출 F1 0.995, 위험 수치 진료 권고 73/73. 판정과 권고는 코드가 하고, LLM은 값을 베끼고 출처가 붙은 문장만 씁니다. 진단은 하지 않습니다.</p>
+      <div class="actions">
+        <button type="button" onclick="location.href='/demo.html'">샘플로 해설 보기</button>
+        <button type="button" class="alt" onclick="location.href='/quality.html'">평가 기록 보기</button>
       </div>
     </div>
-    <aside>
-      <b>이 데모에서 할 수 있는 것</b>
-      <ul style="margin:6px 0;padding-left:18px">
-        <li>합성 샘플 20개 중 하나를 골라 해설 보기</li>
-        <li>결과지에 대해 후속 질문하기</li>
-        <li>평가 기록과 실패 확인하기</li>
-        <li>LLM 비용·지연 보기</li>
-      </ul>
-      <div class="small">데모 호출은 하루 예산 상한($0.20)을 지킵니다.</div>
-    </aside>
+    <div class="sample" aria-label="데모 실제 출력 발췌">
+      <div class="head"><span>샘플 nar-001 실제 출력</span><span>2026-11-12</span></div>
+      <table>
+        <tr><td>공복혈당</td><td class="num">206 mg/dL</td><td class="j j-SUSPECT">질환의심</td></tr>
+        <tr><td>요단백</td><td class="num">약양성(±)</td><td class="j j-NORMAL_B">정상B(경계)</td></tr>
+        <tr><td>AST</td><td class="num">125 U/L</td><td class="j j-SUSPECT">질환의심</td></tr>
+      </table>
+      <div class="say">공복혈당 206 mg/dL은 질환의심 기준인 126 이상에 해당합니다. 다만 이 결과만으로 어떤 병이 있다고 단정할 수는 없습니다.<sup>[3]</sup>
+        <div class="src">[3] 건강검진 실시기준 [별표 4] · 검사항목별 판정기준</div></div>
+      <div class="q">“제가 당뇨병인가요?”</div>
+      <div><span class="pill s-bad">진단 질문이라 답하지 않음</span></div>
+      <div class="small">어떤 병이 있는지는 이 서비스가 판단할 수 없습니다. 정확한 진단은 의료진과 상담하세요.</div>
+    </div>
   </section>
 
-  <h2>기능별로 보기</h2>
-  <div class="grid four">
-    <div class="product">
-      <span class="cat">1단계 · 추출</span><h3>결과지 수치 추출</h3>
-      <div class="price">F1 0.995<small>보고서당 $0.0012</small></div>
-      <div><span class="pill s-limit">조건 있음</span></div>
-      <p>Haiku 5.5 구조화 출력 + 원문 대조 검증. 처음 보는 양식 30개로 잼.</p>
-      <a class="more" href="/demo.html">데모에서 보기 ›</a>
+  <h2>된 것과 안 된 것</h2>
+  <div class="two">
+    <div>
+      <h3 class="good">된 것</h3>
+      <ul>
+        <li>결과지 수치 추출 <b>F1 0.995</b>. 보고서 한 장에 5초, $0.0012</li>
+        <li>위험 수치 진료 권고 <b>73/73</b>, 잘못된 권고 0</li>
+        <li>외부로 보내기 전 식별정보 <b>0/90</b> 남음</li>
+        <li>판정 해설을 벡터 검색에서 항목 코드 조회로 바꿔 비용 <b>−27%</b>, LLM 지연 6.0초 → 3.3초</li>
+      </ul>
     </div>
-    <div class="product">
-      <span class="cat">2단계 · 판정</span><h3>국가 기준 판정과 진료 권고</h3>
-      <div class="price">73/73<small>잘못된 권고 0</small></div>
-      <div><span class="pill s-good">목표 달성</span></div>
-      <p>보건복지부 고시 판정기준표로 코드가 판정하고, 위험 수치에 진료를 권합니다.</p>
-      <a class="more" href="/demo.html">데모에서 보기 ›</a>
-    </div>
-    <div class="product">
-      <span class="cat">3단계 · 해설</span><h3>출처 붙은 판정 해설</h3>
-      <div class="price">−27%<small>비용 (검색 → 조회)</small></div>
-      <div><span class="pill s-good">목표 달성</span></div>
-      <p>항목 코드로 공개 문서 절을 찾고, 인용·숫자 검증을 통과한 문장만 남깁니다.</p>
-      <a class="more" href="/demo.html">데모에서 보기 ›</a>
-    </div>
-    <div class="product">
-      <span class="cat">4단계 · 후속 질문</span><h3>결과지에 대해 묻고 답하기</h3>
-      <div class="price">2/22<small>시험에서 답하면 안 되는데 답함</small></div>
-      <div><span class="pill s-bad">목표 미달</span></div>
-      <p>진단·약 질문은 거절하도록 했지만, 질환 이름 없이 묻는 진단 질문은 놓칠 수 있습니다.</p>
-      <a class="more" href="/quality.html#followup">평가 기록 보기 ›</a>
+    <div>
+      <h3 class="bad">안 된 것</h3>
+      <ul>
+        <li>후속 질문은 시험에서 진단 질문 <b>2건</b>에 답해 통과 기준을 못 넘었습니다</li>
+        <li>진단 규칙을 더한 뒤에도 새 문항의 진단 질문 <b>8개 중 2개</b>를 놓칩니다. 질환 이름 없이 묻는 경우입니다</li>
+        <li>정답 근거를 인용해 답한 비율은 시험 <b>8~10/18</b>입니다</li>
+        <li>결과지는 모두 합성이고, 라벨러는 의료인이 아닌 개발자 1명입니다</li>
+      </ul>
+      <a href="/quality.html">평가 기록 전체 보기</a>
     </div>
   </div>
 
-  <h2>처리 순서</h2>
-  <div class="steps">
-    <div class="step"><span class="pill badge-llm">LLM</span><b>1. 추출</b>PDF에서 항목·값·단위</div>
-    <div class="step"><span class="pill badge-code">코드</span><b>2. 원문 대조</b>원문에 없는 값은 버림</div>
-    <div class="step"><span class="pill badge-code">코드</span><b>3. 기준 판정</b>고시 판정기준표</div>
-    <div class="step"><span class="pill badge-code">코드</span><b>4. 근거 조회</b>항목 코드로 문서 절</div>
-    <div class="step"><span class="pill badge-llm">LLM</span><b>5. 해설 문장</b>인용·숫자 검증 통과분만</div>
-    <div class="step"><span class="pill badge-code">코드</span><b>6. 권고·고지</b>위험 수치 진료 권고</div>
+  <h2>누가 무엇을 하나</h2>
+  <div class="who">
+    <div>
+      <h3>LLM (Claude Haiku 5.5)</h3>
+      <ol>
+        <li>결과지 PDF에서 항목·값·단위를 뽑습니다</li>
+        <li>근거 문단을 인용해 해설 문장을 씁니다</li>
+      </ol>
+    </div>
+    <div>
+      <h3>코드</h3>
+      <ol>
+        <li>뽑은 값이 원문에 있는지 대조하고, 없으면 버립니다</li>
+        <li>보건복지부 고시 판정기준표로 판정합니다</li>
+        <li>항목 코드로 공개 문서 9편에서 근거 절을 찾습니다</li>
+        <li>인용과 숫자가 근거에 있는지 검증하고, 위험 수치에 진료 권고와 고지를 붙입니다</li>
+      </ol>
+    </div>
   </div>
-
-  <h2>이용 전 확인하세요</h2>
-  <div class="warn">
-    <ul style="margin:4px 0;padding-left:18px">
-      <li><b>후속 질문은 시험 통과 규칙을 채우지 못했습니다.</b> 진단 규칙을 더한 뒤에도 새 문항의 진단 질문 8개 중 2개를 놓쳤습니다.</li>
-      <li>결과지는 모두 합성 데이터입니다. 글자 층이 있는 PDF만 다루고 스캔 이미지는 다루지 않습니다.</li>
-      <li>라벨러는 개발자 1명이고 의료인이 아닙니다. 채점기와 리뷰에 같은 계열 모델(Claude)이 많습니다.</li>
-    </ul>
-  </div>
-  <p class="small">Java 21 · Spring Boot 4 · Spring AI 2 · PostgreSQL 18 + pgvector · Claude Haiku 5.5 · Ollama(bge-m3, 오프라인 모드 qwen3:4b) · Python 평가 스크립트.
-    모든 LLM 호출은 토큰·비용·지연을 기록하고 보내기 전에 식별정보를 지웁니다.</p>
+  <p class="small" style="margin-top:40px">Java 21 · Spring Boot 4 · Spring AI 2 · PostgreSQL 18 + pgvector · Claude Haiku 5.5 · Ollama(bge-m3) · Python 평가 스크립트. 모든 LLM 호출의 토큰·비용·지연을 기록하고, 보내기 전에 식별정보를 지웁니다.</p>
 </main>
-<footer class="foot">합성 데이터로 만든 포트폴리오 데모입니다. 이 내용은 의료 진단이 아니며, 정확한 판단은 의료진과 상담하세요. · <a href="#">맨 위로</a></footer>
+<footer class="foot">합성 데이터로 만든 포트폴리오 데모입니다. 이 내용은 의료 진단이 아니며, 정확한 판단은 의료진과 상담하세요.</footer>
 </body>
 </html>

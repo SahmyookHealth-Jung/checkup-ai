@@ -6,90 +6,75 @@
 <title>해설 데모 · 검진 결과 해설 AI</title>
 <link rel="stylesheet" href="/app.css">
 <style>
-  .empty { border: 1px dashed var(--line); border-radius: 8px; padding: 18px; color: var(--muted); margin-top: 12px; }
-  .criterion { color: var(--muted); font-size: 12px; margin: 0 0 8px; }
-  #items .card { border: 1px solid var(--line); margin: 10px 0; padding: 14px 16px; }
-  .advice { border-left: 4px solid var(--s); background: var(--deal-bg); padding: 6px 10px; margin-top: 8px; border-radius: 4px; font-size: 13px; }
-  .review { border-left-color: var(--b); background: var(--amber-bg); }
-  .noevidence { color: var(--muted); font-style: italic; }
+  .summary { font-size: 15px; margin: 24px 0 12px; }
+  .summary b { font-variant-numeric: tabular-nums; }
+  .criterion { color: var(--muted); font-size: 13px; margin: 0 0 8px; }
+  #items .card { border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 20px 0; margin: 0; }
+  #items .card h3 { font-size: 17px; }
+  .advice { background: var(--s-bg); border-radius: 6px; padding: 8px 12px; margin-top: 10px; font-size: 14px; }
+  .review { background: var(--b-bg); }
+  .noevidence { color: var(--muted); }
   .metrics { color: var(--muted); font-size: 12px; margin-top: 16px; }
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
-  .chips label { font-size: 12px; cursor: pointer; white-space: nowrap; border: 1px solid var(--line); border-radius: 100px; padding: 2px 10px; background: var(--card); }
-  .chips label:has(input:checked) { border-color: #007185; background: #e7f4f5; }
-  .chips input { margin: 0 4px 0 0; padding: 0; box-shadow: none; }
-  .examples { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; }
-  #fq-answers .card { border-top: 1px solid var(--line); border-radius: 0; margin: 0; padding: 14px 0; }
-  .answer-head { display: grid; grid-template-columns: 52px 1fr; gap: 4px 8px; }
-  .answer-head b { font-size: 13px; }
-  .d-ANSWER { color: var(--good); background: var(--good-bg); }
-  .d-NO_EVIDENCE { color: var(--muted); background: var(--soft); }
-  .d-REFUSE_DIAGNOSIS, .d-REFUSE_TREATMENT, .d-MALICIOUS { color: var(--deal); background: var(--deal-bg); }
-  .sumrow { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; border-bottom: 1px solid var(--line); }
-  #summary { margin-top: 12px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; }
+  .chips label { font-size: 13px; cursor: pointer; white-space: nowrap; border: 1px solid var(--line-2); border-radius: 6px; padding: 3px 10px; background: var(--bg); }
+  .chips label:has(input:checked) { border-color: var(--accent); background: var(--accent-bg); }
+  .chips input { margin: 0 5px 0 0; padding: 0; vertical-align: -1px; }
+  .examples { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  #fq-answers .card { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 20px 0; margin: 0; }
+  .answer-head { display: grid; grid-template-columns: 40px 1fr; gap: 6px 8px; }
+  .answer-head > b { color: var(--muted); font-weight: 500; font-size: 13px; padding-top: 2px; }
+  .answer-head > a { color: var(--text); font-weight: 600; }
+  .d-ANSWER { color: var(--a); }
+  .d-NO_EVIDENCE { color: var(--muted); }
+  .d-REFUSE_DIAGNOSIS, .d-REFUSE_TREATMENT, .d-MALICIOUS { color: var(--s); }
 </style>
 </head>
 <body>
-<nav class="nav"><div>
-  <a class="brand" href="/">검진 결과 해설 AI<small>합성 데이터 데모 · 진단하지 않음</small></a>
-  <span class="spacer"></span>
-  <a href="/demo.html" aria-current="page"><small>결과지 고르고</small>해설 데모</a><a href="/quality.html"><small>평가 기록·실패 포함</small>품질</a><a href="/ops.html"><small>비용·지연</small>운영</a>
-</div></nav>
-<div class="subnav"><div>
-  <a href="/">소개</a><a href="/demo.html">판정 해설</a><a href="/demo.html#followup">후속 질문</a><a href="/quality.html">대표 수치</a><a href="/quality.html#followup">후속 질문 평가</a><a href="/ops.html">LLM 비용·지연</a>
-</div></div>
+<nav class="nav"><div><a class="brand" href="/">검진 결과 해설</a><a href="/demo.html" aria-current="page">해설 데모</a><a href="/quality.html">품질</a><a href="/ops.html">운영</a></div></nav>
 <main>
-  <p class="crumb"><a href="/">소개</a> › 해설 데모</p>
-  <div class="layout">
-    <div>
-      <div class="card">
-        <h1>검진 결과 해설</h1>
-        <p class="sub">합성 결과지를 골라 추출 → 국가건강검진 기준 판정 → 항목별 근거 조회 → 출처 붙은 해설 순서를 확인합니다. 실제 결과지는 올리지 마세요.</p>
-        <div class="empty" id="empty">오른쪽에서 샘플 결과지를 고르고 <b>해설 보기</b>를 누르세요. 처음 고른 샘플은 추출까지 10초 안팎 걸립니다.</div>
-        <section id="result" hidden>
-          <div id="review"></div>
-          <h2>결과 표</h2>
-          <div class="scroll"><table>
-            <thead><tr><th>항목</th><th>결과지 항목명</th><th>결과</th><th>결과지 판정</th><th>국가 기준 판정</th></tr></thead>
-            <tbody id="table"></tbody>
-          </table></div>
-          <h2>항목별 해설</h2>
-          <div id="items"></div>
-          <h2>출처</h2>
-          <div id="citations"></div>
-          <div class="metrics" id="metrics"></div>
-        </section>
-      </div>
+  <h1>검진 결과 해설</h1>
+  <p class="sub">합성 결과지를 하나 고르면 추출 → 국가 기준 판정 → 근거 조회 → 출처 붙은 해설까지 돌립니다. 실제 결과지는 올리지 마세요.</p>
+  <div class="controls">
+    <select id="sample" aria-label="합성 샘플 결과지"><option>불러오는 중…</option></select>
+    <button id="run" type="button">해설 보기</button>
+    <span class="status" id="status"></span>
+  </div>
+  <p class="empty small" id="empty">처음 고른 샘플은 추출까지 10초 안팎 걸립니다. 같은 샘플은 다시 추출하지 않습니다.</p>
 
-      <div class="card" id="followup" hidden>
-        <h2 style="margin-top:0">이 결과지에 대해 묻고 답하기</h2>
-        <p class="small">공개 문서 9편에서 근거를 찾아 출처와 함께 답합니다. 진단·약·치료를 정해 달라는 질문, 근거가 없는 질문에는 정해진 문구로 답합니다.</p>
-        <div class="warn small">알려진 한계: 질환 이름 없이 묻는 진단 질문(예: "콩팥이 망가지기 시작한 단계인가요?")은 거절하지 못하고 답할 수 있습니다.
-          재확인에서 진단 질문 8개 중 2개를 놓쳤습니다. <a href="/quality.html#followup">평가 기록 보기</a></div>
-        <div class="small">항목 고르기 (선택, 고르지 않으면 질문과 결과지로 정합니다)</div>
-        <div class="chips" id="fq-items"></div>
-        <div class="examples" id="fq-examples"></div>
-        <textarea id="fq-question" maxlength="300" placeholder="예: 공복혈당이 경계로 나왔는데 무슨 뜻인가요?"></textarea>
-        <div style="display:flex;gap:12px;align-items:center;margin-top:8px">
-          <button id="fq-run" type="button">질문하기</button>
-          <span class="status" id="fq-status"></span>
-        </div>
-        <div id="fq-answers"></div>
+  <section id="result" hidden>
+    <p class="summary" id="summary"></p>
+    <div id="review"></div>
+    <div class="scroll"><table>
+      <thead><tr><th>항목</th><th>결과지 항목명</th><th>결과</th><th>결과지 판정</th><th>국가 기준 판정</th></tr></thead>
+      <tbody id="table"></tbody>
+    </table></div>
+
+    <h2>항목별 해설</h2>
+    <div id="items"></div>
+    <h2>출처</h2>
+    <div id="citations"></div>
+    <p class="metrics" id="metrics"></p>
+    <p class="disclaimer" id="disclaimer">이 내용은 의료 진단이 아니며, 정확한 판단은 의료진과 상담하세요.</p>
+  </section>
+
+  <section id="followup" hidden>
+    <h2>이 결과지에 대해 묻기</h2>
+    <p class="small">공개 문서 9편에서 근거를 찾아 출처와 함께 답합니다. 진단·약·치료를 정해 달라는 질문과 근거가 없는 질문에는 정해진 문구로 답합니다.</p>
+    <p class="warn">질환 이름 없이 묻는 진단 질문(예: "콩팥이 망가지기 시작한 단계인가요?")은 거절하지 못하고 답할 수 있습니다. 재확인에서 진단 질문 8개 중 2개를 놓쳤습니다. <a href="/quality.html#followup">평가 기록</a></p>
+    <div class="panel">
+      <div class="small">항목 고르기 (선택. 고르지 않으면 질문과 결과지로 정합니다)</div>
+      <div class="chips" id="fq-items"></div>
+      <textarea id="fq-question" maxlength="300" placeholder="예: 공복혈당이 질환의심으로 나왔는데 무슨 뜻인가요?"></textarea>
+      <div class="examples" id="fq-examples"></div>
+      <div style="display:flex;gap:12px;align-items:center;margin-top:12px">
+        <button id="fq-run" type="button">질문하기</button>
+        <span class="status" id="fq-status"></span>
       </div>
     </div>
-
-    <aside class="aside">
-      <div class="card" style="margin-top:12px">
-        <div class="small">합성 샘플 결과지</div>
-        <select id="sample" style="width:100%;margin:6px 0 12px"><option>불러오는 중…</option></select>
-        <button id="run" type="button" style="width:100%">해설 보기</button>
-        <div class="status" id="status" style="margin-top:8px"></div>
-        <div id="summary"></div>
-        <div class="disclaimer" id="disclaimer" style="margin-bottom:0">이 내용은 의료 진단이 아니며, 정확한 판단은 의료진과 상담하세요.</div>
-      </div>
-    </aside>
-  </div>
+    <div id="fq-answers"></div>
+  </section>
 </main>
-<footer class="foot">합성 데이터로 만든 포트폴리오 데모입니다. 이 내용은 의료 진단이 아니며, 정확한 판단은 의료진과 상담하세요. · <a href="#">맨 위로</a></footer>
+<footer class="foot">합성 데이터로 만든 포트폴리오 데모입니다. 이 내용은 의료 진단이 아니며, 정확한 판단은 의료진과 상담하세요.</footer>
 <script>
   const $ = id => document.getElementById(id);
   const el = (tag, attrs = {}, ...children) => {
@@ -151,10 +136,10 @@
     currentSample = data.sampleId;
     renderFollowupItems(x.judgments);
     const count = j => x.judgments.filter(v => v.judgment === j).length;
-    $('summary').replaceChildren(el('b', {}, `${data.sampleId} 판정 요약`),
-      ...[['질환의심', 'SUSPECT'], ['정상B(경계)', 'NORMAL_B'], ['정상A', 'NORMAL_A'], ['판정 기준 없음', 'NOT_JUDGED']].map(([label, j]) =>
-        el('div', { class: 'sumrow' }, el('span', { class: `j j-${j}` }, label), el('span', {}, `${count(j)}개`))),
-      el('div', { class: 'sumrow' }, el('span', {}, '해설한 항목'), el('span', {}, `${x.items.length}개`)));
+    $('summary').replaceChildren(el('b', {}, data.sampleId), ' · ',
+      ...[['질환의심', 'SUSPECT'], ['정상B(경계)', 'NORMAL_B'], ['정상A', 'NORMAL_A'], ['기준 없음', 'NOT_JUDGED']]
+        .flatMap(([label, j], i) => [i ? ' · ' : '', el('span', { class: `j j-${j}` }, label), ` ${count(j)}`]),
+      ` · 해설 ${x.items.length}개`);
     $('empty').hidden = true;
     $('result').hidden = false;
     $('followup').hidden = false;
@@ -211,8 +196,8 @@
     const m = r.metrics;
     return el('div', { class: 'card' },
       el('div', { class: 'answer-head' },
-        el('b', {}, '질문:'), el('a', { href: '#fq-question' }, r.question),
-        el('b', {}, '답변:'), el('div', {},
+        el('b', {}, '질문'), el('a', { href: '#fq-question' }, r.question),
+        el('b', {}, '답'), el('div', {},
           el('span', { class: `pill d-${r.decision}` }, DECISION[r.decision] ?? r.decision), ' ',
           why ? el('span', { class: 'small' }, why) : '',
           r.sentences.length ? el('p', {}, ...r.sentences.map(s => [s.text, ...s.citations.map(n => el('sup', {}, `[${n}]`)), ' '])) : '',
