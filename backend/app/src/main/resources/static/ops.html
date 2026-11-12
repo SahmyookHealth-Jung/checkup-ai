@@ -7,12 +7,12 @@
 <link rel="stylesheet" href="/app.css">
 <style>
   .chart { position: relative; }
-  .tip { position: absolute; pointer-events: none; background: var(--card); border: 1px solid var(--line); border-radius: 8px;
-         padding: 6px 10px; font-size: 13px; box-shadow: 0 4px 14px rgba(0,0,0,.12); white-space: nowrap; }
+  .tip { position: absolute; pointer-events: none; background: var(--paper); border: 1px solid var(--rule-strong);
+         padding: 6px 10px; font-size: 13px; white-space: nowrap; }
   .tip b { display: block; }
-  .tip span::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 6px; background: var(--c); }
-  .budget-track { background: var(--soft); border-radius: 4px; height: 8px; margin-top: 6px; overflow: hidden; }
-  .budget-fill { height: 100%; background: var(--series-1); }
+  .tip span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 6px; background: var(--c); }
+  .budget-track { background: var(--tint); height: 6px; margin-top: 8px; overflow: hidden; }
+  .budget-fill { height: 100%; background: var(--ink); }
 </style>
 </head>
 <body>
@@ -20,7 +20,8 @@
   <a href="/">소개</a><a href="/demo.html">해설 데모</a><a href="/quality.html">품질</a><a href="/ops.html" aria-current="page">운영</a>
 </div></nav>
 <main>
-  <h1>운영 <span class="tag">LLM 호출 기록</span></h1>
+  <p class="kicker" style="margin-top:36px">LLM 호출 기록</p>
+  <h1>운영</h1>
   <p class="sub">앱의 모든 LLM 호출은 토큰·비용·지연·상태를 <code>llm_call_log</code>에 남깁니다(ADR 0006). 결과지 원문은 남기지 않습니다.
     평가 스크립트가 직접 부른 채점 모델(Sonnet) 호출은 여기에 없습니다.</p>
   <div class="controls">
@@ -29,10 +30,10 @@
     <span class="status" id="status">불러오는 중…</span>
   </div>
 
-  <div class="grid" style="margin-top:12px" id="tiles"></div>
+  <div class="grid" id="tiles"></div>
 
   <h2>날짜별 비용</h2>
-  <div class="card chart" id="chart"></div>
+  <div class="chart" id="chart"></div>
   <div class="legend" id="legend"></div>
 
   <h2>기능별</h2>

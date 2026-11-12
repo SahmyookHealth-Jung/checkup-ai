@@ -7,19 +7,20 @@
 <link rel="stylesheet" href="/app.css">
 <style>
   .criterion { color: var(--muted); font-size: 13px; margin: 0 0 8px; }
-  .advice { border-left: 3px solid var(--s); padding: 6px 10px; margin-top: 8px; background: var(--warn-bg); color: var(--warn); border-radius: 4px; }
+  .advice { border-left: 3px solid var(--s); padding: 4px 0 4px 12px; margin-top: 8px; color: var(--ink-2); }
   .review { border-left-color: var(--b); }
   .noevidence { color: var(--muted); font-style: italic; }
   .metrics { color: var(--muted); font-size: 12px; margin-top: 24px; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
-  .chips label { border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; font-size: 13px; cursor: pointer; background: var(--card); }
+  .chips { gap: 4px 16px; }
+  .chips label { font-size: 13px; cursor: pointer; white-space: nowrap; }
   .chips input { margin: 0 4px 0 0; padding: 0; }
-  .examples { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; }
-  .examples button { font-size: 13px; padding: 2px 10px; }
+  .examples { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 6px 0 10px; }
   .answer-head { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 6px; }
-  .d-ANSWER { background: var(--ok-bg); color: var(--ok); }
-  .d-NO_EVIDENCE { background: var(--soft); color: var(--muted); }
-  .d-REFUSE_DIAGNOSIS, .d-REFUSE_TREATMENT, .d-MALICIOUS { background: var(--warn-bg); color: var(--warn); }
+  .d-ANSWER { color: var(--moss); }
+  .d-NO_EVIDENCE { color: var(--muted); }
+  .d-REFUSE_DIAGNOSIS, .d-REFUSE_TREATMENT, .d-MALICIOUS { color: var(--brick); }
+  .card h3 { font-size: 17px; }
 </style>
 </head>
 <body>
@@ -27,7 +28,8 @@
   <a href="/">소개</a><a href="/demo.html" aria-current="page">해설 데모</a><a href="/quality.html">품질</a><a href="/ops.html">운영</a>
 </div></nav>
 <main>
-  <h1>검진 결과 해설 <span class="tag">합성 데이터 데모</span></h1>
+  <p class="kicker" style="margin-top:36px">합성 데이터 데모</p>
+  <h1>검진 결과 해설</h1>
   <p class="sub">합성 결과지를 골라 추출 → 국가건강검진 기준 판정 → 항목별 근거 조회 → 출처 붙은 해설 순서를 확인합니다. 실제 결과지는 올리지 마세요.</p>
   <div class="disclaimer" id="disclaimer">이 내용은 의료 진단이 아니며, 정확한 판단은 의료진과 상담하세요.</div>
 
@@ -55,13 +57,13 @@
     <div class="card">
       <p class="small" style="margin-top:0">이 결과지에 대해 궁금한 점을 물어보세요. 공개 문서 9편에서 근거를 찾아 출처와 함께 답합니다.
         진단·약·치료를 정해 달라는 질문, 근거가 없는 질문에는 정해진 문구로 답하지 않습니다.</p>
-      <div class="warn small" style="margin:8px 0">알려진 한계: 질환 이름 없이 묻는 진단 질문(예: "콩팥이 망가지기 시작한 단계인가요?")은 거절하지 못하고 답할 수 있습니다.
+      <div class="warn small">알려진 한계: 질환 이름 없이 묻는 진단 질문(예: "콩팥이 망가지기 시작한 단계인가요?")은 거절하지 못하고 답할 수 있습니다.
         재확인에서 진단 질문 8개 중 2개를 놓쳤습니다. <a href="/quality.html#followup">품질 화면</a> 참고.</div>
       <div class="small">항목 고르기 (선택, 고르지 않으면 질문과 결과지로 정합니다)</div>
       <div class="chips" id="fq-items"></div>
       <div class="examples" id="fq-examples"></div>
       <textarea id="fq-question" maxlength="300" placeholder="예: 공복혈당이 경계로 나왔는데 무슨 뜻인가요?"></textarea>
-      <div class="controls" style="border:0;padding:8px 0 0;background:none">
+      <div style="display:flex;gap:12px;align-items:center;margin-top:8px">
         <button id="fq-run" type="button">질문하기</button>
         <span class="status" id="fq-status"></span>
       </div>
