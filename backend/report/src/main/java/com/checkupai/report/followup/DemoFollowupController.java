@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * 화면 데모의 후속 질문 (ADR 0012 2절). 합성 샘플에만 열고, 결과지는 서버가 추출한 것을 쓴다.
+ * 화면 데모의 후속 질문 (ADR 0012 2절). 합성 샘플과 화면에서 올린 결과지(up-…)에 열고, 결과지는 서버가 추출한 것을 쓴다.
  *
  * <pre>
  * curl -X POST -H 'Content-Type: application/json' localhost:8080/api/demo/samples/std-001/followup \

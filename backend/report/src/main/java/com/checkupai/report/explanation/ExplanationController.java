@@ -54,7 +54,8 @@ public class ExplanationController {
     public ExplainResponse explain(@RequestPart("file") MultipartFile file) throws IOException {
         budget.check();
         ExtractionResult extraction = extractor.extract(textReader.read(file.getBytes(), file.getOriginalFilename()));
-        return new ExplainResponse(null, extraction, explanation.explain(extraction));
+        // 후속 질문을 받으려고 추출 결과를 잠시 기억한다 (sampleId로 /demo/samples/{id}/followup)
+        return new ExplainResponse(samples.remember(extraction), extraction, explanation.explain(extraction));
     }
 
     /** 합성 샘플 결과지 목록 (화면의 선택 상자) */

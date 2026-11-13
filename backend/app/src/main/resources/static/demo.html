@@ -14,6 +14,9 @@
   #table tr.dim td:not(.j) { color: var(--muted); }   /* 정상A는 흐리게, 찾는 줄(경계·질환의심)만 눈에 띄게 */
   #table tr:not(.dim) td:first-child { font-weight: 600; }
   .back { font-size: 13px; }
+  .upload { font-size: 14px; color: var(--text-2); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+  .upload input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+  .upload:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
   .noevidence { color: var(--muted); }
   .metrics { color: var(--muted); font-size: 12px; margin-top: 16px; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; }
@@ -34,10 +37,11 @@
 <nav class="nav"><div><a class="brand" href="/">검진 결과 해설</a><a href="/demo.html" aria-current="page">해설 데모</a><a href="/stats.html">통계</a><a href="/quality.html">품질</a><a href="/ops.html">운영</a></div></nav>
 <main>
   <h1>검진 결과 해설</h1>
-  <p class="sub">합성 결과지를 하나 고르면 추출 → 국가 기준 판정 → 근거 조회 → 출처 붙은 해설까지 돌립니다. 실제 결과지는 올리지 마세요.</p>
+  <p class="sub">합성 결과지를 하나 고르거나 직접 만든 가상의 결과지를 올리면 추출 → 국가 기준 판정 → 근거 조회 → 출처 붙은 해설까지 돌립니다. 실제 결과지는 올리지 마세요.</p>
   <div class="controls">
     <select id="sample" aria-label="합성 샘플 결과지"><option>불러오는 중…</option></select>
     <button id="run" type="button">해설 보기</button>
+    <label class="upload">또는 가상 결과지 올리기 (글자가 있는 PDF·txt)<input id="file" type="file" accept=".pdf,.txt,application/pdf,text/plain"></label>
     <span class="status" id="status"></span>
   </div>
   <p class="empty small" id="empty">샘플을 고르고 <b>해설 보기</b>를 누르세요. 처음 고른 샘플은 추출까지 10초 안팎 걸리고, 같은 샘플은 다시 추출하지 않습니다.</p>
@@ -91,12 +95,19 @@
     if (!ids.length) $('status').textContent = '샘플 PDF가 없습니다 (eval/에서 생성기로 만드세요).';
   }
 
-  async function run() {
+  async function run(file) {
     const id = $('sample').value;
     $('run').disabled = true;
     $('status').textContent = '추출하고 해설하는 중… (10초 안팎)';
     try {
-      const response = await fetch(`/api/demo/samples/${encodeURIComponent(id)}/explain`, { method: 'POST' });
+      let response;
+      if (file) {
+        const form = new FormData();
+        form.append('file', file);
+        response = await fetch('/api/reports/explain', { method: 'POST', body: form });
+      } else {
+        response = await fetch(`/api/demo/samples/${encodeURIComponent(id)}/explain`, { method: 'POST' });
+      }
       if (!response.ok) {
         const body = await response.json().catch(() => ({}));
         throw new Error(body.detail ?? `${response.status}`);
@@ -107,6 +118,7 @@
       $('status').textContent = '실패: ' + e.message;
     } finally {
       $('run').disabled = false;
+      $('file').value = '';
     }
   }
 
@@ -138,7 +150,7 @@
     currentSample = data.sampleId;
     renderFollowupItems(x.judgments);
     const count = j => x.judgments.filter(v => v.judgment === j).length;
-    $('summary').replaceChildren(el('b', {}, data.sampleId), ' · ',
+    $('summary').replaceChildren(el('b', {}, data.sampleId.startsWith('up-') ? '올린 결과지' : data.sampleId), ' · ',
       ...[['질환의심', 'SUSPECT'], ['정상B(경계)', 'NORMAL_B'], ['정상A', 'NORMAL_A'], ['기준 없음', 'NOT_JUDGED']]
         .flatMap(([label, j], i) => [i ? ' · ' : '', el('span', { class: `j j-${j}` }, label), ` ${count(j)}`]),
       ` · 해설 ${x.items.length}개`);
@@ -215,7 +227,8 @@
   // 출처 번호로 이동하면 접힌 출처를 펼친다
   const openCited = () => { const t = location.hash && document.getElementById(location.hash.slice(1)); if (t && t.tagName === 'DETAILS') t.open = true; };
   window.addEventListener('hashchange', openCited);
-  $('run').addEventListener('click', run);
+  $('run').addEventListener('click', () => run());
+  $('file').addEventListener('change', e => { if (e.target.files[0]) run(e.target.files[0]); });
   loadSamples().catch(e => $('status').textContent = '샘플 목록을 불러오지 못했습니다: ' + e.message);
 </script>
 </body>
