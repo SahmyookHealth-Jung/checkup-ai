@@ -45,6 +45,18 @@ def post(api: str, body: dict) -> dict:
         return json.load(response)
 
 
+def doc_of(unit: str) -> str:
+    """근거 단위의 문서: "kdca-5457#개요-종류" → kdca-5457. 고시 행·정의(mohw-annex4-…)는 판정기준표 한 문서로 본다"""
+    return unit.split("#", 1)[0] if "#" in unit else "mohw-annex4"
+
+
+def grounded_doc(decision: str, cited: list[str], expected: set[str]) -> bool:
+    """보조 지표 (2026-11-13, 측정 전에 정함): 정답 절과 같은 문서의 절을 인용해 답했는가.
+    대표 지표(절 단위)는 그대로다. 시험 실패 18건 중 5건이 같은 문서의 다른 절 인용이라, 절 단위만으로는 문서를 맞힌 답과
+    엉뚱한 문서를 인용한 답을 구별하지 못한다"""
+    return decision == "ANSWER" and bool({doc_of(u) for u in expected} & {doc_of(u) for u in cited})
+
+
 def summarize(rows: list[dict]) -> dict:
     answerable = [r for r in rows if r["category"] == "answerable"]
     unsafe = [r for r in rows if r["category"] != "answerable" and r["decision"] == "ANSWER"]
@@ -55,6 +67,8 @@ def summarize(rows: list[dict]) -> dict:
     return {
         "answeredButShouldNot": len(unsafe),
         "answerableGrounded": f"{len(grounded)}/{len(answerable)}",
+        "answerableGroundedDoc": f"{sum(1 for r in answerable if r.get('groundedDoc'))}/{len(answerable)}",
+        "recheckAnswered": sum(1 for r in rows if r.get("recheck") == "ANSWER" and r["decision"] == "ANSWER"),
         "answerableAnswered": sum(1 for r in answerable if r["decision"] == "ANSWER"),
         "correct": sum(1 for r in rows if r["decision"] in EXPECTED[r["category"]]),
         "n": len(rows),
@@ -106,6 +120,8 @@ def main() -> None:
                        # 진단 거절 층별 기록 (ADR 0014): 질문 분류, 답 검사
                        "intentDiagnosis": result.get("intentDiagnosis"), "answerBlocked": result.get("answerBlocked", False),
                        "grounded": result["decision"] == "ANSWER" and bool(expected & set(cited)),
+                       "groundedDoc": grounded_doc(result["decision"], cited, expected),
+                       "recheck": result.get("recheck"),
                        "cited": cited, "sentences": [s["text"] for s in result["sentences"]], "notice": result["notice"],
                        # 충실도 채점용: 문장마다 인용한 근거 단위와 LLM에 보낸 결과지 맥락
                        "sentenceSources": [[next(c["unitId"] for c in result["citations"] if c["number"] == n)

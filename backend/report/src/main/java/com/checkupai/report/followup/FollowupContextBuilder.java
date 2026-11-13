@@ -31,7 +31,9 @@ import org.springframework.stereotype.Component;
  *   <li>범위 안 순위: 질의(질문 + 항목 이름)와 절의 글자 2-gram BM25 점수({@link CharBigramBm25}). 같으면 벡터 유사도
  *       (절 점수는 그 절 청크 점수의 최댓값). 처음 계획은 벡터였지만, 개발 몫에서 BM25가 모호한 질문의 근거를 더 잘 담고
  *       잃는 문항이 없어 바꿨다 (ADR 0011 결과, 2026-11-12 사용자 결정). 평가를 위해 벡터 순위도 고를 수 있다</li>
- *   <li>절 채우기: 순위대로 절을 통째로 넣되 예산(글자 수)을 넘으면 그 절은 건너뛴다</li>
+ *   <li>절 채우기: 순위대로 절을 통째로 넣되 예산(글자 수)을 넘으면 그 절은 건너뛴다.
+ *       질문에 항목이 둘 이상이면(고름·질문 속 항목) 항목마다 돌아가며 그 항목의 다음 순위 절을 넣는다.
+ *       한 항목의 절이 예산을 다 차지해 다른 항목의 근거가 빠지지 않게 한다 (2026-11-13, 두 항목의 관계 질문에서 정답 절이 빠짐)</li>
  * </ol>
  * 근거 단위는 정답셋의 근거 라벨과 같다: 고시는 행, 나머지는 "문서#절" ({@link GuidelineCorpus#unitOf}).
  */
@@ -128,7 +130,8 @@ public class FollowupContextBuilder {
         List<ContextUnit> fixed = fixedUnits(chunks, rowItems, judgments);
         String query = (question.strip() + " " + textItems.stream().map(ItemCode::koreanName)
                 .collect(Collectors.joining(" "))).strip();
-        List<ContextUnit> ranked = rankedUnits(chunks, textItems, query, budgetChars, ranking);
+        boolean balance = (source == ItemSource.SELECTED || source == ItemSource.MENTIONED) && textItems.size() >= 2;
+        List<ContextUnit> ranked = rankedUnits(chunks, textItems, query, budgetChars, ranking, balance);
         int rankedChars = ranked.stream().mapToInt(u -> u.text().length()).sum();
         int fixedChars = fixed.stream().mapToInt(u -> u.text().length()).sum();
         return new FollowupContext(source, List.copyOf(textItems), List.copyOf(rowItems), query, ranking, budgetChars, fixed,
@@ -175,9 +178,10 @@ public class FollowupContextBuilder {
     }
 
     private List<ContextUnit> rankedUnits(List<RetrievedChunk> chunks, Set<ItemCode> textItems, String query,
-                                          int budgetChars, Ranking ranking) {
+                                          int budgetChars, Ranking ranking, boolean balance) {
         // 범위: 고시가 아닌 문서의 청크 중 질문 항목이 붙은 것. 항목이 없으면 전체
         Map<String, List<RetrievedChunk>> sections = new LinkedHashMap<>();
+        Map<String, Set<ItemCode>> sectionItems = new HashMap<>();
         for (RetrievedChunk chunk : chunks) {
             if (GuidelineCorpus.CRITERIA_DOC.equals(chunk.metadataText("doc_id"))) {
                 continue;
@@ -186,6 +190,8 @@ public class FollowupContextBuilder {
                 continue;
             }
             sections.computeIfAbsent(GuidelineCorpus.unitOf(chunk), k -> new ArrayList<>()).add(chunk);
+            itemCodes(chunk).stream().filter(textItems::contains).forEach(code ->
+                    sectionItems.computeIfAbsent(GuidelineCorpus.unitOf(chunk), k -> EnumSet.noneOf(ItemCode.class)).add(code));
         }
         if (sections.isEmpty()) {
             return List.of();
@@ -210,6 +216,9 @@ public class FollowupContextBuilder {
             scored.sort(Comparator.comparingDouble(ContextUnit::score).reversed());
             candidates = scored;
         }
+        if (balance) {
+            candidates = roundRobin(candidates, textItems, sectionItems);
+        }
         List<ContextUnit> packed = new ArrayList<>();
         int used = 0;
         for (ContextUnit candidate : candidates) {
@@ -219,6 +228,31 @@ public class FollowupContextBuilder {
             }
         }
         return packed;
+    }
+
+    /** 항목마다 돌아가며 그 항목이 붙은 다음 순위 절을 고른다. 순위는 원래 순서를 따른다 */
+    static List<ContextUnit> roundRobin(List<ContextUnit> ranked, Set<ItemCode> items, Map<String, Set<ItemCode>> sectionItems) {
+        Set<String> chosen = new LinkedHashSet<>();
+        List<ContextUnit> out = new ArrayList<>();
+        Map<ItemCode, Integer> next = new EnumMap<>(ItemCode.class);
+        boolean progressed = true;
+        while (progressed) {
+            progressed = false;
+            for (ItemCode item : items) {
+                for (int i = next.getOrDefault(item, 0); i < ranked.size(); i++) {
+                    ContextUnit unit = ranked.get(i);
+                    if (sectionItems.getOrDefault(unit.id(), Set.of()).contains(item) && chosen.add(unit.id())) {
+                        out.add(unit);
+                        next.put(item, i + 1);
+                        progressed = true;
+                        break;
+                    }
+                    next.put(item, i + 1);
+                }
+            }
+        }
+        ranked.stream().filter(u -> !chosen.contains(u.id())).forEach(out::add);  // 어느 항목에도 안 붙은 절 (없어야 정상)
+        return out;
     }
 
     private static ContextUnit unit(String id, List<RetrievedChunk> chunks, double score, double vectorScore) {

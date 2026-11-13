@@ -171,4 +171,22 @@ class FollowupContextBuilderTest {
                     .toList();
         }
     }
+
+    @Test
+    @DisplayName("항목이 둘 이상이면 항목마다 돌아가며 다음 순위 절을 고른다 (한 항목이 예산을 다 차지하지 않게)")
+    void roundRobinAcrossItems() {
+        var a1 = unitOf("a1"); var a2 = unitOf("a2"); var a3 = unitOf("a3"); var b1 = unitOf("b1"); var both = unitOf("ab");
+        java.util.Map<String, java.util.Set<ItemCode>> items = java.util.Map.of(
+                "a1", java.util.Set.of(ItemCode.WAIST_CIRCUMFERENCE), "a2", java.util.Set.of(ItemCode.WAIST_CIRCUMFERENCE),
+                "a3", java.util.Set.of(ItemCode.WAIST_CIRCUMFERENCE), "b1", java.util.Set.of(ItemCode.FASTING_GLUCOSE),
+                "ab", java.util.Set.of(ItemCode.WAIST_CIRCUMFERENCE, ItemCode.FASTING_GLUCOSE));
+        var order = FollowupContextBuilder.roundRobin(java.util.List.of(a1, a2, a3, both, b1),
+                java.util.EnumSet.of(ItemCode.WAIST_CIRCUMFERENCE, ItemCode.FASTING_GLUCOSE), items);
+        org.assertj.core.api.Assertions.assertThat(order.stream().map(FollowupContextBuilder.ContextUnit::id))
+                .containsExactly("a1", "ab", "a2", "b1", "a3");
+    }
+
+    private static FollowupContextBuilder.ContextUnit unitOf(String id) {
+        return new FollowupContextBuilder.ContextUnit(id, "doc", "t", "s", 0, 0, java.util.List.of(), id);
+    }
 }

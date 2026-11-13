@@ -53,7 +53,8 @@ class FollowupServiceTest {
         assertThat(result.sentences()).singleElement().satisfies(s -> assertThat(s.citations()).containsExactly(1));
         assertThat(result.citations()).singleElement().satisfies(c -> assertThat(c.unitId()).isEqualTo("kdca-5457#개요-종류"));
         assertThat(result.metrics().unsupportedQuotes()).isEqualTo(1);  // S9는 없는 근거라 구절도 대조할 수 없다
-        assertThat(result.metrics().promptVersion()).isEqualTo("followup-v3+followup-intent-v1");
+        assertThat(result.metrics().promptVersion()).isEqualTo("followup-v3+followup-intent-v1+followup-recheck-v1");
+        assertThat(result.recheck()).isNull();  // 첫 답이 근거 없음일 때만 다시 묻는다
         assertThat(result.intentDiagnosis()).isFalse();
         assertThat(result.answerBlocked()).isFalse();
         assertThat(result.notice()).isNull();
@@ -148,6 +149,40 @@ class FollowupServiceTest {
     }
 
     @Test
+    @DisplayName("첫 답이 근거 없음이면 상위 절만 남겨 다시 묻고, 검증을 통과한 답이 나오면 답한다 (2026-11-13)")
+    void recheckAnswersWhenEvidenceIsThere() throws IOException {
+        var model = new ScriptedChatModel("{\"decision\":\"NO_EVIDENCE\",\"uncovered\":\"\",\"sentences\":[]}", false, false, """
+                {"decision":"ANSWER","uncovered":"","sentences":[
+                  {"text":"eGFR 44는 3b단계(30~44)에 해당합니다.","sources":["S3"],"quote":"3b단계: 사구체 여과율 30~44"}]}""");
+        FollowupResult result = service(model).answer(report(), "eGFR 44면 무슨 뜻이에요?", List.of(ItemCode.EGFR));
+
+        assertThat(result.llmDecision()).isEqualTo("NO_EVIDENCE");
+        assertThat(result.recheck()).isEqualTo("ANSWER");
+        assertThat(result.decision()).isEqualTo(Decision.ANSWER);
+        assertThat(result.sentences()).singleElement().satisfies(s -> assertThat(s.citations()).containsExactly(1));
+        // 재확인 문맥은 첫 답과 같은 번호를 쓴다: S3은 두 문맥에서 같은 근거다 (Codex 리뷰 P1 확인)
+        assertThat(result.citations()).singleElement().satisfies(c -> assertThat(c.unitId()).isEqualTo("kdca-5457#개요-종류"));
+        assertThat(model.lastRecheckPrompt).contains("[S3] [만성콩팥병 | 개요-종류] 3b단계").contains("eGFR 44면 무슨 뜻이에요?");
+    }
+
+    @Test
+    @DisplayName("재확인 답도 근거 구절이 맞지 않으면 근거 없음으로 둔다. 진단 질문은 다시 묻지 않는다")
+    void recheckKeepsNoEvidenceWithoutVerifiedSentences() throws IOException {
+        var invented = new ScriptedChatModel("{\"decision\":\"NO_EVIDENCE\",\"uncovered\":\"\",\"sentences\":[]}", false, false, """
+                {"decision":"ANSWER","uncovered":"","sentences":[
+                  {"text":"물을 많이 마시면 좋아집니다.","sources":["S3"],"quote":"물을 많이 마시면 콩팥이 좋아진다"}]}""");
+        FollowupResult result = service(invented).answer(report(), "물 많이 마시면 좋아져요?", List.of(ItemCode.EGFR));
+        assertThat(result.recheck()).isEqualTo("NO_EVIDENCE");
+        assertThat(result.decision()).isEqualTo(Decision.NO_EVIDENCE);
+
+        var diagnosis = new ScriptedChatModel("{\"decision\":\"NO_EVIDENCE\",\"uncovered\":\"\",\"sentences\":[]}", true);
+        FollowupResult refused = service(diagnosis).answer(report(), "콩팥이 많이 상한 상태예요?", List.of(ItemCode.EGFR));
+        assertThat(refused.recheck()).isNull();
+        assertThat(refused.decision()).isEqualTo(Decision.REFUSE_DIAGNOSIS);
+        assertThat(diagnosis.lastRecheckPrompt).isEmpty();
+    }
+
+    @Test
     @DisplayName("일부만 답했으면 고정 안내를 붙이고, 모르는 처리 구분이나 실패는 근거 없음으로 둔다")
     void partialAndUnknown() throws IOException {
         var partial = new ScriptedChatModel("""
@@ -231,7 +266,9 @@ class FollowupServiceTest {
         private final String response;
         private final boolean diagnosis;
         private final boolean intentFails;
+        private final String recheckResponse;
         private String lastPrompt = "";
+        private String lastRecheckPrompt = "";
         private String lastIntentPrompt = "";
 
         ScriptedChatModel(String response) {
@@ -243,9 +280,14 @@ class FollowupServiceTest {
         }
 
         ScriptedChatModel(String response, boolean diagnosis, boolean intentFails) {
+            this(response, diagnosis, intentFails, "{\"decision\":\"NO_EVIDENCE\",\"uncovered\":\"\",\"sentences\":[]}");
+        }
+
+        ScriptedChatModel(String response, boolean diagnosis, boolean intentFails, String recheckResponse) {
             this.response = response;
             this.diagnosis = diagnosis;
             this.intentFails = intentFails;
+            this.recheckResponse = recheckResponse;
         }
 
         @Override
@@ -258,6 +300,9 @@ class FollowupServiceTest {
                     throw new IllegalStateException("분류 호출 실패");
                 }
                 out = "{\"diagnosis\":" + diagnosis + "}";
+            } else if (contents.contains("다시 살피는")) {
+                lastRecheckPrompt = contents;
+                out = recheckResponse;
             } else {
                 lastPrompt = contents;
                 out = response;
