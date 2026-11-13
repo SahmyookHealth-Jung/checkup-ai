@@ -21,6 +21,12 @@
   .fu .big { font-size: 32px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
   @media (max-width: 760px) { .fu { grid-template-columns: 1fr; gap: 16px; } }
   .mono { font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: var(--text-2); }
+  /* 긴 페이지라 절 목차를 머리글 밑에 붙이고, 지금 보는 절을 굵게 한다 */
+  .toc { position: sticky; top: 64px; z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line);
+         display: flex; gap: 20px; overflow-x: auto; padding: 10px 0; margin: 20px 0 0; }
+  .toc a { font-size: 13px; color: var(--muted); text-decoration: none; white-space: nowrap; }
+  .toc a[aria-current="true"] { color: var(--text); font-weight: 600; }
+  [id] { scroll-margin-top: 120px; }   /* 머리글(64px) + 목차 밑에 숨지 않게 */
 </style>
 </head>
 <body>
@@ -30,7 +36,10 @@
   <p class="sub" id="lede">기능 1은 합성 결과지로, 기능 2(통계)는 공공데이터 표본으로 쟀습니다. 못 채운 것도 그대로 둡니다.</p>
   <p class="small">비교 수치는 커밋한 코드로만 쟀습니다(기록의 dirty=false). 데이터는 <code>eval/build_dashboard_data.py</code>가 커밋된 평가 기록에서 만듭니다.</p>
 
-  <div class="scroll" style="margin-top:24px"><table class="hl">
+  <nav class="toc" aria-label="이 페이지의 절">
+    <a href="#summary">대표 수치</a><a href="#followup">후속 질문</a><a href="#faithfulness">답 문장의 충실도</a><a href="#records">평가 기록 전체</a>
+  </nav>
+  <div class="scroll" id="summary" style="margin-top:24px"><table class="hl">
     <thead><tr><th>영역</th><th>무엇을</th><th>수치</th><th>평가셋</th><th>상태</th></tr></thead>
     <tbody id="highlights"></tbody>
   </table></div>
@@ -56,10 +65,10 @@
     </div>
   </div>
 
-  <h2>답 문장의 충실도 <span class="tag">시험 · 항목 고름 · Sonnet 채점</span></h2>
+  <h2 id="faithfulness">답 문장의 충실도 <span class="tag">시험 · 항목 고름 · Sonnet 채점</span></h2>
   <div id="faith" style="max-width:640px"></div>
 
-  <h2>평가 기록 전체</h2>
+  <h2 id="records">평가 기록 전체</h2>
   <details id="runs-box">
     <summary id="runs-sum">평가 기록 펼치기</summary>
     <p class="small">dirty=true인 기록은 커밋하지 않은 변경이 있던 때라 비교 수치로 쓰지 않았습니다.</p>
@@ -165,6 +174,16 @@
       el('p', { class: 'small', style: 'margin-bottom:0' }, `판정 구간 틀림 ${f.bandWrong} · 치료 지시 ${f.treatmentPresent} · 채점 비용 $${f.costUsd}. `
         + '구절 대조는 구절이 근거에 있는지만 보고, 문장의 나머지가 그 구절에서 나오는지는 보지 못합니다. 그래서 채점을 따로 합니다.'));
   }
+  // 지금 보는 절을 목차에서 굵게 한다: 화면 가운데를 지난 마지막 절. 맨 아래에 닿으면 마지막 절 (짧은 끝 절도 잡히게)
+  const tocLinks = [...document.querySelectorAll('.toc a')];
+  function markCurrent() {
+    const atEnd = innerHeight + scrollY >= document.documentElement.scrollHeight - 4;
+    const passed = tocLinks.filter(a => document.querySelector(a.hash)?.getBoundingClientRect().top <= innerHeight / 2);
+    const current = atEnd ? tocLinks.at(-1) : passed.at(-1) ?? tocLinks[0];
+    tocLinks.forEach(a => a.setAttribute('aria-current', String(a === current)));
+  }
+  addEventListener('scroll', markCurrent, { passive: true });
+  markCurrent();
 </script>
 </body>
 </html>

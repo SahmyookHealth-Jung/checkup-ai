@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="/app.css">
 <style>
   .chart { position: relative; }
+  .chart text.val { fill: var(--text-2); font-weight: 600; }
   .tip { position: absolute; pointer-events: none; background: var(--bg); border: 1px solid var(--line-2); border-radius: 6px;
          padding: 6px 10px; font-size: 13px; white-space: nowrap; }
   .tip b { display: block; }
@@ -146,6 +147,11 @@
         root.append(svg('path', { d: roundedTop(x, top, bw, h, r), fill: g.color }));
         base += v;
       });
+      // 날짜별 합계를 막대 위에 바로 적는다. 칸이 좁으면(기간이 길면) 가장 큰 날만
+      const total = base;
+      if (total > 0 && (step >= 40 || total === max)) {
+        const label = svg('text', { x: x + bw / 2, y: y(total) - 5, 'text-anchor': 'middle', class: 'val' }); label.textContent = usd(total); root.append(label);
+      }
       if (i % Math.ceil(days.length / 7) === 0 || i === days.length - 1) {
         const label = svg('text', { x: x + bw / 2, y: H - 8, 'text-anchor': 'middle' }); label.textContent = day.slice(5).replace('-', '/'); root.append(label);
       }
@@ -165,7 +171,9 @@
       root.append(hit);
     });
     $('chart').replaceChildren(root, tip);
-    $('legend').replaceChildren(...GROUPS.map(g => el('span', { style: `--c:${g.color}` }, g.label)));
+    // 범례에 기간 합계를 같이 적어, 색만 보고 비교하지 않게 한다
+    const sum = g => days.reduce((s, day) => s + byDay[day][g.key].cost, 0);
+    $('legend').replaceChildren(...GROUPS.map(g => el('span', { style: `--c:${g.color}` }, `${g.label} ${usd(sum(g))}`)));
   }
 
   function roundedTop(x, y, w, h, r) {
