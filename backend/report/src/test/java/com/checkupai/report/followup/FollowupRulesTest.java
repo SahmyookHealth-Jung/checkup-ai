@@ -2,6 +2,7 @@ package com.checkupai.report.followup;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -38,5 +39,24 @@ class FollowupRulesTest {
         assertThat(FollowupRules.check("당뇨병 진단 기준이 뭐예요?").diagnosis()).isFalse();
         assertThat(FollowupRules.check("빈혈이면 어지러운 거예요?").diagnosis()).isFalse();
         assertThat(FollowupRules.check("비만이면 고혈압 위험이 커지나요?").diagnosis()).isFalse();
+    }
+
+    @Test
+    @DisplayName("답 검사: 진단을 확인해 주는 답만 걸리고, 판정 구간·기준 설명은 걸리지 않는다 (ADR 0014)")
+    void answerCheck() {
+        assertThat(FollowupRules.answerConfirmsDiagnosis("LDL 193이면 고지혈증이랑 같은 거죠?",
+                List.of("네, LDL 130 이상이면 이상지질혈증에 해당하는 기준이 됩니다."))).isTrue();
+        assertThat(FollowupRules.answerConfirmsDiagnosis("이거 진단이랑 같은 말이죠?", List.of("맞습니다. 판정 기준상 질환의심 구간입니다."))).isTrue();
+        assertThat(FollowupRules.answerConfirmsDiagnosis("혈압이 왜 높을까요?", List.of("고혈압이 맞습니다."))).isTrue();
+        assertThat(FollowupRules.answerConfirmsDiagnosis("LDL 193이면 그런 거죠?",
+                List.of("네, 기준을 넘었습니다.", "이상지질혈증에 해당하는 수치입니다."))).isTrue();  // 질환이 둘째 문장에 있다
+
+        assertThat(FollowupRules.answerConfirmsDiagnosis("공복혈당이 질환의심 구간인가요?",
+                List.of("네, 공복혈당 136은 질환의심 구간(126 이상)에 해당합니다."))).isFalse();
+        assertThat(FollowupRules.answerConfirmsDiagnosis("LDL은 몇부터 높은 거예요?",
+                List.of("LDL 160 이상은 이상지질혈증 기준에 해당합니다."))).isFalse();
+        assertThat(FollowupRules.answerConfirmsDiagnosis("당뇨 관리는 어떻게 해요?",
+                List.of("예를 들어 식사 조절과 운동이 도움이 됩니다."))).isFalse();
+        assertThat(FollowupRules.answerConfirmsDiagnosis("아무거나", List.of())).isFalse();
     }
 }

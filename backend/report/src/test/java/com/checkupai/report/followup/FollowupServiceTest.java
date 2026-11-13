@@ -53,7 +53,9 @@ class FollowupServiceTest {
         assertThat(result.sentences()).singleElement().satisfies(s -> assertThat(s.citations()).containsExactly(1));
         assertThat(result.citations()).singleElement().satisfies(c -> assertThat(c.unitId()).isEqualTo("kdca-5457#개요-종류"));
         assertThat(result.metrics().unsupportedQuotes()).isEqualTo(1);  // S9는 없는 근거라 구절도 대조할 수 없다
-        assertThat(result.metrics().promptVersion()).isEqualTo("followup-v3");
+        assertThat(result.metrics().promptVersion()).isEqualTo("followup-v3+followup-intent-v1");
+        assertThat(result.intentDiagnosis()).isFalse();
+        assertThat(result.answerBlocked()).isFalse();
         assertThat(result.notice()).isNull();
         assertThat(result.disclaimer()).isEqualTo(ExplanationGuardrails.DISCLAIMER);
         assertThat(model.lastPrompt).contains("eGFR 44면 무슨 뜻이에요?").contains("3b단계");
@@ -102,6 +104,46 @@ class FollowupServiceTest {
         assertThat(result.ruleDiagnosis()).isTrue();
         assertThat(result.sentences()).isEmpty();
         assertThat(result.citations()).isEmpty();
+        assertThat(result.notice()).isEqualTo(FollowupService.FIXED.get(Decision.REFUSE_DIAGNOSIS));
+    }
+
+    @Test
+    @DisplayName("질문 분류가 진단 요청이라고 하면 규칙에 안 걸려도 진단 거절로 답한다 (ADR 0014)")
+    void intentClassifierRefusesDiagnosis() throws IOException {
+        var model = new ScriptedChatModel("""
+                {"decision":"ANSWER","uncovered":"","sentences":[
+                  {"text":"3b단계는 사구체 여과율 30~44입니다.","sources":["S3"],"quote":"3b단계: 사구체 여과율 30~44"}]}""", true);
+        FollowupResult result = service(model).answer(report(), "콩팥이 많이 상한 상태예요?", List.of(ItemCode.EGFR));
+
+        assertThat(result.ruleDiagnosis()).isFalse();
+        assertThat(result.intentDiagnosis()).isTrue();
+        assertThat(result.decision()).isEqualTo(Decision.REFUSE_DIAGNOSIS);
+        assertThat(result.sentences()).isEmpty();
+        assertThat(model.lastIntentPrompt).contains("콩팥이 많이 상한 상태예요?").doesNotContain("3b단계");  // 분류에는 질문만 보낸다
+    }
+
+    @Test
+    @DisplayName("질문 분류 호출이 실패하면 진단 질문으로 보고 거절한다 (보수적 실패, Codex 리뷰 P1)")
+    void intentFailureRefuses() throws IOException {
+        var model = new ScriptedChatModel("""
+                {"decision":"ANSWER","uncovered":"","sentences":[
+                  {"text":"3b단계는 사구체 여과율 30~44입니다.","sources":["S3"],"quote":"3b단계: 사구체 여과율 30~44"}]}""", false, true);
+        FollowupResult result = service(model).answer(report(), "eGFR 44면 무슨 뜻이에요?", List.of(ItemCode.EGFR));
+
+        assertThat(result.intentDiagnosis()).isNull();
+        assertThat(result.decision()).isEqualTo(Decision.REFUSE_DIAGNOSIS);
+    }
+
+    @Test
+    @DisplayName("분류가 놓쳐도 진단을 확인해 주는 답(긍정 + 질환)은 답 검사가 막는다 (ADR 0014)")
+    void answerCheckBlocksConfirmation() throws IOException {
+        var model = new ScriptedChatModel("""
+                {"decision":"ANSWER","uncovered":"","sentences":[
+                  {"text":"네, 3b단계는 만성콩팥병의 한 단계로 사구체 여과율 30~44입니다.","sources":["S3"],"quote":"3b단계: 사구체 여과율 30~44"}]}""");
+        FollowupResult result = service(model).answer(report(), "이거 콩팥병 진단이랑 같은 말이죠?", List.of(ItemCode.EGFR));
+
+        assertThat(result.answerBlocked()).isTrue();
+        assertThat(result.decision()).isEqualTo(Decision.REFUSE_DIAGNOSIS);
         assertThat(result.notice()).isEqualTo(FollowupService.FIXED.get(Decision.REFUSE_DIAGNOSIS));
     }
 
@@ -184,18 +226,43 @@ class FollowupServiceTest {
         }
     }
 
+    /** 질문 분류 호출에는 분류 답을, 답 호출에는 정해 둔 답을 돌려준다 */
     private static final class ScriptedChatModel implements ChatModel {
         private final String response;
+        private final boolean diagnosis;
+        private final boolean intentFails;
         private String lastPrompt = "";
+        private String lastIntentPrompt = "";
 
         ScriptedChatModel(String response) {
+            this(response, false);
+        }
+
+        ScriptedChatModel(String response, boolean diagnosis) {
+            this(response, diagnosis, false);
+        }
+
+        ScriptedChatModel(String response, boolean diagnosis, boolean intentFails) {
             this.response = response;
+            this.diagnosis = diagnosis;
+            this.intentFails = intentFails;
         }
 
         @Override
         public ChatResponse call(Prompt prompt) {
-            lastPrompt = prompt.getContents();
-            return new ChatResponse(new ArrayList<>(List.of(new Generation(new AssistantMessage(response)))));
+            String contents = prompt.getContents();
+            String out;
+            if (contents.contains("질문 하나를 분류한다")) {
+                lastIntentPrompt = contents;
+                if (intentFails) {
+                    throw new IllegalStateException("분류 호출 실패");
+                }
+                out = "{\"diagnosis\":" + diagnosis + "}";
+            } else {
+                lastPrompt = contents;
+                out = response;
+            }
+            return new ChatResponse(new ArrayList<>(List.of(new Generation(new AssistantMessage(out)))));
         }
     }
 }

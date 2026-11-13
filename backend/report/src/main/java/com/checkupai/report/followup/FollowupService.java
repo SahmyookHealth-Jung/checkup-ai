@@ -39,7 +39,8 @@ import org.springframework.stereotype.Service;
  *       검증은 세 가지다. 근거 구절이 인용한 근거 문단에 글자 그대로 있는가(followup-v2), 인용 번호가 허락된 것인가,
  *       숫자가 결과지나 인용한 근거에 있는가(ExplanationValidator).
  *       금지 표현은 세어서 기록한다. 고지문은 늘 붙인다</li>
- *   <li>진단 패턴 규칙은 "규칙 또는 LLM"으로 거절을 강제하고, 약 패턴 규칙은 기록만 한다 ({@link FollowupRules})</li>
+ *   <li>진단 거절은 "규칙 또는 질문 분류 또는 LLM"이고, 답이어도 진단을 확인해 주는 답이면 막는다 (ADR 0014).
+ *       약 패턴 규칙은 기록만 한다 ({@link FollowupRules})</li>
  * </ol>
  */
 @Service
@@ -53,6 +54,10 @@ public class FollowupService {
      * 비수치 주장도 그럴듯한 번호를 붙이면 통과했다 (Codex 적대적 리뷰, 사용자 결정 A안)
      */
     static final String PROMPT_VERSION = "followup-v3";
+    /** 질문 분류 프롬프트 (ADR 0014). 답 프롬프트와 따로 둬서, 답을 쓰는 모델이 설명 쪽으로 기우는 것을 피한다 */
+    static final String INTENT_VERSION = "followup-intent-v1";
+    static final String FEATURE_INTENT = "report.followup.intent";
+    private static final int INTENT_MAX_TOKENS = 100;
     /** 근거 구절의 최소 길이 (공백을 뺀 글자 수). 너무 짧은 구절("입니다")로 대조를 피하지 못하게 한다 */
     static final int MIN_QUOTE_CHARS = 10;
     private static final int MAX_TOKENS = 1500;
@@ -79,13 +84,19 @@ public class FollowupService {
     public record Sentence(String text, List<Integer> citations) {
     }
 
+    /** 질문 분류 출력: 진단 요청인가 */
+    record IntentDraft(boolean diagnosis) {
+    }
+
     public record Citation(int number, String unitId, String title, String section) {
     }
 
     /**
      * @param llmDecision LLM이 낸 처리 구분 (코드가 바꿨으면 decision과 다르다)
      * @param ruleTreatment 약·치료 패턴 규칙이 걸렸는가 (기록만)
-     * @param ruleDiagnosis 진단 요청 패턴 규칙이 걸렸는가 (기록만)
+     * @param ruleDiagnosis 진단 요청 패턴 규칙이 걸렸는가
+     * @param intentDiagnosis 질문 분류가 진단 요청이라고 했는가 (분류 호출이 실패했으면 null)
+     * @param answerBlocked 답 검사가 진단을 확인해 주는 답이라 막았는가
      */
     /**
      * @param unsupportedQuotes 근거 구절이 없거나 짧거나 인용한 근거 문단에 없어 지운 문장 수
@@ -100,7 +111,7 @@ public class FollowupService {
      * @param reportLines LLM에 보낸 결과지 맥락 (항목별 결과값·판정·기준). 충실도 채점이 판정 구간을 비교할 때 쓴다
      */
     public record FollowupResult(String question, Decision decision, String llmDecision, boolean ruleTreatment,
-                                 boolean ruleDiagnosis, List<Sentence> sentences, String notice, List<Citation> citations,
+                                 boolean ruleDiagnosis, Boolean intentDiagnosis, boolean answerBlocked, List<Sentence> sentences, String notice, List<Citation> citations,
                                  String disclaimer, String reportLines, Metrics metrics) {
     }
 
@@ -110,6 +121,7 @@ public class FollowupService {
     private final FollowupProperties properties;
     private final ExplanationValidator validator = new ExplanationValidator();
     private final String systemPrompt;
+    private final String intentPrompt;
 
     public FollowupService(ChatClient.Builder chatClientBuilder, FollowupContextBuilder contextBuilder,
                            ScreeningCriteria criteria, FollowupProperties properties) {
@@ -120,6 +132,8 @@ public class FollowupService {
         try {
             this.systemPrompt = new ClassPathResource("prompts/report-" + PROMPT_VERSION + ".st")
                     .getContentAsString(StandardCharsets.UTF_8);
+            this.intentPrompt = new ClassPathResource("prompts/report-" + INTENT_VERSION + ".st")
+                    .getContentAsString(StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -129,6 +143,14 @@ public class FollowupService {
         long started = System.nanoTime();
         FollowupContext context = contextBuilder.build(report, question, selected, properties.budgetChars());
         FollowupRules.Flags flags = FollowupRules.check(question);
+        Boolean intentDiagnosis = null;
+        try {
+            intentDiagnosis = classify(question);
+        } catch (RuntimeException e) {
+            // 분류를 못 하면 진단 질문으로 본다(보수적 실패). 실패한 층을 조용히 건너뛰지 않는다 (Codex 리뷰 P1)
+            log.warn("질문 분류 실패, 진단 질문으로 처리: {}", e.getClass().getSimpleName());
+        }
+        boolean diagnosisAsked = flags.diagnosis() || !Boolean.FALSE.equals(intentDiagnosis);
 
         Map<String, ContextUnit> byLabel = new LinkedHashMap<>();
         for (ContextUnit unit : context.units()) {
@@ -178,8 +200,13 @@ public class FollowupService {
         } else {
             decision = llmDecision;
         }
-        if (flags.diagnosis() && (decision == Decision.ANSWER || decision == Decision.NO_EVIDENCE)) {
-            decision = Decision.REFUSE_DIAGNOSIS;  // 진단 거절은 규칙 또는 LLM (ADR 0011 결과, 시험 몫에서 LLM이 진단 질문에 답함)
+        if (diagnosisAsked && (decision == Decision.ANSWER || decision == Decision.NO_EVIDENCE)) {
+            decision = Decision.REFUSE_DIAGNOSIS;  // 진단 거절은 규칙 또는 질문 분류 또는 LLM (ADR 0011 결과, ADR 0014)
+        }
+        boolean answerBlocked = decision == Decision.ANSWER && FollowupRules.answerConfirmsDiagnosis(question,
+                outcome.kept().stream().map(ExplanationValidator.CheckedSentence::text).toList());
+        if (answerBlocked) {
+            decision = Decision.REFUSE_DIAGNOSIS;  // 답 검사: 앞 단계가 모두 놓친 진단 답을 내보내지 않는다 (ADR 0014)
         }
         if (decision == Decision.ANSWER) {
             for (ExplanationValidator.CheckedSentence kept : outcome.kept()) {
@@ -196,13 +223,26 @@ public class FollowupService {
                     return new Citation(e.getValue(), unit.id(), unit.title(), unit.section());
                 })
                 .toList();
-        var metrics = new Metrics(PROMPT_VERSION, context.itemSource().name(), context.totalChars(), byLabel.size(),
+        var metrics = new Metrics(PROMPT_VERSION + "+" + INTENT_VERSION, context.itemSource().name(), context.totalChars(), byLabel.size(),
                 drafts.size(), decision == Decision.ANSWER ? outcome.kept().size() : 0, unsupportedQuotes,
                 outcome.invalidCitations(), outcome.uncited(), outcome.ungroundedNumbers(), outcome.forbiddenHits(),
                 llmMs, (System.nanoTime() - started) / 1_000_000, llmError);
         return new FollowupResult(question, decision, llmDecision == null ? null : llmDecision.name(),
-                flags.treatment(), flags.diagnosis(), sentences, notice, citations, ExplanationGuardrails.DISCLAIMER,
+                flags.treatment(), flags.diagnosis(), intentDiagnosis, answerBlocked, sentences, notice, citations, ExplanationGuardrails.DISCLAIMER,
                 reportLines, metrics);
+    }
+
+    /** 질문 분류 (ADR 0014): 질문만 보낸다. 결과지와 근거는 보내지 않는다 */
+    private boolean classify(String question) {
+        IntentDraft intent = chatClient.prompt()
+                .system(intentPrompt)
+                .user(user -> user.text("<질문>\n{question}\n</질문>").param("question", question))
+                .options(ChatOptions.builder().maxTokens(INTENT_MAX_TOKENS))
+                .advisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
+                .advisors(advisor -> advisor.param(LlmCallContext.FEATURE, FEATURE_INTENT))
+                .call()
+                .entity(new BeanOutputConverter<>(IntentDraft.class));
+        return intent != null && intent.diagnosis();
     }
 
     private FollowupDraft generate(Map<String, ContextUnit> byLabel, String reportLines, String question) {

@@ -103,6 +103,8 @@ def main() -> None:
                        "category": g["category"], "reason": g.get("reason"), "question": g["question"],
                        "decision": result["decision"], "llmDecision": result["llmDecision"],
                        "ruleTreatment": result["ruleTreatment"], "ruleDiagnosis": result["ruleDiagnosis"],
+                       # 진단 거절 층별 기록 (ADR 0014): 질문 분류, 답 검사
+                       "intentDiagnosis": result.get("intentDiagnosis"), "answerBlocked": result.get("answerBlocked", False),
                        "grounded": result["decision"] == "ANSWER" and bool(expected & set(cited)),
                        "cited": cited, "sentences": [s["text"] for s in result["sentences"]], "notice": result["notice"],
                        # 충실도 채점용: 문장마다 인용한 근거 단위와 LLM에 보낸 결과지 맥락

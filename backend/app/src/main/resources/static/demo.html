@@ -205,8 +205,9 @@
 
   function renderAnswer(r) {
     const overridden = r.llmDecision && r.llmDecision !== r.decision;
-    const why = !overridden ? '' : r.decision === 'REFUSE_DIAGNOSIS' && r.ruleDiagnosis
-      ? '모델은 답하려 했지만 진단 규칙이 막았습니다' : '모델은 답하려 했지만 근거로 확인된 문장이 없었습니다';
+    const blocker = r.answerBlocked ? '답 검사' : r.ruleDiagnosis ? '진단 규칙' : r.intentDiagnosis ? '질문 분류' : null;
+    const why = !overridden ? '' : r.decision === 'REFUSE_DIAGNOSIS' && blocker
+      ? `모델은 답하려 했지만 ${blocker}가 진단 질문으로 보고 막았습니다` : '모델은 답하려 했지만 근거로 확인된 문장이 없었습니다';
     const m = r.metrics;
     return el('div', { class: 'card' },
       el('div', { class: 'answer-head' },

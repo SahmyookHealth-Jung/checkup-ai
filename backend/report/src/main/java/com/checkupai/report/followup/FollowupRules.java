@@ -1,11 +1,13 @@
 package com.checkupai.report.followup;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
  * 질문의 약·진단 패턴 규칙 (ADR 0011 3절).
  * 진단 규칙은 "규칙 또는 LLM"으로 켰다 (ADR 0011 결과, 사용자 결정 2026-11-12: 시험 몫에서 LLM이 진단 질문 2건에 답함).
  * 약·치료 규칙은 LLM이 놓친 경우가 없어 기록만 한다.
+ * 답 검사({@link #answerConfirmsDiagnosis})는 질문 분류까지 놓친 진단 답을 마지막에 막는다 (ADR 0014).
  * "약"을 부분 문자열로 찾으면 "약간", "요약", "약양성"에서도 걸리므로 약을 다루는 말의 형태로만 찾는다.
  */
 final class FollowupRules {
@@ -26,10 +28,34 @@ final class FollowupRules {
                     + "|" + DISEASE + "[가-힣\\s]{0,10}?(걸린|생긴|간|된|있는)\\s*(건가|건지|거죠|거지|거예요|거야)"
                     + "|" + DISEASE + "\\s*(확정|확진|환자)");
 
+    /** 답의 첫머리 긍정 ("네,", "맞습니다"). "예를 들어"는 걸리지 않게 뒤에 문장부호·공백을 요구한다 */
+    private static final Pattern AFFIRM = Pattern.compile("^\\s*(네|예|맞습니다|맞아요|그렇습니다|그래요)(?=[,.!\\s]|$)");
+    private static final Pattern DISEASE_WORD = Pattern.compile(DISEASE);
+    /** 질환 이름으로 단정하는 문장 ("당뇨병입니다", "고혈압이 맞습니다"). "~에 해당합니다"는 기준 설명에도 쓰여 보지 않는다 */
+    private static final Pattern DISEASE_ASSERTION = Pattern.compile(
+            DISEASE + "[가-힣]{0,3}\\s*(입니다|이에요|예요|이\\s*맞|가\\s*맞|이\\s*확실|가\\s*확실|에\\s*걸리)");
+
     record Flags(boolean treatment, boolean diagnosis) {
     }
 
     private FollowupRules() {
+    }
+
+    /**
+     * 답이 진단을 확인해 주는가 (ADR 0014 답 검사). 첫 문장이 긍정으로 시작하면서 질문이나 답의 어느 문장이 질환·진단을 말하거나,
+     * 어느 문장이든 질환 이름으로 단정하면 그렇다. 2026-11-12 재확인: "고지혈증 진단 받은 거랑 같은 거죠?"에 "네, …이상지질혈증에
+     * 해당하는 기준이 됩니다"로 답했다.
+     */
+    static boolean answerConfirmsDiagnosis(String question, List<String> sentences) {
+        if (sentences.isEmpty()) {
+            return false;
+        }
+        String q = question == null ? "" : question;
+        String first = sentences.get(0);
+        boolean aboutDisease = DISEASE_WORD.matcher(q).find() || q.contains("진단")
+                || sentences.stream().anyMatch(s -> DISEASE_WORD.matcher(s).find());  // 둘째 문장 이후의 질환도 본다 (Codex 리뷰 P2)
+        return AFFIRM.matcher(first).find() && aboutDisease
+                || sentences.stream().anyMatch(s -> DISEASE_ASSERTION.matcher(s).find());
     }
 
     static Flags check(String question) {
