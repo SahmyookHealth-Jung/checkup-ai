@@ -10,9 +10,22 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Alias;
+import net.sf.jsqlparser.expression.CaseExpression;
+import net.sf.jsqlparser.expression.CastExpression;
+import net.sf.jsqlparser.expression.DoubleValue;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.NullValue;
+import net.sf.jsqlparser.expression.SignedExpression;
+import net.sf.jsqlparser.expression.StringValue;
+import net.sf.jsqlparser.expression.WhenClause;
+import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
+import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.util.TablesNamesFinder;
@@ -33,6 +46,16 @@ import net.sf.jsqlparser.util.TablesNamesFinder;
  *       숨김은 LLM이 쓴 n이 아니라 이 인원 중 가장 작은 값으로 정한다 ({@link ResultTable})</li>
  * </ul>
  * 진짜 마지막 방어선은 DB 권한(읽기 전용 계정)이다.
+ *
+ * <p>2026-11-13 자체 점검: 숨은 인원은 "사람 수"가 아니라 "행 수"라서 두 길로 한 사람의 값이 나갔다.
+ * {@code JOIN region r ON r.code <> 0}으로 행을 17배로 불리거나, {@code SUM(CASE WHEN 1명 조건 THEN x ELSE 0 END)}로
+ * 빈 값을 채워 COUNT(인자)를 100만으로 만들었다. 그래서 아래 두 가지를 더한다.
+ * <ul>
+ *   <li>FROM은 checkup 하나로 시작하고, 조인은 코드표(region, age_group)를 각각 한 번, 키 조건으로만 붙인다 (행이 불지 않는다)</li>
+ *   <li>HAVING은 쓰지 않는다 (작은 집단의 값이 기준을 넘는지가 행의 유무로 드러난다)</li>
+ *   <li>AVG·SUM·PERCENTILE_CONT의 인자는 열 하나, 결과가 모두 상수인 CASE(비율용 표시값), 또는 ELSE 없이 열을 고르는 CASE만
+ *       쓴다. 그래야 COUNT(인자)가 값을 낸 사람 수와 같다. 연산·COALESCE로 표시값과 열을 섞는 길도 함께 막는다</li>
+ * </ul>
  */
 public final class SqlGuard {
 
@@ -93,6 +116,12 @@ public final class SqlGuard {
         lexicalCheck(body);
         PlainSelect select = parse(body);
         checkTables(body);
+        checkJoins(select);
+        if (select.getHaving() != null) {
+            // HAVING은 작은 집단의 값이 기준보다 큰지 작은지를 행이 나오는지로 알려 준다
+            throw new Rejected("HAVING은 쓸 수 없다 (결과를 묶은 뒤 거르지 않는다)");
+        }
+        checkValueArguments(body);  // 반환 열뿐 아니라 ORDER BY의 집계도 본다
         if (select.getGroupBy() == null) {
             for (SelectItem<?> item : select.getSelectItems()) {
                 if (!HAS_AGGREGATE.matcher(item.getExpression().toString()).find()) {
@@ -194,6 +223,126 @@ public final class SqlGuard {
                 throw new Rejected("허용하지 않은 테이블이다: " + name + " (checkup, region, age_group만 쓸 수 있다)");
             }
         }
+    }
+
+    /** 조인 키: 코드표 → 그 코드표를 가리키는 checkup 열 */
+    private static final java.util.Map<String, String> JOIN_KEYS = java.util.Map.of("region", "region_code", "age_group", "age_group");
+    private static final Pattern VALUE_AGGREGATE = Pattern.compile("\\b(avg|sum)\\s*\\(", Pattern.CASE_INSENSITIVE);
+
+    /** FROM checkup [별칭] 뒤에 코드표를 키 조건으로만 붙인다. 쉼표 조인, 자기 조인, 키가 아닌 조건은 행을 불려 숨김을 피한다 */
+    private static void checkJoins(PlainSelect select) {
+        if (!(select.getFromItem() instanceof Table from) || !"checkup".equals(tableName(from))) {
+            throw new Rejected("FROM은 checkup으로 시작한다 (예: FROM checkup c JOIN region r ON r.code = c.region_code)");
+        }
+        String checkup = aliasOf(from);
+        Set<String> joined = new java.util.HashSet<>();
+        for (Join join : select.getJoins() == null ? List.<Join>of() : select.getJoins()) {
+            if (join.isSimple() || join.isCross() || join.isNatural() || join.isRight() || join.isFull()
+                    || !join.getUsingColumns().isEmpty() || !(join.getRightItem() instanceof Table table)) {
+                throw new Rejected("조인은 JOIN 코드표 ON 키 조건으로만 쓴다 (예: JOIN region r ON r.code = c.region_code)");
+            }
+            String name = tableName(table);
+            String key = JOIN_KEYS.get(name);
+            if (key == null || !joined.add(name)) {
+                throw new Rejected("checkup에는 region과 age_group만 각각 한 번 붙일 수 있다: " + table);
+            }
+            var on = join.getOnExpressions();
+            if (on.size() != 1 || !(on.iterator().next() instanceof EqualsTo equals)
+                    || !keyPair(equals, aliasOf(table), checkup, key)) {
+                throw new Rejected("조인 조건은 " + aliasOf(table) + ".code = " + checkup + "." + key + " 하나만 쓴다");
+            }
+        }
+    }
+
+    private static boolean keyPair(EqualsTo equals, String codeTable, String checkup, String key) {
+        return equals.getLeftExpression() instanceof Column left && equals.getRightExpression() instanceof Column right
+                && (isColumn(left, codeTable, "code") && isColumn(right, checkup, key)
+                    || isColumn(right, codeTable, "code") && isColumn(left, checkup, key));
+    }
+
+    /** 열 이름이 같고, 앞에 테이블(별칭)을 붙였다면 그 테이블이다 */
+    private static boolean isColumn(Column column, String table, String name) {
+        return name.equalsIgnoreCase(column.getColumnName())
+                && (column.getTable() == null || column.getTable().getName() == null
+                    || table.equalsIgnoreCase(column.getTable().getName()));
+    }
+
+    private static String tableName(Table table) {
+        String name = table.getName().replace("\"", "").toLowerCase(Locale.ROOT);
+        return name.startsWith("stats.") ? name.substring("stats.".length()) : name;
+    }
+
+    private static String aliasOf(Table table) {
+        return table.getAlias() != null ? table.getAlias().getName() : tableName(table);
+    }
+
+    /**
+     * AVG·SUM·PERCENTILE_CONT 인자의 모양: 열 하나(CAST 가능), 결과가 모두 상수인 CASE, ELSE 없이 열을 고르는 CASE.
+     * COUNT는 값을 내보내지 않으므로 보지 않는다.
+     */
+    static void checkValueArguments(String expression) {
+        List<String> arguments = new ArrayList<>();
+        Matcher call = VALUE_AGGREGATE.matcher(expression);
+        while (call.find()) {
+            arguments.add(balanced(expression, call.end()).strip());
+        }
+        Matcher within = WITHIN_GROUP.matcher(expression);
+        while (within.find()) {
+            arguments.add(balanced(expression, within.end()).strip().replaceAll("(?i)\\s+(asc|desc)$", ""));
+        }
+        for (String argument : arguments) {
+            if (!safeValueArgument(argument)) {
+                throw new Rejected("AVG·SUM 안에는 열 하나나 CASE만 쓴다 (예: AVG(c.ldl), AVG(CASE WHEN 조건 THEN 1 ELSE 0 END), "
+                        + "AVG(CASE WHEN 조건 THEN c.ldl END)): " + argument);
+            }
+        }
+    }
+
+    private static boolean safeValueArgument(String argument) {
+        Expression expression;
+        try {
+            expression = CCJSqlParserUtil.parseExpression(unwrap(argument));
+        } catch (JSQLParserException e) {
+            return false;
+        }
+        if (isColumnValue(expression)) {
+            return true;
+        }
+        if (!(expression instanceof CaseExpression cases)) {
+            return false;
+        }
+        List<Expression> results = new ArrayList<>(cases.getWhenClauses().stream().map(WhenClause::getThenExpression).toList());
+        Expression otherwise = cases.getElseExpression();
+        if (otherwise != null) {
+            results.add(otherwise);
+        }
+        if (results.stream().allMatch(SqlGuard::isConstant)) {
+            return true;  // 비율·건수용 표시값. 분자가 작은 비율은 남은 한계다 (ADR 0013)
+        }
+        // 열을 고르는 CASE는 ELSE가 없어야(또는 NULL) COUNT(인자)가 고른 사람 수와 같다
+        return (otherwise == null || otherwise instanceof NullValue)
+                && cases.getWhenClauses().stream().map(WhenClause::getThenExpression)
+                        .allMatch(then -> isColumnValue(then) || isConstant(then));
+    }
+
+    private static boolean isColumnValue(Expression expression) {
+        return expression instanceof Column
+                || expression instanceof CastExpression cast && cast.getLeftExpression() instanceof Column;
+    }
+
+    private static boolean isConstant(Expression expression) {
+        return expression instanceof LongValue || expression instanceof DoubleValue || expression instanceof NullValue
+                || expression instanceof StringValue
+                || expression instanceof SignedExpression signed && isConstant(signed.getExpression());
+    }
+
+    /** 바깥을 감싼 괄호를 벗긴다: "(x)" → "x" */
+    private static String unwrap(String text) {
+        String s = text.strip();
+        while (s.startsWith("(") && s.endsWith(")") && balanced(s, 1).length() == s.length() - 2) {
+            s = s.substring(1, s.length() - 1).strip();
+        }
+        return s;
     }
 
     /** 반환 열의 집계마다 인원 열: 묶음 인원 COUNT(*)와 집계 인자의 COUNT(인자) */

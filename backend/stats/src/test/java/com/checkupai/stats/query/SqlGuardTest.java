@@ -19,8 +19,11 @@ class SqlGuardTest {
                 + "FROM checkup c WHERE c.drinking IS NOT NULL GROUP BY c.sex ORDER BY c.sex")).isEmpty();
         assertThat(SqlGuard.check("SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY hemoglobin) AS med, COUNT(*) AS n "
                 + "FROM checkup WHERE hemoglobin IS NOT NULL")).isEmpty();
-        assertThat(SqlGuard.check("SELECT r.name, ROUND(AVG(c.ggt), 1) AS g, COUNT(*) AS n FROM checkup c, region r "
-                + "WHERE r.code = c.region_code GROUP BY r.name ORDER BY AVG(c.ggt) DESC LIMIT 5")).isEmpty();
+        assertThat(SqlGuard.check("SELECT r.name, a.label, ROUND(AVG(c.ggt), 1) AS g, COUNT(*) AS n FROM checkup c "
+                + "JOIN region r ON c.region_code = r.code LEFT JOIN age_group a ON a.code = c.age_group "
+                + "GROUP BY r.name, a.label ORDER BY AVG(c.ggt) DESC LIMIT 5")).isEmpty();
+        assertThat(SqlGuard.check("SELECT AVG(CASE WHEN sex = 1 THEN height_cm END) AS m, ROUND(AVG(CAST(ldl AS numeric)), 1) AS l, "
+                + "SUM(CASE WHEN smoking = 3 THEN 1 ELSE 0 END) AS s, COUNT(*) AS n FROM checkup")).isEmpty();
     }
 
     @Test
@@ -41,6 +44,35 @@ class SqlGuardTest {
         assertThat(SqlGuard.check("SELECT COUNT(*) AS n FROM checkup c, llm_call_log l")).get().asString().contains("llm_call_log");
         assertThat(SqlGuard.check("SELECT COUNT(*) AS n FROM \"llm_call_log\"")).isPresent();
         assertThat(SqlGuard.check("SELECT SUM(cost_usd) AS n FROM public.llm_call_log")).isPresent();
+    }
+
+    @Test
+    @DisplayName("행 수를 불리거나 빈 값을 채워 숨김 인원을 부풀리는 우회를 막는다 (2026-11-13 자체 점검, 실제로 1명 값이 나갔다)")
+    void blocksInflatedCounts() {
+        // 키가 아닌 조인 조건으로 행을 17배로: 1명 집단의 인원이 17로 세어졌다
+        assertThat(SqlGuard.check("SELECT AVG(c.fasting_glucose) AS v, COUNT(*) AS n FROM checkup c JOIN region r ON r.code <> 0 "
+                + "WHERE c.region_code = 36 AND c.age_group = 18 AND c.sex = 1 AND c.height_cm = 150")).get().asString().contains("조인 조건");
+        assertThat(SqlGuard.check("SELECT AVG(c1.height_cm) AS v, COUNT(*) AS n FROM checkup c1 JOIN checkup c2 "
+                + "ON c2.region_code = c1.region_code")).isPresent();
+        assertThat(SqlGuard.check("SELECT COUNT(*) AS n FROM checkup c, region r WHERE r.code = c.region_code")).isPresent();
+        assertThat(SqlGuard.check("SELECT COUNT(*) AS n FROM checkup c JOIN region r ON r.code = c.region_code "
+                + "JOIN region r2 ON r2.code = c.region_code")).isPresent();
+        assertThat(SqlGuard.check("SELECT COUNT(*) AS n FROM region r JOIN checkup c ON r.code = c.region_code")).isPresent();
+        assertThat(SqlGuard.check("SELECT COUNT(*) AS n FROM checkup c JOIN region r ON r.code = c.region_code AND c.sex = 1")).isPresent();
+        // ELSE 0으로 빈 값을 채워 COUNT(인자)를 100만으로: 1명의 공복혈당 90이 그대로 나갔다
+        assertThat(SqlGuard.check("SELECT SUM(CASE WHEN region_code = 36 AND age_group = 18 AND sex = 1 AND height_cm = 150 "
+                + "THEN fasting_glucose ELSE 0 END) AS v, COUNT(*) AS n FROM checkup")).get().asString().contains("AVG·SUM");
+        assertThat(SqlGuard.check("SELECT SUM(COALESCE(CASE WHEN sex = 1 AND height_cm = 150 THEN fasting_glucose END, 0)) AS v FROM checkup")).isPresent();
+        assertThat(SqlGuard.check("SELECT SUM(fasting_glucose * (CASE WHEN height_cm = 150 THEN 1 ELSE 0 END)) AS v FROM checkup")).isPresent();
+        assertThat(SqlGuard.check("SELECT SUM(fasting_glucose * (1 / (ABS(height_cm - 150) + 1))) AS v FROM checkup")).isPresent();
+        assertThat(SqlGuard.check("SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY CASE WHEN height_cm = 150 THEN fasting_glucose ELSE 0 END) AS v "
+                + "FROM checkup")).isPresent();
+        // HAVING: 작은 집단의 값이 기준을 넘는지가 행의 유무로 드러난다
+        assertThat(SqlGuard.check("SELECT height_cm, COUNT(*) AS n FROM checkup WHERE region_code = 36 GROUP BY height_cm "
+                + "HAVING AVG(fasting_glucose) > 89")).get().asString().contains("HAVING");
+        // ORDER BY 안의 집계도 본다
+        assertThat(SqlGuard.check("SELECT sex, COUNT(*) AS n FROM checkup GROUP BY sex "
+                + "ORDER BY SUM(CASE WHEN height_cm = 150 THEN fasting_glucose ELSE 0 END)")).isPresent();
     }
 
     @Test

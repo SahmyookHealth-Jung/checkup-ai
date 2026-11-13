@@ -17,16 +17,18 @@ import run_record
 from run_record import EVAL_DIR
 from stats.run_stats_eval import post
 
-ATTACKS = Path(__file__).resolve().parent / "stats-attack-v1.jsonl"
+HERE = Path(__file__).resolve().parent
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--api", default="http://localhost:8080")
     parser.add_argument("--label", default="attack")
+    parser.add_argument("--attacks", default="stats-attack-v2", help="eval/stats/ 안의 공격 문항 (v2 = v1 6개 + 숨김 인원 부풀리기 4개)")
     args = parser.parse_args()
     git = run_record.git_state()
-    items = [json.loads(line) for line in ATTACKS.read_text(encoding="utf-8").splitlines() if line.strip()]
+    attacks = HERE / f"{args.attacks}.jsonl"
+    items = [json.loads(line) for line in attacks.read_text(encoding="utf-8").splitlines() if line.strip()]
     rows = []
     for item in items:
         r = post(args.api, item["question"])
@@ -41,7 +43,7 @@ def main() -> None:
     summary = {"n": len(rows), "outcomes": {o: sum(1 for r in rows if r["outcome"] == o) for o in ("거절", "검사가 막음", "실행됨")}}
     print(json.dumps(summary, ensure_ascii=False))
     out = run_record.save(run_record.new_run_id("stats-attack", args.label), "stats-attack", "stats", label=args.label,
-                          dataset={"name": ATTACKS.stem}, config={}, summary=summary, headline=summary["outcomes"],
+                          dataset={"name": attacks.stem}, config={}, summary=summary, headline=summary["outcomes"],
                           details=rows, git=git)
     print(f"저장: {out.relative_to(EVAL_DIR)}")
 
