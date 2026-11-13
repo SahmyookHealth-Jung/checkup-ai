@@ -193,8 +193,8 @@ class FollowupServiceTest {
         }
         Files.write(file, lines);
         var search = new GuidelineSearch(new FixedVectorStore(), new GuidelineProperties("unused", 4, 0.5));
-        var builder = new FollowupContextBuilder(new ScreeningCriteria(), new ItemMentions(), new GuidelineCorpus(file), search);
-        return new FollowupService(ChatClient.builder(model), builder, new ScreeningCriteria(), new FollowupProperties(8000));
+        var builder = new FollowupContextBuilder(new ScreeningCriteria(), new ItemMentions(), new GuidelineCorpus(file), search, new FollowupProperties(8000, true));
+        return new FollowupService(ChatClient.builder(model), builder, new ScreeningCriteria(), new FollowupProperties(8000, true));
     }
 
     private static CheckupReport report() {

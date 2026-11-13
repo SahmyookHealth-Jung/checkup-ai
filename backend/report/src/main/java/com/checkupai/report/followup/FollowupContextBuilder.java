@@ -82,13 +82,15 @@ public class FollowupContextBuilder {
     private final ItemMentions mentions;
     private final GuidelineCorpus corpus;
     private final GuidelineSearch search;
+    private final FollowupProperties properties;
 
     public FollowupContextBuilder(ScreeningCriteria criteria, ItemMentions mentions, GuidelineCorpus corpus,
-                                  GuidelineSearch search) {
+                                  GuidelineSearch search, FollowupProperties properties) {
         this.criteria = criteria;
         this.mentions = mentions;
         this.corpus = corpus;
         this.search = search;
+        this.properties = properties;
     }
 
     /**
@@ -197,7 +199,9 @@ public class FollowupContextBuilder {
             return List.of();
         }
         Map<String, Double> scores = new HashMap<>();
-        search.search(query, chunks.size()).chunks().forEach(c -> scores.put(c.id(), c.score()));
+        if (properties.vectorTiebreak()) {
+            search.search(query, chunks.size()).chunks().forEach(c -> scores.put(c.id(), c.score()));
+        }
         List<ContextUnit> byVector = sections.entrySet().stream()
                 .map(e -> unit(e.getKey(), e.getValue(), 0.0,
                         e.getValue().stream().mapToDouble(c -> scores.getOrDefault(c.id(), 0.0)).max().orElse(0.0)))

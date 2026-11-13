@@ -38,6 +38,8 @@ class FollowupContextBuilderTest {
     Path tempDir;
     private final Map<String, Double> scores = new java.util.HashMap<>();
     private FollowupContextBuilder builder;
+    private Path file;
+    private boolean storeDown;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -53,7 +55,7 @@ class FollowupContextBuilderTest {
                 chunk("kdca-5457-symptoms-2", "[만성콩팥병 | 증상] 빈혈도 생긴다", "kdca-5457", "증상", List.of("EGFR")),
                 chunk("kdca-1104-symptoms-1", "[빈혈 | 증상] 어지러움", "kdca-1104", "증상", List.of("HEMOGLOBIN")),
                 chunk("kdca-6715-definition-1", "[이상지질혈증 | 개요-정의] LDL 130 이상", "kdca-6715", "개요-정의", List.of("LDL_CHOLESTEROL")));
-        Path file = tempDir.resolve("chunks.jsonl");
+        file = tempDir.resolve("chunks.jsonl");
         var mapper = JsonMapper.builder().build();
         List<String> lines = new ArrayList<>();
         for (Map<String, Object> c : chunks) {
@@ -63,7 +65,7 @@ class FollowupContextBuilderTest {
         scores.putAll(Map.of("kdca-5457-types-1", 0.6, "kdca-5457-symptoms-1", 0.7, "kdca-5457-symptoms-2", 0.5,
                 "kdca-1104-symptoms-1", 0.65, "kdca-6715-definition-1", 0.4));
         var search = new GuidelineSearch(new ScoredVectorStore(), new GuidelineProperties("unused", 4, 0.5));
-        builder = new FollowupContextBuilder(new ScreeningCriteria(), new ItemMentions(), new GuidelineCorpus(file), search);
+        builder = new FollowupContextBuilder(new ScreeningCriteria(), new ItemMentions(), new GuidelineCorpus(file), search, new FollowupProperties(8000, true));
     }
 
     @Test
@@ -151,6 +153,23 @@ class FollowupContextBuilderTest {
     }
 
     /** 질의와 무관하게 정해 둔 점수로 모든 청크를 돌려준다 */
+    @Test
+    @DisplayName("벡터 동점 처리를 끄면 벡터 검색을 부르지 않고 BM25만으로 순위를 매긴다 (공개 데모, 임베딩 모델 없음)")
+    void bm25WorksWithoutVectorStore() {
+        storeDown = true;
+        var search = new GuidelineSearch(new ScoredVectorStore(), new GuidelineProperties("unused", 4, 0.5));
+        var noVector = new FollowupContextBuilder(new ScreeningCriteria(), new ItemMentions(), new GuidelineCorpus(file),
+                search, new FollowupProperties(8000, false));
+
+        FollowupContext context = noVector.build(report(), "몇 단계예요?", List.of(ItemCode.EGFR), 20000);
+        assertThat(ids(context.rankedUnits())).containsExactly("kdca-5457#개요-종류", "kdca-5457#증상");
+        assertThat(context.rankedUnits()).allMatch(unit -> unit.vectorScore() == 0);
+
+        // 겹치는 글자가 없으면 청크 파일 순서로 남는다 (절이 빠지지는 않는다)
+        FollowupContext noOverlap = noVector.build(report(), "어때요", List.of(ItemCode.EGFR), 20000);
+        assertThat(ids(noOverlap.rankedUnits())).containsExactlyInAnyOrder("kdca-5457#개요-종류", "kdca-5457#증상");
+    }
+
     private final class ScoredVectorStore implements VectorStore {
         @Override
         public void add(List<Document> documents) {
@@ -166,6 +185,9 @@ class FollowupContextBuilderTest {
 
         @Override
         public List<Document> similaritySearch(SearchRequest request) {
+            if (storeDown) {
+                throw new IllegalStateException("임베딩 모델 없음");
+            }
             return scores.entrySet().stream()
                     .map(e -> Document.builder().id(e.getKey()).text(e.getKey()).score(e.getValue()).build())
                     .toList();
