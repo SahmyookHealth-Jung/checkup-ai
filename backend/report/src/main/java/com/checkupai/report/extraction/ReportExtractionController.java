@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
  * </pre>
  */
 @RestController
+@RestControllerAdvice   // 형식 오류 처리(아래)를 화면의 올리기 경로(ExplanationController)에도 적용한다
 @RequestMapping("/api/reports")
 public class ReportExtractionController {
 

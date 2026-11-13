@@ -28,10 +28,15 @@ public class ReportTextReader {
     }
 
     private String readPdf(byte[] content) {
-        var reader = new PagePdfDocumentReader(new ByteArrayResource(content));
-        String text = reader.get().stream()
-                .map(Document::getText)
-                .collect(Collectors.joining("\n"));
+        String text;
+        try {
+            text = new PagePdfDocumentReader(new ByteArrayResource(content)).get().stream()
+                    .map(Document::getText)
+                    .collect(Collectors.joining("\n"));
+        } catch (RuntimeException e) {
+            // 깨졌거나 PDF가 아닌 파일. 화면에서 남이 올린 파일도 받으므로 500이 아니라 형식 오류로 알린다
+            throw new UnsupportedReportFormatException("읽을 수 없는 PDF");
+        }
         if (text.isBlank()) {
             // 글자 층이 없는 스캔 PDF
             throw new UnsupportedReportFormatException("글자 층이 없는 PDF(스캔 이미지)");

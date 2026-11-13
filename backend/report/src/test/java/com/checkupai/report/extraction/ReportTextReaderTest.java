@@ -44,6 +44,14 @@ class ReportTextReaderTest {
     }
 
     @Test
+    @DisplayName("깨진 PDF는 서버 오류가 아니라 형식 오류로 알린다")
+    void rejectsBrokenPdf() {
+        assertThatThrownBy(() -> reader.read(new byte[] {1, 2, 3}, "broken.pdf"))
+                .isInstanceOf(ReportTextReader.UnsupportedReportFormatException.class)
+                .hasMessageContaining("읽을 수 없는 PDF");
+    }
+
+    @Test
     @DisplayName("이미지 파일은 아직 지원하지 않는다")
     void rejectsImages() {
         assertThatThrownBy(() -> reader.read(new byte[] {1, 2, 3}, "photo.jpg"))
