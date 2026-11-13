@@ -14,6 +14,7 @@
 명령 (eval/ 폴더에서)
     .venv/bin/python -m rag.followup_evidence form       # → eval/.cache/labeling/followup-evidence.html (근거 원문이 있어 커밋 안 함)
     .venv/bin/python -m rag.followup_evidence apply <내려받은 JSON>   # 정답셋(followup-v1.jsonl)에 expectedSections를 채운다
+    --gold followup/<이름>.jsonl   # 다른 정답셋. 제안·manifest는 같은 폴더의 <이름>.evidence-suggestions.json, <이름>.manifest.json
 """
 from __future__ import annotations
 
@@ -27,8 +28,6 @@ from run_record import ROOT
 
 CHUNKS = ROOT / "data" / "guidelines" / "chunks" / "chunks.jsonl"
 GOLD = OUT / "followup-v1.jsonl"
-MANIFEST = OUT / "followup-v1.manifest.json"
-SUGGESTIONS = OUT / "followup-v1.evidence-suggestions.json"
 LABELED = ("answerable", "unanswerable")
 CRITERIA_DOC = "mohw-2026-6-annex4"
 # 주제 → 근거 문서. 후보를 좁히는 데만 쓴다. 화면에서 전체 문서로 넓혀 볼 수 있다
@@ -70,8 +69,14 @@ def unit_ids_sha() -> str:
     return hashlib.sha256(spec.encode()).hexdigest()[:16]
 
 
-def gold_rows() -> list[dict]:
-    return [json.loads(line) for line in GOLD.read_text(encoding="utf-8").splitlines() if line.strip()]
+def gold_set(gold: Path) -> tuple[str, Path, Path]:
+    """정답셋 이름, manifest, Claude 제안 파일"""
+    name = gold.name.removesuffix(".jsonl")
+    return name, gold.with_name(f"{name}.manifest.json"), gold.with_name(f"{name}.evidence-suggestions.json")
+
+
+def gold_rows(gold: Path = GOLD) -> list[dict]:
+    return [json.loads(line) for line in gold.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
 def candidate_units(row: dict, flagged: list[dict], all_units: list[dict]) -> list[str]:
@@ -93,13 +98,15 @@ def candidate_units(row: dict, flagged: list[dict], all_units: list[dict]) -> li
     return out
 
 
-def build_form() -> Path:
+def build_form(gold: Path = GOLD) -> Path:
+    name, _, suggestions_file = gold_set(gold)
     all_units = units()
     contexts = {c["key"]: c for c in report_contexts()}
-    suggestions = json.loads(SUGGESTIONS.read_text(encoding="utf-8"))["suggestions"] if SUGGESTIONS.exists() else {}
+    suggestions = (json.loads(suggestions_file.read_text(encoding="utf-8"))["suggestions"]
+                   if suggestions_file.exists() else {})
     known = {u["id"] for u in all_units}
     questions = []
-    for r in gold_rows():
+    for r in gold_rows(gold):
         if r["category"] not in LABELED:
             continue
         ctx = contexts.get(r.get("report") or "")
@@ -111,26 +118,29 @@ def build_form() -> Path:
         if suggestion and candidates:  # 제안한 단위가 후보 밖이어도 보이게 한다
             candidates += [u for u in suggestion["units"] if u not in candidates]
         questions.append({**r, "flagged": flagged, "candidates": candidates, "suggestion": suggestion})
-    data = {"set": "followup-v1", "unitsSha256": unit_ids_sha(), "categories": CATEGORIES, "topics": TOPICS,
+    data = {"set": name, "unitsSha256": unit_ids_sha(), "categories": CATEGORIES, "topics": TOPICS,
             "questions": questions, "units": all_units}
     html = (Path(__file__).parent / "followup_evidence.html").read_text(encoding="utf-8")
     html = html.replace("__DATA__", json.dumps(data, ensure_ascii=False).replace("</", "<\\/"))
     SCREEN.mkdir(parents=True, exist_ok=True)
-    screen = SCREEN / "followup-evidence.html"
+    screen = SCREEN / ("followup-evidence.html" if name == "followup-v1" else f"{name}-evidence.html")
     screen.write_text(html, encoding="utf-8")
     avg = sum(len(q["candidates"]) or len(all_units) for q in questions) / len(questions)
     print(f"문항 {len(questions)}개, 단위 {len(all_units)}개, 문항당 후보 평균 {avg:.1f}개")
     return screen
 
 
-def apply(labels_file: Path) -> None:
+def apply(labels_file: Path, gold: Path = GOLD) -> None:
+    name, manifest_file, suggestions_file = gold_set(gold)
     doc = json.loads(labels_file.read_text(encoding="utf-8"))
+    if doc.get("set") != name:
+        raise SystemExit(f"라벨 파일은 {doc.get('set')}용이다. --gold가 {name}이다")
     if doc.get("unitsSha256") != unit_ids_sha():
         raise SystemExit(f"절 구성이 라벨링 때와 다르다 ({doc.get('unitsSha256')} → {unit_ids_sha()}). 라벨을 다시 맞춘다")
     labels = doc["labels"]
     known = {u["id"] for u in units()}
-    suggestions = json.loads(SUGGESTIONS.read_text(encoding="utf-8"))["suggestions"]
-    rows = gold_rows()
+    suggestions = json.loads(suggestions_file.read_text(encoding="utf-8"))["suggestions"]
+    rows = gold_rows(gold)
     pending = [r["id"] for r in rows if r["category"] in LABELED and not (labels.get(r["id"]) or {}).get("confirmed")]
     if pending:
         raise SystemExit(f"확인하지 않은 문항 {len(pending)}개: {', '.join(pending)}")
@@ -164,14 +174,14 @@ def apply(labels_file: Path) -> None:
         r["expectedSections"] = picked or None
         if label.get("note"):
             r["evidenceNote"] = label["note"]
-    GOLD.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows), encoding="utf-8")
-    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    gold.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows), encoding="utf-8")
+    manifest = json.loads(manifest_file.read_text(encoding="utf-8")) if manifest_file.exists() else {"name": name}
     manifest["evidence"] = {
         "unit": "section (고시는 행)", "unitsSha256": unit_ids_sha(), "labeledAt": doc.get("exportedAt"),
         "appliedAt": datetime.now().isoformat(timespec="seconds"),
         "suggestedBy": "claude", "keptSuggestion": same, "editedSuggestion": edited,
         "categoryChanges": changed, "rule": "절 구성이 바뀌면 라벨을 다시 맞춘다"}
-    MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    manifest_file.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     answerable = [r for r in rows if r["category"] == "answerable"]
     print(f"반영: 답 가능 {len(answerable)}문항, 평균 근거 절 "
           f"{sum(len(r['expectedSections'] or []) for r in answerable) / max(len(answerable), 1):.1f}개")
@@ -181,15 +191,16 @@ def apply(labels_file: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--gold", type=Path, default=GOLD, help="정답셋 jsonl (기본 followup-v1)")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("form")
     p_apply = sub.add_parser("apply")
     p_apply.add_argument("labels", type=Path)
     args = parser.parse_args()
     if args.command == "form":
-        print(f"라벨링 화면: {build_form()}")
+        print(f"라벨링 화면: {build_form(args.gold.resolve())}")
     else:
-        apply(args.labels)
+        apply(args.labels, args.gold.resolve())
 
 
 if __name__ == "__main__":

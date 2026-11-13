@@ -1,0 +1,19 @@
+{
+  "name": "followup-ground-v1",
+  "evidence": {
+    "unit": "section (고시는 행)",
+    "unitsSha256": "1534c1a1a6a5c142",
+    "labeledAt": "2026-11-13T09:10:46.390Z",
+    "appliedAt": "2026-11-13T18:11:28",
+    "suggestedBy": "claude",
+    "keptSuggestion": 36,
+    "editedSuggestion": [
+      "fg-003",
+      "fg-005"
+    ],
+    "categoryChanges": [
+      "fg-003 답 가능 → 답 불가: 만약 제가 이미 혈압약을 먹고 있는 사람이었다면 검진 판정이 지금이랑 다르게 나오나요?"
+    ],
+    "rule": "절 구성이 바뀌면 라벨을 다시 맞춘다"
+  }
+}
