@@ -6,93 +6,160 @@
 <title>검진 결과 해설 AI</title>
 <link rel="stylesheet" href="/app.css">
 <style>
-  .hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 48px; align-items: start; padding-top: 24px; }
-  .hero h1 { margin-top: 12px; }
-  .hero .actions { display: flex; gap: 8px; margin-top: 24px; flex-wrap: wrap; }
-  .sample { background: var(--bg-2); border-radius: 8px; padding: 20px; font-size: 14px; }
-  .sample .head { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  main { max-width: none; padding: 0; }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 20px; }
+
+  /* 첫 화면: 폭을 다 쓰는 큰 제목 하나 */
+  .hero h1 { font-size: clamp(32px, 4.6vw, 54px); line-height: 1.18; letter-spacing: -0.04em; max-width: 1000px; margin: 72px 0 24px; }
+  .hero .sub { font-size: 17px; max-width: 680px; }
+  .hero .actions { margin-top: 28px; }
+
+  /* 처리 순서: 선 위 여섯 단계, 좁으면 옆으로 넘긴다 */
+  .steps { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(168px, 1fr); gap: 24px; margin: 80px 0 96px;
+           overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; }
+  .steps > div { border-top: 1px solid var(--text); padding-top: 14px; scroll-snap-align: start; }
+  .steps .who { font-size: 12px; font-weight: 600; color: var(--muted); }
+  .steps h3 { font-size: 16px; margin: 6px 0 6px; }
+  .steps p { font-size: 13px; color: var(--text-2); margin: 0; line-height: 1.6; }
+
+  /* 대표 출력: 어두운 띠. 오른쪽 발췌가 그림 자리다 */
+  .band { background: #141413; color: #faf9f5; padding: 72px 0; }
+  .band .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 56px; align-items: center; }
+  .band h2 { margin: 12px 0 16px; font-size: 30px; }
+  .band p { color: #c2c0b6; max-width: 480px; }
+  .band .meta { color: #9c9a92; }
+  .band button { background: #faf9f5; color: #141413; border-color: #faf9f5; margin-top: 20px; }
+  .meta { font-size: 13px; color: var(--muted); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .meta .chip { border: 1px solid currentColor; border-radius: 6px; padding: 0 8px; font-size: 12px; }
+
+  .sample { background: var(--bg-2); color: var(--text); border-radius: 10px; padding: 24px; font-size: 14px; }
+  .sample .head { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
   .sample table { margin-bottom: 14px; }
   .sample td { padding: 6px 10px 6px 0; font-size: 13px; }
   .sample .say { border-left: 2px solid var(--line-2); padding-left: 12px; margin: 12px 0; }
   .sample .src { font-size: 12px; color: var(--muted); }
   .sample .q { font-weight: 600; margin-top: 14px; }
-  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
-  .two ul { margin: 8px 0; padding-left: 18px; } .two li { margin: 8px 0; }
-  .two li b { font-variant-numeric: tabular-nums; }
-  .who { display: grid; grid-template-columns: 1fr 2fr; gap: 40px; }
-  .who ol { margin: 8px 0; padding-left: 20px; } .who li { margin: 6px 0; }
-  @media (max-width: 760px) { .hero, .two, .who { grid-template-columns: 1fr; gap: 24px; } }
+
+  /* 된 것과 안 된 것: 엇갈린 두 단 */
+  .posts { display: grid; grid-template-columns: 1fr 1fr; gap: 0 64px; margin-top: 40px; }
+  .posts > div:last-child { padding-top: 140px; }
+  .post { margin-bottom: 72px; }
+  .post h3 { font-size: 21px; line-height: 1.4; letter-spacing: -0.025em; font-weight: 700; margin: 12px 0 8px; }
+  .post p { color: var(--text-2); margin: 0; }
+  .fig { background: var(--bg-2); border-radius: 10px; padding: 28px 24px; margin-bottom: 16px; }
+  .fig .cap { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .fig .bar-track { height: 10px; }
+  .fig .bar-fill.dim { background: var(--line-2); }
+  .more { font-weight: 600; }
+
+  .stack { border-top: 1px solid var(--line); padding-top: 24px; margin-top: 24px; }
+  @media (max-width: 820px) {
+    .band .wrap, .posts { grid-template-columns: 1fr; gap: 32px; }
+    .posts > div:last-child { padding-top: 0; }
+    .post { margin-bottom: 48px; }
+  }
 </style>
 </head>
 <body>
 <nav class="nav"><div><a class="brand" href="/" aria-current="page">검진 결과 해설</a><a href="/demo.html">해설 데모</a><a href="/stats.html">통계</a><a href="/quality.html">품질</a><a href="/ops.html">운영</a></div></nav>
 <main>
-  <section class="hero">
-    <div>
-      <h1>검진 결과지를 읽고, 국가 기준으로 판정하고, 근거가 있는 말만 합니다</h1>
-      <p class="sub">처음 보는 양식의 결과지 30장에서 수치 추출 F1 0.995, 위험 수치 진료 권고 73/73. 판정과 권고는 코드가 하고, LLM은 값을 베끼고 출처가 붙은 문장만 씁니다. 진단은 하지 않습니다.</p>
-      <div class="actions">
-        <button type="button" onclick="location.href='/demo.html'">샘플로 해설 보기</button>
-      </div>
-    </div>
-    <div class="sample" aria-label="데모 실제 출력 발췌">
-      <div class="head"><span>샘플 nar-001 실제 출력</span><span>2026-11-12 · <code>explanation-v1</code></span></div>
-      <table>
-        <tr><td>공복혈당</td><td class="num">206 mg/dL</td><td class="j j-SUSPECT">질환의심</td></tr>
-        <tr><td>요단백</td><td class="num">약양성(±)</td><td class="j j-NORMAL_B">정상B(경계)</td></tr>
-        <tr><td>AST</td><td class="num">125 U/L</td><td class="j j-SUSPECT">질환의심</td></tr>
-      </table>
-      <div class="say">공복혈당 206 mg/dL은 질환의심 기준인 126 이상에 해당합니다. 다만 이 결과만으로 어떤 병이 있다고 단정할 수는 없습니다.<sup>[3]</sup>
-        <div class="src">[3] 건강검진 실시기준 [별표 4] · 검사항목별 판정기준</div></div>
-      <div class="q">“제가 당뇨병인가요?”</div>
-      <div><span class="pill s-bad">진단 질문이라 답하지 않음</span></div>
-      <div class="small">어떤 병이 있는지는 이 서비스가 판단할 수 없습니다. 정확한 진단은 의료진과 상담하세요.</div>
+  <section class="wrap hero">
+    <h1>검진 결과지를 읽고, 국가 기준으로 판정하고, 근거가 있는 말만 합니다</h1>
+    <p class="sub">처음 보는 양식의 결과지 30장에서 수치 추출 F1 0.995, 위험 수치 진료 권고 73/73. 판정과 권고는 코드가 하고, LLM은 값을 베끼고 출처가 붙은 문장만 씁니다. 진단은 하지 않습니다.</p>
+    <div class="actions"><button type="button" onclick="location.href='/demo.html'">샘플로 해설 보기</button></div>
+
+    <div class="steps" aria-label="처리 순서">
+      <div><span class="who">01 · LLM</span><h3>추출</h3><p>결과지 PDF에서 항목·값·단위를 구조화 출력으로 뽑습니다</p></div>
+      <div><span class="who">02 · 코드</span><h3>원문 대조</h3><p>뽑은 값이 원문에 없으면 버립니다</p></div>
+      <div><span class="who">03 · 코드</span><h3>판정</h3><p>보건복지부 고시 판정기준표로 정상A·경계·질환의심을 정합니다</p></div>
+      <div><span class="who">04 · 코드</span><h3>근거 조회</h3><p>항목 코드로 공개 문서 9편에서 근거 절을 찾습니다</p></div>
+      <div><span class="who">05 · LLM</span><h3>해설</h3><p>근거 절을 인용해 7개 항목의 문장을 씁니다. 10개 항목은 고정 문구입니다</p></div>
+      <div><span class="who">06 · 코드</span><h3>검증·권고</h3><p>인용과 숫자를 근거와 대조하고, 위험 수치에 진료 권고와 고지를 붙입니다</p></div>
     </div>
   </section>
 
-  <h2>된 것과 안 된 것</h2>
-  <div class="two">
-    <div>
-      <h3 class="good">된 것</h3>
-      <ul>
-        <li>결과지 수치 추출 <b>F1 0.995</b>. 보고서 한 장에 5초, $0.0012</li>
-        <li>위험 수치 진료 권고 <b>73/73</b>, 잘못된 권고 0</li>
-        <li>외부로 보내기 전 식별정보 <b>0/90</b> 남음</li>
-        <li>판정 해설을 벡터 검색에서 항목 코드 조회로 바꿔 비용 <b>−27%</b>, LLM 지연 6.0초 → 3.3초</li>
-      </ul>
+  <section class="band">
+    <div class="wrap">
+      <div>
+        <div class="meta"><span class="chip">실제 출력</span><span>서술형 샘플 결과지</span><span>2026-11-12</span></div>
+        <h2>공복혈당 206 mg/dL을 질환의심으로 판정하고, 출처를 붙여 설명하고, 진단 질문은 거절했습니다</h2>
+        <p>데모에서 나온 그대로 옮겼습니다. 판정은 코드가 기준표로 하고, 해설 문장은 허락된 근거를 인용하고 근거에 없는 숫자가 없을 때만 남습니다.</p>
+        <button type="button" onclick="location.href='/demo.html'">직접 해 보기</button>
+      </div>
+      <div class="sample" aria-label="데모 실제 출력 발췌">
+        <div class="head"><span>판정 · 해설 · 후속 질문</span><span><code>explanation-v1</code></span></div>
+        <table>
+          <tr><td>공복혈당</td><td class="num">206 mg/dL</td><td class="j j-SUSPECT">질환의심</td></tr>
+          <tr><td>요단백</td><td class="num">약양성(±)</td><td class="j j-NORMAL_B">정상B(경계)</td></tr>
+          <tr><td>AST</td><td class="num">125 U/L</td><td class="j j-SUSPECT">질환의심</td></tr>
+        </table>
+        <div class="say">공복혈당 206 mg/dL은 질환의심 기준인 126 이상에 해당합니다. 다만 이 결과만으로 어떤 병이 있다고 단정할 수는 없습니다.<sup>[3]</sup>
+          <div class="src">[3] 건강검진 실시기준 [별표 4] · 검사항목별 판정기준</div></div>
+        <div class="q">“제가 당뇨병인가요?”</div>
+        <div><span class="pill s-bad">진단 질문이라 답하지 않음</span></div>
+        <div class="small">어떤 병이 있는지는 이 서비스가 판단할 수 없습니다. 정확한 진단은 의료진과 상담하세요.</div>
+      </div>
     </div>
-    <div>
-      <h3 class="bad">안 된 것</h3>
-      <ul>
-        <li>후속 질문은 시험에서 진단 질문 <b>2건</b>에 답해 통과 기준을 못 넘었습니다</li>
-        <li>질문 분류 단계를 더한 뒤 새 문항에서 진단 요청 <b>36건 중 1건</b>에 아직 답합니다(예전 방식이면 22건). 같은 질문도 분류가 매번 같지 않습니다</li>
-        <li>정답 근거를 인용해 답한 비율은 시험 <b>8~10/18</b>입니다</li>
-        <li>결과지는 모두 합성이고, 라벨러는 의료인이 아닌 개발자 1명입니다</li>
-      </ul>
-      <a href="/quality.html">평가 기록 전체 보기</a>
-    </div>
-  </div>
+  </section>
 
-  <h2>누가 무엇을 하나</h2>
-  <div class="who">
-    <div>
-      <h3>LLM (Claude Haiku 5.5)</h3>
-      <ol>
-        <li>결과지 PDF에서 항목·값·단위를 뽑습니다</li>
-        <li>근거 문단을 인용해 해설 문장을 씁니다</li>
-      </ol>
+  <section class="wrap">
+    <h2>된 것과 안 된 것</h2>
+    <p class="sub">모든 수치는 합성 결과지로 쟀습니다. 목표를 못 채운 것도 같은 무게로 적습니다.</p>
+    <div class="posts">
+      <div>
+        <article class="post">
+          <div class="fig" aria-label="추출 F1 비교">
+            <div class="cap">항목 F1 · 처음 보는 양식 30장</div>
+            <div class="bar-row"><span>Claude Haiku 5.5</span><div class="bar-track"><div class="bar-fill" style="width:99.5%"></div></div><span>0.995</span></div>
+            <div class="bar-row"><span>qwen3:4b (로컬)</span><div class="bar-track"><div class="bar-fill dim" style="width:92.5%"></div></div><span>0.925</span></div>
+          </div>
+          <div class="meta"><span class="pill s-good">된 것</span><span>추출 · ADR 0005</span></div>
+          <h3>처음 보는 양식 30장에서 수치 추출 F1 0.995</h3>
+          <p>구조화 출력으로 뽑고 원문과 대조해 받아들입니다. 보고서 한 장에 5초, $0.0012입니다.</p>
+        </article>
+        <article class="post">
+          <div class="fig" aria-label="진단 요청에 답한 건수 비교">
+            <div class="cap">진단 요청 36건 중 답한 건수 · 같은 실행</div>
+            <div class="bar-row"><span>예전 방식</span><div class="bar-track"><div class="bar-fill dim" style="width:61.1%"></div></div><span>22/36</span></div>
+            <div class="bar-row"><span>분류 + 답 검사</span><div class="bar-track"><div class="bar-fill" style="width:2.8%"></div></div><span>1/36</span></div>
+          </div>
+          <div class="meta"><span class="pill s-bad">안 된 것</span><span>후속 질문 · ADR 0014</span></div>
+          <h3>진단 요청 36건 중 1건에 아직 답합니다</h3>
+          <p>질문 분류 단계와 답 검사를 더해 22건에서 1건으로 줄었지만 0이 아닙니다. 같은 질문도 분류가 매번 같지 않습니다.</p>
+        </article>
+        <article class="post">
+          <div class="meta"><span class="pill s-good">된 것</span><span>개인정보 · ADR 0006</span></div>
+          <h3>외부로 보내기 전 식별정보 0/90 남음</h3>
+          <p>합성 결과지 60개에서 이름·생년월일 같은 식별정보를 지운 뒤 모델에 보냅니다.</p>
+        </article>
+      </div>
+      <div>
+        <article class="post">
+          <div class="meta"><span class="pill s-good">된 것</span><span>진료 권고 · ADR 0010</span></div>
+          <h3>위험 수치 진료 권고 73/73, 잘못된 권고 0</h3>
+          <p>처음 보는 양식 30장을 2회 돌렸습니다. 같은 판정 규칙과 기준 데이터를 쓰는 앱과 평가의 일치라는 한계가 있습니다.</p>
+        </article>
+        <article class="post">
+          <div class="fig" aria-label="LLM 문장 수 비교">
+            <div class="cap">판정 해설의 LLM 문장 수 · 30장 × 2회</div>
+            <div class="bar-row"><span>벡터 검색</span><div class="bar-track"><div class="bar-fill dim" style="width:100%"></div></div><span>437</span></div>
+            <div class="bar-row"><span>항목 코드 조회</span><div class="bar-track"><div class="bar-fill" style="width:40.3%"></div></div><span>176</span></div>
+          </div>
+          <div class="meta"><span class="pill s-good">된 것</span><span>해설 · ADR 0010</span></div>
+          <h3>벡터 검색을 항목 코드 조회로 바꿔 비용 −27%</h3>
+          <p>입력이 닫힌 곳에는 검색을 쓰지 않습니다. LLM 지연은 6.0초에서 3.3초로 줄었습니다.</p>
+        </article>
+        <article class="post">
+          <div class="meta"><span class="pill s-bad">안 된 것</span><span>후속 질문 · ADR 0011</span></div>
+          <h3>정답 근거를 인용한 답은 시험 8~10/18</h3>
+          <p>목표에 못 미쳤습니다. 결과지는 모두 합성이고, 라벨러는 의료인이 아닌 개발자 1명입니다.</p>
+        </article>
+        <a class="more" href="/quality.html">평가 기록 전체 보기 →</a>
+      </div>
     </div>
-    <div>
-      <h3>코드</h3>
-      <ol>
-        <li>뽑은 값이 원문에 있는지 대조하고, 없으면 버립니다</li>
-        <li>보건복지부 고시 판정기준표로 판정합니다</li>
-        <li>항목 코드로 공개 문서 9편에서 근거 절을 찾습니다</li>
-        <li>인용과 숫자가 근거에 있는지 검증하고, 위험 수치에 진료 권고와 고지를 붙입니다</li>
-      </ol>
-    </div>
-  </div>
-  <p class="small" style="margin-top:40px">Java 21 · Spring Boot 4 · Spring AI 2 · PostgreSQL 18 + pgvector · Claude Haiku 5.5 · Ollama(bge-m3) · Python 평가 스크립트. 모든 LLM 호출의 토큰·비용·지연을 기록하고, 보내기 전에 식별정보를 지웁니다.</p>
+
+    <p class="small stack">Java 21 · Spring Boot 4 · Spring AI 2 · PostgreSQL 18 + pgvector · Claude Haiku 5.5 · Ollama(bge-m3) · Python 평가 스크립트. 모든 LLM 호출의 토큰·비용·지연을 기록하고, 보내기 전에 식별정보를 지웁니다.</p>
+  </section>
 </main>
 <footer class="foot">합성 데이터로 만든 포트폴리오 데모입니다. 이 내용은 의료 진단이 아니며, 정확한 판단은 의료진과 상담하세요.</footer>
 </body>
