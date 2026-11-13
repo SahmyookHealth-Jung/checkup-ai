@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>해설 데모 · 검진 결과 해설 AI</title>
+<title>결과지 해설받기 · Checkup AI</title>
 <link rel="stylesheet" href="/app.css">
 <style>
   .summary { font-size: 15px; margin: 24px 0 12px; }
@@ -37,16 +37,18 @@
 </style>
 </head>
 <body>
-<nav class="nav"><div><a class="brand" href="/">검진 결과 해설</a><a href="/demo.html" aria-current="page">해설 데모</a><a href="/stats.html">통계</a><a href="/quality.html">품질</a><a href="/ops.html">운영</a></div></nav>
+<nav class="nav"><div><a class="brand" href="/">Checkup AI</a><a href="/demo.html" aria-current="page">결과지 해설받기</a><a href="/stats.html">통계</a><a href="/quality.html">품질</a><a href="/ops.html">운영</a></div></nav>
 <main>
-  <h1>검진 결과 해설</h1>
-  <p class="sub">합성 결과지를 하나 고르거나 직접 만든 가상의 결과지를 올리면 추출 → 국가 기준 판정 → 근거 조회 → 출처 붙은 해설까지 돌립니다. 실제 결과지는 올리지 마세요.</p>
+  <h1>결과지 해설받기</h1>
+  <p class="sub">합성 결과지를 하나 고르거나 직접 만든 가상의 결과지를 올리면 추출 → 국가 기준 판정 → 근거 조회 → 출처 붙은 해설까지 돌립니다.</p>
   <div class="controls">
     <select id="sample" aria-label="합성 샘플 결과지"><option>불러오는 중…</option></select>
     <button id="run" type="button">해설 보기</button>
     <label class="upload">또는 가상 결과지 올리기 (글자가 있는 PDF·txt)<input id="file" type="file" accept=".pdf,.txt,application/pdf,text/plain"></label>
     <span class="status" id="status"></span>
   </div>
+  <!-- 메뉴 이름이 '결과지 해설받기'라 실제 결과지를 올리기 쉽다. 합성 데이터만 쓰는 규칙(CLAUDE.md 절대 규칙 1)을 화면에서도 분명히 한다 -->
+  <p class="care review"><b>실제 결과지는 올리지 마세요</b>체험용 화면입니다. 샘플 결과지나 직접 만든 가상의 결과지만 써 주세요.</p>
   <div class="controls" id="history" hidden></div>
   <p class="empty small" id="empty">샘플 이름의 질환의심·경계는 결과지에 적힌 값을 판정기준표로 미리 판정한 것입니다. 샘플을 고르고 <b>해설 보기</b>를 누르세요. 처음 고른 샘플은 추출까지 10초 안팎 걸리고, 같은 샘플은 다시 추출하지 않습니다.</p>
 

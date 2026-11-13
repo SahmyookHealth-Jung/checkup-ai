@@ -11,9 +11,9 @@
 
 전 직장의 코드, DB 스키마, 실제 수검자 데이터는 쓰지 않았다. 합성 결과지와 공공데이터만 썼다.
 
-| 해설 데모: 추출 → 국가 기준 판정 | 후속 질문: 진단 질문은 답하지 않음 |
+| 결과지 해설받기: 추출 → 국가 기준 판정 | 후속 질문: 진단 질문은 답하지 않음 |
 |---|---|
-| ![해설 데모](docs/images/demo.png) | ![후속 질문 거절](docs/images/demo-followup.png) |
+| ![결과지 해설받기](docs/images/demo.png) | ![후속 질문 거절](docs/images/demo-followup.png) |
 | **통계 질문: 한국어 → 검사한 SQL → 집계** | **품질: 실패를 포함한 평가 기록** |
 | ![통계 질문](docs/images/stats.png) | ![품질](docs/images/quality.png) |
 
@@ -88,7 +88,7 @@ curl localhost:8080/actuator/health
 
 - 화면: http://localhost:8080 ([ADR 0012](docs/adr/0012-화면-개편과-데모-예산.md))
   - 소개 `/`: 무엇을 하고 하지 않는지, 대표 수치와 한계
-  - 해설 데모 `/demo.html`: 합성 샘플이나 직접 만든 가상 결과지(글자 있는 PDF·txt, 10MB까지)로 추출 → 판정 → 해설, 그리고 후속 질문. 최근 본 결과 10개는 브라우저에만 남아 새로고침해도 다시 돌리지 않는다
+  - 결과지 해설받기 `/demo.html`: 합성 샘플이나 직접 만든 가상 결과지(글자 있는 PDF·txt, 10MB까지)로 추출 → 판정 → 해설, 그리고 후속 질문. 최근 본 결과 10개는 브라우저에만 남아 새로고침해도 다시 돌리지 않는다
   - 품질 `/quality.html`: 평가 기록(실패 포함). 평가를 새로 돌리면 `(cd eval && .venv/bin/python build_dashboard_data.py)`로 데이터를 다시 만든다
   - 통계 `/stats.html`: 관리자 통계 질문(Text-to-SQL). SQL, 결과 표, 10명 미만 집단 숨김을 보여 준다 ([ADR 0013](docs/adr/0013-Text-to-SQL-통계-어시스턴트-설계.md))
   - 운영 `/ops.html`: LLM 호출 기록의 기능별·날짜별 호출, 비용, 지연
