@@ -2,3 +2,5 @@ gradlew text eol=lf
 *.bat text eol=crlf
 *.jar binary
 *.sh text eol=lf
+# 프롬프트 템플릿(.st)이 GitHub 언어 막대에 Smalltalk으로 잡히지 않게 한다
+*.st linguist-language=StringTemplate
