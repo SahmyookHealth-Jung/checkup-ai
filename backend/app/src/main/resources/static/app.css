@@ -13,6 +13,7 @@
   --a-bg: #eaf6ee; --b-bg: #fdf4e3; --s-bg: #fdecec;
   /* 차트 범주색: dataviz 기준 팔레트 1~3번 (세 개까지 모든 짝이 색각 이상 검사를 통과) */
   --series-1: #2a78d6; --series-2: #eb6834; --series-3: #1baf7a; --series-4: #eda100; --series-5: #8b9491;
+  --read: 16px; --read-lh: 1.75;   /* 해설·답 문장: 가장 많이 읽는 글이라 본문보다 한 단계 크게 */
   --font: "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
 }
 @media (prefers-color-scheme: dark) {
@@ -33,13 +34,18 @@ h1 { font-size: 32px; line-height: 1.3; letter-spacing: -0.025em; font-weight: 7
 h2 { font-size: 22px; line-height: 1.35; letter-spacing: -0.02em; font-weight: 700; margin: 64px 0 12px; }
 h3 { font-size: 17px; letter-spacing: -0.01em; font-weight: 600; margin: 0 0 6px; }
 p { margin: 8px 0; }
+h1, h2, h3 { text-wrap: balance; }
+p, li { text-wrap: pretty; }
+[id] { scroll-margin-top: 72px; }   /* 고정 머리글(56px) 밑에 앵커가 숨지 않게 */
+:target { background: var(--b-bg); transition: background 1.2s; }
+.read { font-size: var(--read); line-height: var(--read-lh); }
+.mono, code { overflow-wrap: anywhere; }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; text-underline-offset: 3px; }
 code { font-size: 13px; background: var(--bg-2); padding: 1px 5px; border-radius: 4px; }
 .sub { color: var(--text-2); max-width: 640px; font-size: 16px; }
 .small { font-size: 13px; color: var(--muted); }
 .tag { font-size: 13px; font-weight: 500; color: var(--muted); margin-left: 8px; letter-spacing: 0; }
-.kicker, .crumb { font-size: 13px; color: var(--muted); margin: 0; }
 .num, .tnum { font-variant-numeric: tabular-nums; }
 
 /* 머리글: 흰 바탕 한 줄 */
@@ -57,12 +63,13 @@ code { font-size: 13px; background: var(--bg-2); padding: 1px 5px; border-radius
 .card { border: 1px solid var(--line); border-radius: 8px; padding: 20px; margin: 12px 0; background: var(--bg); }
 .panel { background: var(--bg-2); border-radius: 8px; padding: 20px; }
 .grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin: 12px 0; }
-.stat .label { font-size: 13px; color: var(--muted); }
-.stat .value { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-.stat .note { font-size: 13px; color: var(--muted); }
 
 /* 경고·고지 */
 .disclaimer { font-size: 13px; color: var(--muted); margin: 12px 0; }
+/* 진료 권고: 제목이 곧 할 일, 색만으로 알리지 않는다 (NHS care card 방식) */
+.care { border-left: 3px solid var(--s); background: var(--s-bg); border-radius: 0 6px 6px 0; padding: 10px 14px; margin-top: 12px; font-size: 14px; }
+.care b { display: block; margin-bottom: 2px; }
+.care.review { border-left-color: var(--b); background: var(--b-bg); }
 .warn { background: var(--s-bg); color: var(--text); border-radius: 8px; padding: 12px 16px; margin: 12px 0; font-size: 14px; }
 
 /* 상태: 색 점 + 글자 (색만으로 구분하지 않는다) */

@@ -29,16 +29,14 @@
 <main>
   <section class="hero">
     <div>
-      <p class="kicker">합성 데이터로 만든 포트폴리오 · 2026</p>
       <h1>검진 결과지를 읽고, 국가 기준으로 판정하고, 근거가 있는 말만 합니다</h1>
       <p class="sub">처음 보는 양식의 결과지 30장에서 수치 추출 F1 0.995, 위험 수치 진료 권고 73/73. 판정과 권고는 코드가 하고, LLM은 값을 베끼고 출처가 붙은 문장만 씁니다. 진단은 하지 않습니다.</p>
       <div class="actions">
         <button type="button" onclick="location.href='/demo.html'">샘플로 해설 보기</button>
-        <button type="button" class="alt" onclick="location.href='/quality.html'">평가 기록 보기</button>
       </div>
     </div>
     <div class="sample" aria-label="데모 실제 출력 발췌">
-      <div class="head"><span>샘플 nar-001 실제 출력</span><span>2026-11-12</span></div>
+      <div class="head"><span>샘플 nar-001 실제 출력</span><span>2026-11-12 · <code>explanation-v1</code></span></div>
       <table>
         <tr><td>공복혈당</td><td class="num">206 mg/dL</td><td class="j j-SUSPECT">질환의심</td></tr>
         <tr><td>요단백</td><td class="num">약양성(±)</td><td class="j j-NORMAL_B">정상B(경계)</td></tr>

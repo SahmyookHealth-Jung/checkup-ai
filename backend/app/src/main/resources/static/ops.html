@@ -14,6 +14,8 @@
   .summary { font-size: 16px; line-height: 1.8; max-width: 760px; }
   .summary b { font-variant-numeric: tabular-nums; }
   .budget-track { background: var(--bg-2); border-radius: 4px; height: 8px; max-width: 420px; margin-top: 8px; overflow: hidden; }
+  .days a { margin-right: 12px; } .days a[aria-current="page"] { font-weight: 700; color: var(--text); text-decoration: none; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; background: var(--c); margin-right: 6px; }
   .budget-fill { height: 100%; background: var(--accent); border-radius: 4px; }
 </style>
 </head>
@@ -24,14 +26,14 @@
   <p class="sub">앱의 모든 LLM 호출은 토큰·비용·지연·상태를 <code>llm_call_log</code>에 남깁니다(ADR 0006). 결과지 원문은 남기지 않습니다.
     평가 스크립트가 직접 부른 채점 모델(Sonnet) 호출은 여기에 없습니다.</p>
   <div class="controls">
-    <label for="days">기간</label>
-    <select id="days"><option value="7">최근 7일</option><option value="14" selected>최근 14일</option><option value="30">최근 30일</option></select>
+    <span class="days" id="days">기간 <a href="?days=7">7일</a><a href="?days=14">14일</a><a href="?days=30">30일</a></span>
     <span class="status" id="status">불러오는 중…</span>
   </div>
 
   <p class="summary" id="tiles"></p>
 
-  <h2>날짜별 비용</h2>
+  <h2 id="chart-title">날짜별 비용</h2>
+  <p class="small" id="chart-sub">단위 달러, 기능별로 쌓은 막대. 막대를 누르거나 올리면 그날 값이 보이고, 자세한 값은 아래 표에 있습니다.</p>
   <div class="chart" id="chart"></div>
   <div class="legend" id="legend"></div>
 
@@ -68,10 +70,14 @@
   const usd = v => '$' + Number(v).toFixed(Number(v) < 1 ? 4 : 2);
   const int = v => Number(v).toLocaleString('ko-KR');
 
+  const DAYS = [7, 14, 30].includes(Number(new URLSearchParams(location.search).get('days')))
+    ? Number(new URLSearchParams(location.search).get('days')) : 14;
+  document.querySelectorAll('#days a').forEach(a => { if (a.getAttribute('href') === `?days=${DAYS}`) a.setAttribute('aria-current', 'page'); });
+
   async function load() {
     $('status').textContent = '불러오는 중…';
     try {
-      const data = await fetch(`/api/ops/llm-usage?days=${$('days').value}`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+      const data = await fetch(`/api/ops/llm-usage?days=${DAYS}`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
       render(data);
       $('status').textContent = `${new Date(data.since).toLocaleDateString('ko-KR')}부터`;
     } catch (e) {
@@ -86,14 +92,22 @@
     const limit = Number(d.dailyBudgetUsd ?? 0);
     const today = Number(d.todayCostUsd);
     const used = limit > 0 ? Math.min(today / limit, 1) : 0;
-    $('tiles').replaceChildren(
+    if (!calls) {
+      $('tiles').textContent = '아직 호출 기록이 없습니다. 해설 데모를 한 번 돌리면 여기 쌓입니다.';
+      $('chart-title').textContent = '날짜별 비용';
+    } else {
+      const top = GROUPS.map(g => ({ g, cost: d.byFeature.filter(f => g.match(f.feature)).reduce((s, f) => s + Number(f.costUsd), 0) }))
+        .sort((a, b) => b.cost - a.cost)[0];
+      $('chart-title').textContent = `최근 ${d.days}일 비용의 ${Math.round(top.cost / cost * 100)}%는 ${top.g.label}입니다`;
+    }
+    if (calls) $('tiles').replaceChildren(
       '오늘 ', el('b', {}, usd(today)), ' 썼습니다',
       ...(limit > 0 ? [` (데모 하루 상한 ${usd(limit)}의 `, el('b', {}, `${Math.round(used * 100)}%`), ').'] : [' (상한 꺼짐).']),
       ` 최근 ${d.days}일 동안 `, el('b', {}, `${int(calls)}회`), ' 호출에 ', el('b', {}, usd(cost)),
       `, 호출당 ${calls ? usd(cost / calls) : '-'}, 실패 ${int(errors)}건입니다.`,
       limit > 0 ? el('div', { class: 'budget-track', title: '오늘 비용 / 하루 상한' }, el('div', { class: 'budget-fill', style: `width:${used * 100}%` })) : '');
     $('table').replaceChildren(...d.byFeature.map(f => el('tr', {},
-      el('td', {}, `${groupOf(f.feature).label} `, el('span', { class: 'small' }, f.feature)),
+      el('td', {}, el('span', { class: 'dot', style: `--c:${groupOf(f.feature).color}` }), `${groupOf(f.feature).label} `, el('span', { class: 'small' }, f.feature)),
       el('td', { class: 'num' }, int(f.calls)), el('td', { class: 'num' }, int(f.errors)),
       el('td', { class: 'num' }, int(f.inputTokens)), el('td', { class: 'num' }, int(f.outputTokens)),
       el('td', { class: 'num' }, usd(f.costUsd)), el('td', { class: 'num' }, usd(Number(f.costUsd) / Math.max(f.calls, 1))),
@@ -136,7 +150,7 @@
         const label = svg('text', { x: x + bw / 2, y: H - 8, 'text-anchor': 'middle' }); label.textContent = day.slice(5).replace('-', '/'); root.append(label);
       }
       const hit = svg('rect', { x: L + step * i, y: T, width: step, height: H - T - B, fill: 'transparent' });
-      hit.addEventListener('mouseenter', () => {
+      const show = () => {
         const total = GROUPS.reduce((s, g) => s + byDay[day][g.key].cost, 0);
         tip.replaceChildren(el('b', {}, `${day} · ${usd(total)}`),
           ...GROUPS.map(g => el('div', {}, el('span', { style: `--c:${g.color}` }, `${g.label} ${usd(byDay[day][g.key].cost)} · ${byDay[day][g.key].calls}회`))));
@@ -144,7 +158,9 @@
         const box = $('chart').getBoundingClientRect(), scale = box.width / W;
         tip.style.left = `${Math.min((L + step * i + step) * scale + 8, box.width - 190)}px`;
         tip.style.top = '12px';
-      });
+      };
+      hit.addEventListener('mouseenter', show);
+      hit.addEventListener('click', show);
       hit.addEventListener('mouseleave', () => { tip.hidden = true; });
       root.append(hit);
     });
@@ -157,7 +173,6 @@
     return `M${x},${y + h} V${y + r} Q${x},${y} ${x + r},${y} H${x + w - r} Q${x + w},${y} ${x + w},${y + r} V${y + h} Z`;
   }
 
-  $('days').addEventListener('change', load);
   load();
 </script>
 </body>

@@ -87,7 +87,10 @@
 - [7 Signs a UI Has Been Vibe Coded (The Fountain Institute)](https://www.thefountaininstitute.com/blog/signs-vibe-coded-ui)
 - [Why Your AI Keeps Building the Same Purple Gradient Website](https://prg.sh/ramblings/Why-Your-AI-Keeps-Building-the-Same-Purple-Gradient-Website)
 
-## 부록: 4번째 시안 점검 (조사 세션, 2026-11-13, 아직 반영 안 한 제안)
+## 부록: 4번째 시안 점검 (조사 세션, 2026-11-13)
+
+**반영 (2026-11-13, 사용자 결정 "색 빼고 반영"):** A2의 2~6번, A3 중 색이 아닌 것(앵커 여백·`:target`·`text-wrap`·해설 16px/1.75·고정폭 줄바꿈), A4의 소개 1·2, 데모 1~4, 품질 1~5(미달 줄 바탕색 제외), 운영 1~5.
+**반영 안 함:** 색 관련 전부. A2-1과 A3의 잉크색 버튼·링크·막대, A4 소개-3(된 것/안 된 것 제목색), 품질-2의 미달 줄 바탕색. A4 소개-4(항목마다 근거 숫자)는 바로 위 "된 것" 목록과 겹쳐 넣지 않았다. 데모의 첫 샘플 자동 실행은 들어올 때마다 LLM 비용이 들어 빈 상태 문구만 바꿨다.
 
 위 1~6절로 다시 만든 현재 화면(커밋 0eb1207 기준)을 읽고, 실제 사이트에서 잰 값과 비교해 남은 틈만 적었다. 방향은 위와 같다. 3절의 청록 강조색을 바꾸자는 제안(A2의 1번)은 위 토큰과 충돌하니, 반영 여부는 따로 정한다.
 ### A1. AI 티 목록에 더할 것 (기존 가이드 1절 보충)

@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="/app.css">
 <style>
   .hl td:first-child { color: var(--muted); font-size: 13px; white-space: nowrap; }
-  .hl .v { font-weight: 700; font-size: 16px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .hl .v { font-weight: 600; font-size: 16px; white-space: nowrap; font-variant-numeric: tabular-nums; }
   .hl .d { color: var(--text-2); font-size: 13px; margin-top: 2px; }
   .matrix td.hit { font-weight: 700; }
   .matrix td.unsafe { color: var(--s); font-weight: 700; background: var(--s-bg); }
@@ -15,6 +15,8 @@
   .tabs button { background: var(--bg); color: var(--text-2); border-color: var(--line-2); font-weight: 500; font-size: 13px; padding: 5px 12px; }
   .tabs button[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
   .tabs .sep { width: 1px; height: 18px; background: var(--line-2); margin: 0 6px; }
+  .tabs .name { font-size: 12px; color: var(--muted); margin-right: 2px; }
+  #fu-sum { font-size: 14px; margin: 0 0 12px; }
   .fu { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 40px; }
   .fu .big { font-size: 32px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
   @media (max-width: 760px) { .fu { grid-template-columns: 1fr; gap: 16px; } }
@@ -43,7 +45,7 @@
       <div id="fu-bars" style="margin-top:16px"></div>
     </div>
     <div>
-      <div class="grid" id="fu-tiles" style="margin-top:0"></div>
+      <p id="fu-sum"></p>
       <div class="scroll"><table class="matrix">
         <thead><tr><th>기대 행동</th><th class="num">답</th><th class="num">근거 없음</th><th class="num">진단 거절</th><th class="num">약·치료 거절</th><th class="num">악성</th></tr></thead>
         <tbody id="fu-matrix"></tbody>
@@ -58,11 +60,14 @@
   <div id="faith" style="max-width:640px"></div>
 
   <h2>평가 기록 전체</h2>
-  <p class="small">dirty=true인 기록은 커밋하지 않은 변경이 있던 때라 비교 수치로 쓰지 않았습니다.</p>
-  <div class="scroll"><table>
-    <thead><tr><th>날짜</th><th>종류</th><th>이름</th><th>커밋</th><th>대표 값</th></tr></thead>
-    <tbody id="runs"></tbody>
-  </table></div>
+  <details id="runs-box">
+    <summary id="runs-sum">평가 기록 펼치기</summary>
+    <p class="small">dirty=true인 기록은 커밋하지 않은 변경이 있던 때라 비교 수치로 쓰지 않았습니다.</p>
+    <div class="scroll"><table>
+      <thead><tr><th>날짜</th><th>종류</th><th>이름</th><th>커밋</th><th>대표 값</th></tr></thead>
+      <tbody id="runs"></tbody>
+    </table></div>
+  </details>
 </main>
 <footer class="foot">합성 데이터로 만든 포트폴리오 데모입니다. 이 내용은 의료 진단이 아니며, 정확한 판단은 의료진과 상담하세요.</footer>
 <script>
@@ -92,9 +97,11 @@
 
   function render() {
     const by = st => data.highlights.filter(h => h.status === st).length;
-    $('lede').replaceChildren(`기능 1은 합성 결과지로, 기능 2(통계)는 공공데이터 표본으로 쟀습니다. 아래 ${data.highlights.length}개 중 `,
-      el('span', { class: 'good' }, `목표를 채운 것 ${by('good')}개`), ', ', el('span', { class: 's-limit' }, `조건이 붙은 것 ${by('limit')}개`), ', ',
-      el('span', { class: 'bad' }, `못 채운 것 ${by('bad')}개`), '입니다. 못 채운 것도 그대로 둡니다.');
+    const t = data.followup.test.modes.selected;
+    $('lede').replaceChildren(`후속 질문은 시험에서 답하면 안 되는 질문 ${t.answeredButShouldNot}건에 답했고 정답 근거 인용이 ${t.answerableGrounded}라 통과하지 못했습니다. `,
+      `아래 ${data.highlights.length}개 지표 중 `, el('span', { class: 'bad' }, `못 채운 것 ${by('bad')}개`), ', ',
+      el('span', { class: 's-limit' }, `조건이 붙은 것 ${by('limit')}개`), ', ', el('span', { class: 'good' }, `목표를 채운 것 ${by('good')}개`),
+      '입니다. 기능 1은 합성 결과지로, 기능 2(통계)는 공공데이터 표본으로 쟀습니다.');
     $('highlights').replaceChildren(...data.highlights.map(h => el('tr', {},
       el('td', {}, h.area),
       el('td', {}, el('div', {}, h.title), el('div', { class: 'd' }, h.detail)),
@@ -104,6 +111,7 @@
         el('a', { class: 'small', href: data.adrBase + encodeURI(h.adr), target: '_blank', rel: 'noopener' }, 'ADR ' + h.adr.slice(0, 4))))));
     renderFollowup();
     renderFaith();
+    $('runs-sum').textContent = `평가 기록 전체 · ${data.runs.length}건`;
     $('runs').replaceChildren(...[...data.runs].reverse().map(r => el('tr', {},
       el('td', { class: 'num' }, r.createdAt.slice(0, 16).replace('T', ' ')), el('td', {}, r.kind),
       el('td', { class: 'mono' }, r.label ?? ''), el('td', { class: 'mono' }, r.commit + (r.dirty ? ' ' : ''),
@@ -117,7 +125,8 @@
     $('fu-tabs').replaceChildren(...tabs.flatMap((t, i) => {
       const b = el('button', { type: 'button', 'aria-pressed': String(t.on) }, t.label);
       b.addEventListener('click', () => { const [k, v] = t.id.split(':'); if (k === 'set') current = v; else mode = v; renderFollowup(); });
-      return i === SETS.length ? [el('span', { class: 'sep' }), b] : [b];
+      return i === 0 ? [el('span', { class: 'name' }, '평가셋'), b]
+        : i === SETS.length ? [el('span', { class: 'sep' }), el('span', { class: 'name' }, '항목'), b] : [b];
     }));
     const run = data.followup[current], m = run.modes[mode];
     const [g, n] = m.answerableGrounded.split('/').map(Number);
@@ -131,14 +140,9 @@
       return el('div', { class: 'bar-row', style: 'grid-template-columns: 110px 1fr 44px' }, el('span', {}, SHORT[c]),
         el('div', { class: 'bar-track' }, el('div', { class: 'bar-fill', style: `width:${ok / total * 100}%` })), el('span', {}, `${ok}/${total}`));
     }));
-    $('fu-tiles').replaceChildren(
-      el('div', { class: 'stat' }, el('div', { class: 'label' }, '답하면 안 되는데 답함'),
-        el('div', { class: 'value' }, `${m.answeredButShouldNot}/${unsafeTotal}`), el('div', { class: 'note' }, '목표 0')),
-      el('div', { class: 'stat' }, el('div', { class: 'label' }, '정답 근거를 인용해 답함'),
-        el('div', { class: 'value' }, `${g}/${n}`), el('div', { class: 'note' }, `${Math.round(g / n * 100)}% · 목표 80%`)),
-      el('div', { class: 'stat' }, el('div', { class: 'label' }, '통과 규칙'),
-        el('div', { class: `value s-${m.pass ? 'good' : 'bad'}` }, m.pass ? '통과' : '미달'),
-        el('div', { class: 'note' }, `${run.runId.slice(0, 13)} · 커밋 ${run.commit}${run.dirty ? ' (dirty)' : ''}`)));
+    $('fu-sum').replaceChildren(`답하면 안 되는 ${unsafeTotal}문항 중 `, el('b', {}, `${m.answeredButShouldNot}건`), '에 답함(목표 0), 정답 근거를 인용해 답함 ',
+      el('b', {}, `${g}/${n}`), `(${Math.round(g / n * 100)}%, 목표 80%). `,
+      el('span', { class: 'small' }, `${run.runId.slice(0, 13)} · 커밋 ${run.commit}${run.dirty ? ' (dirty)' : ''}`));
     $('fu-matrix').replaceChildren(...Object.keys(CATEGORY).filter(c => Object.keys(m.behavior[c] ?? {}).length).map(c => el('tr', {},
       el('td', {}, CATEGORY[c]),
       ...COLS.map(col => {
