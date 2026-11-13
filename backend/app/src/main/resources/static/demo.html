@@ -134,7 +134,8 @@
       el('div', { class: 'care review' }, el('b', {}, `결과지 원본을 확인해 보세요: ${r.rawName ?? r.code} ${r.value}`),
         `${r.reason ? r.reason + '. ' : ''}${r.advice}`)));
     $('table').replaceChildren(...x.judgments.map(j => el('tr', { class: j.judgment === 'NORMAL_A' ? 'dim' : '' },
-      el('td', {}, j.name), el('td', {}, j.rawName ?? ''), el('td', {}, `${j.value}${j.unit ? ' ' + j.unit : ''}`),
+      // OTHER의 내부 이름("위 목록에 없는 검사")은 화면에 보이지 않는다
+      el('td', {}, j.code === 'OTHER' ? '기타 검사' : j.name), el('td', {}, j.rawName ?? ''), el('td', {}, `${j.value}${j.unit ? ' ' + j.unit : ''}`),
       el('td', {}, j.centerJudgment ?? '-'), el('td', { class: `j j-${j.judgment}` }, j.judgmentLabel))));
     $('items').replaceChildren(...(x.items.length ? x.items.map(item => el('div', { class: 'card' },
       el('h3', {}, `${item.name} ${item.value}${item.unit ? ' ' + item.unit : ''} `,
