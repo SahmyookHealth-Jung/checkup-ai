@@ -57,14 +57,6 @@ public class FollowupService {
     /** 질문 분류 프롬프트 (ADR 0014). 답 프롬프트와 따로 둬서, 답을 쓰는 모델이 설명 쪽으로 기우는 것을 피한다 */
     static final String INTENT_VERSION = "followup-intent-v1";
     static final String FEATURE_INTENT = "report.followup.intent";
-    /**
-     * "근거 없음" 재확인 (2026-11-13, 사용자 결정): 첫 답이 근거 없음이면, 문맥 중 질문과 가장 많이 겹치는 절 몇 개만 남겨
-     * "그중 직접 답하는 문장이 있는가"만 다시 묻는다. 시험에서 정답 절이 문맥에 있는데도 근거 없음으로 답한 경우가 가장 많았다.
-     * 답이 나와도 같은 구절·인용·숫자 검증을 통과해야 남는다.
-     */
-    static final String RECHECK_VERSION = "followup-recheck-v1";
-    static final String FEATURE_RECHECK = "report.followup.recheck";
-    static final int RECHECK_UNITS = 3;
     private static final int INTENT_MAX_TOKENS = 100;
     /** 근거 구절의 최소 길이 (공백을 뺀 글자 수). 너무 짧은 구절("입니다")로 대조를 피하지 못하게 한다 */
     static final int MIN_QUOTE_CHARS = 10;
@@ -105,7 +97,6 @@ public class FollowupService {
      * @param ruleDiagnosis 진단 요청 패턴 규칙이 걸렸는가
      * @param intentDiagnosis 질문 분류가 진단 요청이라고 했는가 (분류 호출이 실패했으면 null)
      * @param answerBlocked 답 검사가 진단을 확인해 주는 답이라 막았는가
-     * @param recheck 근거 없음 재확인 결과 (ANSWER, NO_EVIDENCE, FAILED). 하지 않았으면 null
      */
     /**
      * @param unsupportedQuotes 근거 구절이 없거나 짧거나 인용한 근거 문단에 없어 지운 문장 수
@@ -120,7 +111,7 @@ public class FollowupService {
      * @param reportLines LLM에 보낸 결과지 맥락 (항목별 결과값·판정·기준). 충실도 채점이 판정 구간을 비교할 때 쓴다
      */
     public record FollowupResult(String question, Decision decision, String llmDecision, boolean ruleTreatment,
-                                 boolean ruleDiagnosis, Boolean intentDiagnosis, boolean answerBlocked, String recheck, List<Sentence> sentences, String notice, List<Citation> citations,
+                                 boolean ruleDiagnosis, Boolean intentDiagnosis, boolean answerBlocked, List<Sentence> sentences, String notice, List<Citation> citations,
                                  String disclaimer, String reportLines, Metrics metrics) {
     }
 
@@ -131,7 +122,6 @@ public class FollowupService {
     private final ExplanationValidator validator = new ExplanationValidator();
     private final String systemPrompt;
     private final String intentPrompt;
-    private final String recheckPrompt;
 
     public FollowupService(ChatClient.Builder chatClientBuilder, FollowupContextBuilder contextBuilder,
                            ScreeningCriteria criteria, FollowupProperties properties) {
@@ -143,8 +133,6 @@ public class FollowupService {
             this.systemPrompt = new ClassPathResource("prompts/report-" + PROMPT_VERSION + ".st")
                     .getContentAsString(StandardCharsets.UTF_8);
             this.intentPrompt = new ClassPathResource("prompts/report-" + INTENT_VERSION + ".st")
-                    .getContentAsString(StandardCharsets.UTF_8);
-            this.recheckPrompt = new ClassPathResource("prompts/report-" + RECHECK_VERSION + ".st")
                     .getContentAsString(StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -181,23 +169,6 @@ public class FollowupService {
         Decision llmDecision = parse(draft == null ? null : draft.decision());
         Checked checked = check(draft, byLabel, reportLines);
 
-        String recheck = null;
-        boolean recheckAnswered = false;
-        if (llmDecision == Decision.NO_EVIDENCE && !diagnosisAsked && !flags.treatment() && !context.rankedUnits().isEmpty()) {
-            Map<String, ContextUnit> narrow = narrow(byLabel, context);
-            try {
-                FollowupDraft second = generate(recheckPrompt, FEATURE_RECHECK, narrow, reportLines, question);
-                Checked again = check(second, narrow, reportLines);
-                recheckAnswered = parse(second.decision()) == Decision.ANSWER && !again.outcome().kept().isEmpty();
-                recheck = recheckAnswered ? Decision.ANSWER.name() : Decision.NO_EVIDENCE.name();
-                if (recheckAnswered) {
-                    draft = second;
-                    checked = again;
-                }
-            } catch (RuntimeException e) {
-                recheck = "FAILED";  // 재확인이 실패하면 첫 판단(근거 없음)을 그대로 둔다
-            }
-        }
         long llmMs = (System.nanoTime() - llmStarted) / 1_000_000;
         List<FollowupDraft.SentenceDraft> drafts = checked.drafts();
         int unsupportedQuotes = checked.unsupportedQuotes();
@@ -209,8 +180,6 @@ public class FollowupService {
         String notice;
         if (llmDecision == null) {
             decision = Decision.NO_EVIDENCE;
-        } else if (recheckAnswered) {
-            decision = Decision.ANSWER;  // 재확인에서 근거로 검증된 문장이 나왔다
         } else if (llmDecision == Decision.ANSWER && outcome.kept().isEmpty()) {
             decision = Decision.NO_EVIDENCE;  // 답이라고 했지만 근거로 검증된 문장이 없다 (가드레일 원칙 2)
         } else {
@@ -239,12 +208,12 @@ public class FollowupService {
                     return new Citation(e.getValue(), unit.id(), unit.title(), unit.section());
                 })
                 .toList();
-        var metrics = new Metrics(PROMPT_VERSION + "+" + INTENT_VERSION + "+" + RECHECK_VERSION, context.itemSource().name(), context.totalChars(), byLabel.size(),
+        var metrics = new Metrics(PROMPT_VERSION + "+" + INTENT_VERSION, context.itemSource().name(), context.totalChars(), byLabel.size(),
                 drafts.size(), decision == Decision.ANSWER ? outcome.kept().size() : 0, unsupportedQuotes,
                 outcome.invalidCitations(), outcome.uncited(), outcome.ungroundedNumbers(), outcome.forbiddenHits(),
                 llmMs, (System.nanoTime() - started) / 1_000_000, llmError);
         return new FollowupResult(question, decision, llmDecision == null ? null : llmDecision.name(),
-                flags.treatment(), flags.diagnosis(), intentDiagnosis, answerBlocked, recheck, sentences, notice, citations, ExplanationGuardrails.DISCLAIMER,
+                flags.treatment(), flags.diagnosis(), intentDiagnosis, answerBlocked, sentences, notice, citations, ExplanationGuardrails.DISCLAIMER,
                 reportLines, metrics);
     }
 
@@ -285,20 +254,6 @@ public class FollowupService {
             }
         }
         return new Checked(drafts, unsupportedQuotes, validator.check(quoted, allowed, reportLines));
-    }
-
-    /** 재확인 문맥: 고정 근거(판정기준표 행·판정 정의)와 순위 상위 절 몇 개. 번호는 첫 답과 같게 둔다 */
-    private static Map<String, ContextUnit> narrow(Map<String, ContextUnit> byLabel, FollowupContext context) {
-        Set<String> keep = new java.util.HashSet<>();
-        context.fixedUnits().forEach(u -> keep.add(u.id()));
-        context.rankedUnits().stream().limit(RECHECK_UNITS).forEach(u -> keep.add(u.id()));
-        Map<String, ContextUnit> out = new LinkedHashMap<>();
-        byLabel.forEach((label, unit) -> {
-            if (keep.contains(unit.id())) {
-                out.put(label, unit);
-            }
-        });
-        return out;
     }
 
     private FollowupDraft generate(String prompt, String feature, Map<String, ContextUnit> byLabel, String reportLines,

@@ -68,7 +68,6 @@ def summarize(rows: list[dict]) -> dict:
         "answeredButShouldNot": len(unsafe),
         "answerableGrounded": f"{len(grounded)}/{len(answerable)}",
         "answerableGroundedDoc": f"{sum(1 for r in answerable if r.get('groundedDoc'))}/{len(answerable)}",
-        "recheckAnswered": sum(1 for r in rows if r.get("recheck") == "ANSWER" and r["decision"] == "ANSWER"),
         "answerableAnswered": sum(1 for r in answerable if r["decision"] == "ANSWER"),
         "correct": sum(1 for r in rows if r["decision"] in EXPECTED[r["category"]]),
         "n": len(rows),
@@ -121,7 +120,6 @@ def main() -> None:
                        "intentDiagnosis": result.get("intentDiagnosis"), "answerBlocked": result.get("answerBlocked", False),
                        "grounded": result["decision"] == "ANSWER" and bool(expected & set(cited)),
                        "groundedDoc": grounded_doc(result["decision"], cited, expected),
-                       "recheck": result.get("recheck"),
                        "cited": cited, "sentences": [s["text"] for s in result["sentences"]], "notice": result["notice"],
                        # 충실도 채점용: 문장마다 인용한 근거 단위와 LLM에 보낸 결과지 맥락
                        "sentenceSources": [[next(c["unitId"] for c in result["citations"] if c["number"] == n)
