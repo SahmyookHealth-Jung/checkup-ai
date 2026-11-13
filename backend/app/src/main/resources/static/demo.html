@@ -33,6 +33,7 @@
   .d-NO_EVIDENCE { color: var(--muted); }
   .d-REFUSE_DIAGNOSIS, .d-REFUSE_TREATMENT, .d-MALICIOUS { color: var(--s); }
   #sample { max-width: 100%; }
+  #table button.ghost { padding: 1px 8px; font-size: 12px; margin-left: 4px; }
 </style>
 </head>
 <body>
@@ -57,30 +58,31 @@
       <tbody id="table"></tbody>
     </table></div>
 
+    <section id="followup" hidden>
+      <h2>이 결과지에 대해 묻기</h2>
+      <p class="small">공개 문서 9편에서 근거를 찾아 출처와 함께 답합니다. 진단·약·치료를 정해 달라는 질문과 근거가 없는 질문에는 정해진 문구로 답합니다.</p>
+      <p class="warn">진단을 묻는 질문은 질문 분류·규칙·답 검사로 거절하지만 100%는 아닙니다. 구현 전에 써 둔 새 문항에서 진단 요청 36건 중 1건에 답했습니다. <a href="/quality.html#followup">평가 기록</a></p>
+      <div class="panel">
+        <div class="small">항목 고르기 (선택. 고르지 않으면 질문과 결과지로 정합니다)</div>
+        <div class="chips" id="fq-items"></div>
+        <textarea id="fq-question" maxlength="300" placeholder="예: 공복혈당이 질환의심으로 나왔는데 무슨 뜻인가요?"></textarea>
+        <div class="examples" id="fq-examples"></div>
+        <div style="display:flex;gap:12px;align-items:center;margin-top:12px">
+          <button id="fq-run" type="button">질문하기</button>
+          <span class="status" id="fq-status"></span>
+        </div>
+      </div>
+      <div id="fq-answers"></div>
+    </section>
+
     <h2>항목별 해설</h2>
     <div id="items"></div>
+    <p class="metrics" id="metrics"></p>
     <h2>출처</h2>
     <div id="citations"></div>
-    <p class="metrics" id="metrics"></p>
     <p class="disclaimer" id="disclaimer">이 내용은 의료 진단이 아니며, 정확한 판단은 의료진과 상담하세요.</p>
   </section>
 
-  <section id="followup" hidden>
-    <h2>이 결과지에 대해 묻기</h2>
-    <p class="small">공개 문서 9편에서 근거를 찾아 출처와 함께 답합니다. 진단·약·치료를 정해 달라는 질문과 근거가 없는 질문에는 정해진 문구로 답합니다.</p>
-    <p class="warn">진단을 묻는 질문은 질문 분류·규칙·답 검사로 거절하지만 100%는 아닙니다. 구현 전에 써 둔 새 문항에서 진단 요청 36건 중 1건에 답했습니다. <a href="/quality.html#followup">평가 기록</a></p>
-    <div class="panel">
-      <div class="small">항목 고르기 (선택. 고르지 않으면 질문과 결과지로 정합니다)</div>
-      <div class="chips" id="fq-items"></div>
-      <textarea id="fq-question" maxlength="300" placeholder="예: 공복혈당이 질환의심으로 나왔는데 무슨 뜻인가요?"></textarea>
-      <div class="examples" id="fq-examples"></div>
-      <div style="display:flex;gap:12px;align-items:center;margin-top:12px">
-        <button id="fq-run" type="button">질문하기</button>
-        <span class="status" id="fq-status"></span>
-      </div>
-    </div>
-    <div id="fq-answers"></div>
-  </section>
 </main>
 <footer class="foot">합성 데이터로 만든 포트폴리오 데모입니다. 이 내용은 의료 진단이 아니며, 정확한 판단은 의료진과 상담하세요.</footer>
 <script>
@@ -140,12 +142,14 @@
         `${r.reason ? r.reason + '. ' : ''}${r.advice}`)));
     $('table').replaceChildren(...x.judgments.map(j => el('tr', { class: j.judgment === 'NORMAL_A' ? 'dim' : '' },
       // OTHER의 내부 이름("위 목록에 없는 검사")은 화면에 보이지 않는다
-      el('td', {}, j.code === 'OTHER' ? '기타 검사' : j.name), el('td', {}, j.rawName ?? ''), el('td', {}, `${j.value}${j.unit ? ' ' + j.unit : ''}`),
+      // 묻기는 이름 칸에 둔다: 좁은 화면에서 표가 옆으로 밀려도 보이게
+      el('td', {}, j.code === 'OTHER' ? '기타 검사' : j.name, FLAGGED.includes(j.judgment) && j.code ? [' ', askButton(j.code, j.name)] : ''), el('td', {}, j.rawName ?? ''), el('td', {}, `${j.value}${j.unit ? ' ' + j.unit : ''}`),
       el('td', {}, j.centerJudgment ?? '-'), el('td', { class: `j j-${j.judgment}` }, j.judgmentLabel))));
     $('items').replaceChildren(...(x.items.length ? x.items.map(item => el('div', { class: 'card' },
       el('h3', {}, `${item.name} ${item.value}${item.unit ? ' ' + item.unit : ''} `,
         el('span', { class: `j j-${item.judgment}` }, item.judgmentLabel)),
       el('p', { class: 'criterion' }, `판정 기준: ${item.criterion ?? '-'} (${item.criterionSource ?? ''})`),
+      item.code ? askButton(item.code, item.name, '이 항목 묻기') : '',
       item.noEvidence ? el('p', { class: 'noevidence' }, '이 항목을 설명할 근거를 공개 문서에서 찾지 못했습니다.')
         : el('p', { class: 'read' }, ...item.sentences.map(s => [s.text, ...s.citations.map(n =>
             el('sup', {}, el('a', { href: `#cite-${n}` }, `[${n}]`))), ' '])),
@@ -168,6 +172,19 @@
     $('empty').hidden = true;
     $('result').hidden = false;
     $('followup').hidden = false;
+  }
+
+  // 경계·질환의심 항목에서 바로 묻기: 그 항목만 골라 두고 질문 칸으로 옮긴다
+  const FLAGGED = ['NORMAL_B', 'SUSPECT'];
+  function askButton(code, name, text = '묻기') {
+    const b = el('button', { type: 'button', class: 'ghost', 'aria-label': `${name} 묻기` }, text);
+    b.addEventListener('click', () => {
+      document.querySelectorAll('#fq-items input').forEach(i => i.checked = i.value === code);
+      $('fq-question').placeholder = `예: ${name} 결과가 무슨 뜻인가요?`;
+      $('followup').scrollIntoView({ behavior: 'smooth' });
+      $('fq-question').focus({ preventScroll: true });
+    });
+    return b;
   }
 
   // 후속 질문 (ADR 0012 2절): 결과지는 서버가 추출한 샘플 것을 쓴다
