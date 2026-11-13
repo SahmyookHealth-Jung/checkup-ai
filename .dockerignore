@@ -1,0 +1,7 @@
+# 이미지에는 backend 소스와 데모 데이터(샘플, 근거 청크)만 들어간다. 비밀값(.env)은 절대 넣지 않는다
+*
+!backend
+!data/synthetic/extraction/v1
+!data/guidelines/chunks/chunks.jsonl
+backend/**/build
+backend/.gradle
