@@ -1,0 +1,146 @@
+{
+  "set": "followup-boundary-v1",
+  "suggestedBy": "claude",
+  "unit": "section",
+  "suggestions": {
+    "fb-001": {
+      "units": [
+        "kdca-6694#개요-정의"
+      ],
+      "noEvidence": false,
+      "reason": "비만 단계 기준: 1단계 25.0~29.9, 2단계 30.0~34.9, 3단계 35.0 이상. 31.5는 2단계 범위"
+    },
+    "fb-003": {
+      "units": [
+        "mohw-annex4-row-bmi",
+        "kdca-6694#개요-정의"
+      ],
+      "noEvidence": false,
+      "reason": "판정기준표: 25~29.9 정상B, 30 이상 질환의심. 개요-정의: 25.0~29.9는 1단계 비만"
+    },
+    "fb-004": {
+      "units": [
+        "kdca-6694#개요-정의",
+        "kdca-6694#요약문",
+        "mohw-annex4-row-waist"
+      ],
+      "noEvidence": false,
+      "reason": "복부비만 기준 여성 85 cm 이상(개요-정의·요약문), 판정기준표 여 85 이상 질환의심"
+    },
+    "fb-005": {
+      "units": [
+        "kdca-5457#개요-종류"
+      ],
+      "noEvidence": false,
+      "reason": "사구체 여과율 단계: 3a단계 45~59. 51은 3a 범위"
+    },
+    "fb-007": {
+      "units": [
+        "kdca-5457#개요-종류",
+        "kdca-5457#개요-정의",
+        "kdca-5457#진단 및 검사"
+      ],
+      "noEvidence": false,
+      "reason": "개요-종류: 4단계 15~29. 개요-정의·진단 및 검사: 사구체 여과율 60 미만이 3개월 이상 지속되면 만성콩팥병으로 진단"
+    },
+    "fb-009": {
+      "units": [
+        "kdca-5457#개요-정의",
+        "kdca-5457#진단 및 검사"
+      ],
+      "noEvidence": false,
+      "reason": "사구체 여과율 60 이상이어도 단백뇨·혈뇨 등 콩팥 손상의 근거가 있으면 만성콩팥병으로 진단할 수 있다. 진단 및 검사는 요 스틱 위양성과 정량 검사도 말한다"
+    },
+    "fb-010": {
+      "units": [
+        "kdca-5305#진단 및 검사"
+      ],
+      "noEvidence": false,
+      "reason": "공복혈당장애(당뇨병 전단계) 공복 혈장 포도당 100~125. 판정기준표 행은 정상B 100-125만 있고 '전단계'라는 말이 없어 고르지 않음"
+    },
+    "fb-012": {
+      "units": [
+        "kdca-5305#진단 및 검사"
+      ],
+      "noEvidence": false,
+      "reason": "진단기준 공복 126 이상 등. ①②③은 서로 다른 날 반복 검사로 확진, 같은 날 두 기준 이상 충족하면 바로 진단"
+    },
+    "fb-014": {
+      "units": [
+        "kdca-5305#진단 및 검사"
+      ],
+      "noEvidence": false,
+      "reason": "선별검사 2단계: 공복 110~125면 경구 포도당 부하검사를 고려"
+    },
+    "fb-015": {
+      "units": [
+        "kdca-6765#개요",
+        "mohw-annex4-row-blood-pressure"
+      ],
+      "noEvidence": false,
+      "reason": "고혈압 기준 수축기 140 이상 또는 이완기 90 이상(개요). 판정기준표도 140 이상 또는 90 이상이 질환의심"
+    },
+    "fb-017": {
+      "units": [
+        "kdca-6765#진단 및 검사",
+        "kdca-6765#개요-정의"
+      ],
+      "noEvidence": false,
+      "reason": "진단 및 검사: 표준화된 방법으로 여러 차례 반복 측정, 가정혈압·24시간 활동혈압. 개요-정의: 진료실 혈압만으로는 정확한 진단이 어렵다(백의 고혈압)"
+    },
+    "fb-019": {
+      "units": [
+        "kdca-6715#개요-정의",
+        "mohw-annex4-row-ldl"
+      ],
+      "noEvidence": false,
+      "reason": "개요-정의: LDL 130 이상이면 이상지질혈증. 판정기준표: 160 이상 질환의심"
+    },
+    "fb-021": {
+      "units": [
+        "kdca-6715#개요-정의",
+        "mohw-annex4-row-hdl"
+      ],
+      "noEvidence": false,
+      "reason": "개요-정의: HDL 여성 50 미만이면 이상지질혈증. 판정기준표: 40 미만 질환의심"
+    },
+    "fb-022": {
+      "units": [
+        "kdca-6673#진단 및 검사",
+        "kdca-6673#개요"
+      ],
+      "noEvidence": false,
+      "reason": "진단 및 검사: 복부 초음파·CT·MRI로 지방 침착 확인, 가장 정확한 건 간 생검, 다른 원인 배제. 개요: 영상검사나 간조직 검사에서 지방간 확인"
+    },
+    "fb-024": {
+      "units": [
+        "mohw-annex4-row-gamma-gtp"
+      ],
+      "noEvidence": false,
+      "reason": "남 78 이상 질환의심. 167은 질환의심 구간"
+    },
+    "fb-026": {
+      "units": [
+        "mohw-annex4-row-hemoglobin",
+        "kdca-1104#진단 및 검사"
+      ],
+      "noEvidence": false,
+      "reason": "판정기준표: 남 12.0 미만 질환의심. 진단 및 검사: 병력·신체검사·전체혈구계산(CBC), 필요시 원인 검사"
+    },
+    "fb-028": {
+      "units": [
+        "mohw-annex4-row-hemoglobin"
+      ],
+      "noEvidence": false,
+      "reason": "여 10.0 미만 질환의심, 10.0~11.9 정상B"
+    },
+    "fb-029": {
+      "units": [
+        "mohw-annex4-def-suspect",
+        "mohw-annex4-def-suspect-chronic"
+      ],
+      "noEvidence": false,
+      "reason": "일반 질환의심: 추적검사나 전문 의료기관 진단·치료 필요. 고혈압·당뇨병·이상지질혈증 질환의심: 그 질환이 의심되어 진료와 검사 필요"
+    }
+  }
+}

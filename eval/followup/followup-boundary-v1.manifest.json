@@ -1,0 +1,14 @@
+{
+  "name": "followup-boundary-v1",
+  "evidence": {
+    "unit": "section (고시는 행)",
+    "unitsSha256": "1534c1a1a6a5c142",
+    "labeledAt": "2026-11-13T13:13:46.529Z",
+    "appliedAt": "2026-11-13T22:14:21",
+    "suggestedBy": "claude",
+    "keptSuggestion": 18,
+    "editedSuggestion": [],
+    "categoryChanges": [],
+    "rule": "절 구성이 바뀌면 라벨을 다시 맞춘다"
+  }
+}
