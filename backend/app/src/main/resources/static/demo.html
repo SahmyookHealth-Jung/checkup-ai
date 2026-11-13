@@ -9,12 +9,40 @@
   .summary { font-size: 15px; margin: 24px 0 12px; }
   .summary b { font-variant-numeric: tabular-nums; }
   .criterion { color: var(--muted); font-size: 13px; margin: 0 0 8px; }
-  #items .card { border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 20px 0; margin: 0; }
-  #items .card h3 { font-size: 17px; }
+  #items .card { border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 24px 0; margin: 0; }
+  #items .card h3 { font-size: 17px; margin: 0; }
+  .flag-val { font-size: 15px; color: var(--text-2); margin: 2px 0 6px; }
+  .flag-val .v { font-size: 30px; font-weight: 700; letter-spacing: -0.03em; color: var(--text); font-variant-numeric: tabular-nums; }
+  .flag-val .j { font-size: 16px; margin-left: 4px; }
+  #items .care { margin: 10px 0 12px; }
+  h2.first { margin-top: 32px; }
+  .unjudged { border: 2px solid var(--text); border-radius: 10px; padding: 4px 20px 16px; margin: 32px 0 8px; }
+  .unjudged h2 { margin: 16px 0 4px; display: flex; align-items: center; gap: 10px; }
+  .unjudged .mark { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%;
+                    background: var(--text); color: var(--bg); font-size: 16px; font-weight: 800; flex: none; }
+  .unjudged-lede { font-size: 14px; color: var(--text-2); margin: 0 0 8px; }
+  .notice { border-top: 1px solid var(--line-2); padding: 14px 0 4px; }
+  .notice-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+  .notice-head b { font-size: 16px; } .notice-head .v { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .notice dl { display: grid; grid-template-columns: 116px 1fr; gap: 0 12px; margin: 8px 0 0; font-size: 14px; }
+  .notice dt { color: var(--muted); } .notice dd { margin: 0; color: var(--text-2); }
+  .notice dl.do dd { color: var(--text); font-weight: 700; }
+  @media (max-width: 560px) { .notice dl { grid-template-columns: 1fr; } }
+  #all-results { margin: 16px 0 0; }
+  #all-results summary { font-weight: 600; }
   #table tr.dim td:not(.j) { color: var(--muted); }   /* 정상A는 흐리게, 찾는 줄(경계·질환의심)만 눈에 띄게 */
   #table tr:not(.dim) td:first-child { font-weight: 600; }
   .back { font-size: 13px; }
-  #history button[aria-pressed="true"] { border-color: var(--text); font-weight: 600; }
+  /* 최근 본 결과: 결과 덩어리와 떨어진 접힌 이력. 이름과 연 시각만 */
+  #history { border: 0; padding: 0; margin: 4px 0 0; }
+  #history summary { font-size: 13px; color: var(--text-2); }
+  #history ul { list-style: none; margin: 8px 0 0; padding: 0; max-width: 640px; }
+  #history button { all: unset; box-sizing: border-box; cursor: pointer; display: flex; justify-content: space-between; gap: 16px;
+                    width: 100%; padding: 6px 8px; border-radius: 6px; font-size: 13px; color: var(--text-2); }
+  #history button:hover { background: var(--bg-2); }
+  #history button:focus-visible { outline: 2px solid var(--accent); }
+  #history button[aria-pressed="true"] { color: var(--text); font-weight: 600; background: var(--bg-2); }
+  #history .at { color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
   .upload { font-size: 14px; color: var(--text-2); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
   .upload input { position: absolute; width: 1px; height: 1px; opacity: 0; }
   .upload:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -49,16 +77,27 @@
   </div>
   <!-- 메뉴 이름이 '결과지 해설받기'라 실제 결과지를 올리기 쉽다. 합성 데이터만 쓰는 규칙(CLAUDE.md 절대 규칙 1)을 화면에서도 분명히 한다 -->
   <p class="care review"><b>실제 결과지는 올리지 마세요</b>체험용 화면입니다. 샘플 결과지나 직접 만든 가상의 결과지만 써 주세요.</p>
-  <div class="controls" id="history" hidden></div>
+  <details id="history" hidden><summary>최근 본 결과 <span id="history-count"></span></summary><ul id="history-list"></ul></details>
   <p class="empty small" id="empty">샘플 이름의 질환의심·경계는 결과지에 적힌 값을 판정기준표로 미리 판정한 것입니다. 샘플을 고르고 <b>해설 보기</b>를 누르세요. 처음 고른 샘플은 추출까지 10초 안팎 걸리고, 같은 샘플은 다시 추출하지 않습니다.</p>
 
   <section id="result" hidden>
     <p class="summary" id="summary"></p>
-    <div id="review"></div>
-    <div class="scroll"><table>
-      <thead><tr><th>항목</th><th>결과지 항목명</th><th>결과</th><th>결과지 판정</th><th>국가 기준 판정</th></tr></thead>
-      <tbody id="table"></tbody>
-    </table></div>
+    <!-- 판정이 주인공: 질환의심·경계 항목을 먼저 크게, 진료 권고는 그 항목 바로 밑에 (의료 원칙 3). 전체 표는 접어 둔다 -->
+    <h2 class="first">주의할 항목</h2>
+    <div id="items"></div>
+    <!-- 판정하지 못한 항목: 위험 값일 수 있어 경고 강도를 유지한다 (ADR 0007 보완, 2026-11-11 Codex 리뷰).
+         판정색(노랑)은 쓰지 않고 테두리·아이콘·굵기로 구분한다 -->
+    <section id="unjudged" class="unjudged" hidden>
+      <h2><span class="mark" aria-hidden="true">!</span>판정하지 못한 항목 <span id="unjudged-count"></span></h2>
+      <p class="unjudged-lede">아래 값은 판정 결과가 아닙니다. 값이나 표기를 확인하지 못해 판정에서 뺐고, 위험한 값일 수도 있습니다.</p>
+      <div id="review"></div>
+    </section>
+    <details id="all-results"><summary id="all-summary">전체 검사 결과 보기</summary>
+      <div class="scroll"><table>
+        <thead><tr><th>항목</th><th>결과지 항목명</th><th>결과</th><th>결과지 판정</th><th>국가 기준 판정</th></tr></thead>
+        <tbody id="table"></tbody>
+      </table></div>
+    </details>
 
     <section id="followup" hidden>
       <h2>이 결과지에 대해 묻기</h2>
@@ -77,8 +116,6 @@
       <div id="fq-answers"></div>
     </section>
 
-    <h2>항목별 해설</h2>
-    <div id="items"></div>
     <p class="metrics" id="metrics"></p>
     <h2>출처</h2>
     <div id="citations"></div>
@@ -139,24 +176,31 @@
   function render(data) {
     const x = data.explanation;
     $('disclaimer').textContent = x.disclaimer;
-    $('review').replaceChildren(...x.needsReview.map(r =>
-      el('div', { class: 'care review' }, el('b', {}, `결과지 원본을 확인해 보세요: ${r.rawName ?? r.code} ${r.value}`),
-        `${r.reason ? r.reason + '. ' : ''}${r.advice}`)));
+    const nameOf = code => x.judgments.find(j => j.code === code)?.name;
+    $('review').replaceChildren(...x.needsReview.map(r => el('div', { class: 'notice' },
+      el('div', { class: 'notice-head' }, el('b', {}, nameOf(r.code) ?? r.rawName ?? '항목'), el('span', { class: 'v' }, r.value ?? ''),
+        r.rawName && r.rawName !== nameOf(r.code) ? el('span', { class: 'small' }, `결과지 표기: ${r.rawName}`) : ''),
+      r.reason ? el('dl', {}, el('dt', {}, '판정하지 않은 이유'), el('dd', {}, r.reason)) : '',
+      el('dl', { class: 'do' }, el('dt', {}, '권고'), el('dd', {}, r.advice)))));
+    $('unjudged').hidden = !x.needsReview.length;
+    $('unjudged-count').textContent = `(${x.needsReview.length})`;
     $('table').replaceChildren(...x.judgments.map(j => el('tr', { class: j.judgment === 'NORMAL_A' ? 'dim' : '' },
       // OTHER의 내부 이름("위 목록에 없는 검사")은 화면에 보이지 않는다
       // 묻기는 이름 칸에 둔다: 좁은 화면에서 표가 옆으로 밀려도 보이게
       el('td', {}, j.code === 'OTHER' ? '기타 검사' : j.name, FLAGGED.includes(j.judgment) && j.code ? [' ', askButton(j.code, j.name)] : ''), el('td', {}, j.rawName ?? ''), el('td', {}, `${j.value}${j.unit ? ' ' + j.unit : ''}`),
       el('td', {}, j.centerJudgment ?? '-'), el('td', { class: `j j-${j.judgment}` }, j.judgmentLabel))));
-    $('items').replaceChildren(...(x.items.length ? x.items.map(item => el('div', { class: 'card' },
-      el('h3', {}, `${item.name} ${item.value}${item.unit ? ' ' + item.unit : ''} `,
+    $('items').replaceChildren(...(x.items.length ? x.items.map(item => el('div', { class: 'card flag' },
+      el('h3', {}, item.name),
+      el('div', { class: 'flag-val' }, el('span', { class: 'v' }, item.value), item.unit ? ` ${item.unit} ` : ' ',
         el('span', { class: `j j-${item.judgment}` }, item.judgmentLabel)),
       el('p', { class: 'criterion' }, `판정 기준: ${item.criterion ?? '-'} (${item.criterionSource ?? ''})`),
-      item.code ? askButton(item.code, item.name, '이 항목 묻기') : '',
+      item.careAdvice ? el('div', { class: 'care' }, el('b', {}, '병원에서 확인해 보세요'), item.careAdvice) : '',
       item.noEvidence ? el('p', { class: 'noevidence' }, '이 항목을 설명할 근거를 공개 문서에서 찾지 못했습니다.')
         : el('p', { class: 'read' }, ...item.sentences.map(s => [s.text, ...s.citations.map(n =>
             el('sup', {}, el('a', { href: `#cite-${n}` }, `[${n}]`))), ' '])),
-      item.careAdvice ? el('div', { class: 'care' }, el('b', {}, '병원에서 확인해 보세요'), item.careAdvice) : ''
-    )) : [el('p', { class: 'sub' }, '정상B(경계)·질환의심 항목이 없어 해설할 항목이 없습니다.')]));
+      item.code ? askButton(item.code, item.name, '이 항목 묻기') : ''
+    )) : [el('p', { class: 'sub' }, '정상B(경계)·질환의심 항목이 없습니다. 전체 결과는 아래에서 볼 수 있습니다.')]));
+    $('all-summary').textContent = `전체 검사 결과 보기 (${x.judgments.length}항목)`;
     $('citations').replaceChildren(...x.citations.map(c => el('details', { id: `cite-${c.number}` },
       el('summary', {}, `[${c.number}] ${c.title} · ${c.publisher} · ${c.edition} · ${c.section} `,
         c.url ? el('a', { href: c.url, target: '_blank', rel: 'noopener' }, '원문') : ''),
@@ -168,8 +212,9 @@
     renderFollowupItems(x.judgments);
     const count = j => x.judgments.filter(v => v.judgment === j).length;
     $('summary').replaceChildren(el('b', {}, data.sampleId.startsWith('up-') ? `올린 결과지 ${data.fileName ?? ''}`.trim() : (sampleLabels[data.sampleId] ?? data.sampleId)), ' · ',
-      ...[['질환의심', 'SUSPECT'], ['정상B(경계)', 'NORMAL_B'], ['정상A', 'NORMAL_A'], ['기준 없음', 'NOT_JUDGED']]
+      ...[['질환의심', 'SUSPECT'], ['정상B(경계)', 'NORMAL_B'], ['정상A', 'NORMAL_A'], ['판정 기준 없음', 'NOT_JUDGED']]
         .flatMap(([label, j], i) => [i ? ' · ' : '', el('span', { class: `j j-${j}` }, label), ` ${count(j)}`]),
+      ...(x.needsReview.length ? [' · ', el('b', {}, `판정하지 못한 항목 ${x.needsReview.length}개`)] : []),
       ` · 해설 ${x.items.length}개`);
     $('empty').hidden = true;
     $('result').hidden = false;
@@ -288,10 +333,11 @@
   function renderHistory() {
     const history = loadHistory();
     $('history').hidden = !history.length;
-    $('history').replaceChildren(el('span', { class: 'small' }, '최근 본 결과'), ...history.map(h => {
-      const b = el('button', { type: 'button', class: 'ghost', 'aria-pressed': String(h.key === currentEntry) }, `${h.name} · ${h.at}`);
+    $('history-count').textContent = `(${history.length})`;
+    $('history-list').replaceChildren(...history.map(h => {
+      const b = el('button', { type: 'button', 'aria-pressed': String(h.key === currentEntry) }, el('span', {}, h.name), el('span', { class: 'at' }, h.at));
       b.addEventListener('click', () => show(h));
-      return b;
+      return el('li', {}, b);
     }));
   }
 
