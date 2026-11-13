@@ -14,6 +14,7 @@
   #table tr.dim td:not(.j) { color: var(--muted); }   /* 정상A는 흐리게, 찾는 줄(경계·질환의심)만 눈에 띄게 */
   #table tr:not(.dim) td:first-child { font-weight: 600; }
   .back { font-size: 13px; }
+  #history button[aria-pressed="true"] { border-color: var(--text); font-weight: 600; }
   .upload { font-size: 14px; color: var(--text-2); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
   .upload input { position: absolute; width: 1px; height: 1px; opacity: 0; }
   .upload:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -45,6 +46,7 @@
     <label class="upload">또는 가상 결과지 올리기 (글자가 있는 PDF·txt)<input id="file" type="file" accept=".pdf,.txt,application/pdf,text/plain"></label>
     <span class="status" id="status"></span>
   </div>
+  <div class="controls" id="history" hidden></div>
   <p class="empty small" id="empty">샘플 이름의 질환의심·경계는 결과지에 적힌 값을 판정기준표로 미리 판정한 것입니다. 샘플을 고르고 <b>해설 보기</b>를 누르세요. 처음 고른 샘플은 추출까지 10초 안팎 걸리고, 같은 샘플은 다시 추출하지 않습니다.</p>
 
   <section id="result" hidden>
@@ -117,7 +119,10 @@
         const body = await response.json().catch(() => ({}));
         throw new Error(response.status === 413 ? '파일이 너무 큽니다 (최대 10MB)' : body.detail ?? `${response.status}`);
       }
-      render(await response.json());
+      const data = await response.json();
+      if (file) data.fileName = file.name;
+      render(data);
+      remember(data, file ? file.name : sampleLabels[id] ?? id);
       $('status').textContent = '';
     } catch (e) {
       $('status').textContent = '실패: ' + e.message;
@@ -156,7 +161,7 @@
     currentSample = data.sampleId;
     renderFollowupItems(x.judgments);
     const count = j => x.judgments.filter(v => v.judgment === j).length;
-    $('summary').replaceChildren(el('b', {}, data.sampleId.startsWith('up-') ? '올린 결과지' : (sampleLabels[data.sampleId] ?? data.sampleId)), ' · ',
+    $('summary').replaceChildren(el('b', {}, data.sampleId.startsWith('up-') ? `올린 결과지 ${data.fileName ?? ''}`.trim() : (sampleLabels[data.sampleId] ?? data.sampleId)), ' · ',
       ...[['질환의심', 'SUSPECT'], ['정상B(경계)', 'NORMAL_B'], ['정상A', 'NORMAL_A'], ['기준 없음', 'NOT_JUDGED']]
         .flatMap(([label, j], i) => [i ? ' · ' : '', el('span', { class: `j j-${j}` }, label), ` ${count(j)}`]),
       ` · 해설 ${x.items.length}개`);
@@ -200,7 +205,10 @@
         const body = await response.json().catch(() => ({}));
         throw new Error(body.detail ?? `${response.status}`);
       }
-      $('fq-answers').prepend(renderAnswer(await response.json()));
+      const answer = await response.json();
+      $('fq-answers').prepend(renderAnswer(answer));
+      const history = loadHistory(), entry = history.find(h => h.key === currentEntry);
+      if (entry) { entry.answers.unshift(answer); saveHistory(history); }
       $('fq-status').textContent = '';
     } catch (e) {
       $('fq-status').textContent = '실패: ' + e.message;
@@ -236,7 +244,40 @@
   window.addEventListener('hashchange', openCited);
   $('run').addEventListener('click', () => run());
   $('file').addEventListener('change', e => { if (e.target.files[0]) run(e.target.files[0]); });
-  loadSamples().catch(e => $('status').textContent = '샘플 목록을 불러오지 못했습니다: ' + e.message);
+  // 최근 본 결과: 이 브라우저에만 10개까지 둔다. 새로고침해도 다시 돌리지 않는다 (서버는 결과를 저장하지 않는다)
+  const HISTORY_KEY = 'checkup-demo-history-v1', HISTORY_MAX = 10;
+  let currentEntry = null;
+  function loadHistory() { try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) ?? []; } catch { return []; } }
+  function saveHistory(history) {
+    // 저장 공간이 모자라면 오래된 것부터 버린다. 그래도 안 되면 기억하지 않는다
+    for (let h = history; h.length; h = h.slice(0, -1)) {
+      try { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); return; } catch { /* 다음 크기로 */ }
+    }
+  }
+  function remember(data, name) {
+    const entry = { key: Date.now(), name, at: new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }), data, answers: [] };
+    saveHistory([entry, ...loadHistory()].slice(0, HISTORY_MAX));
+    currentEntry = entry.key;
+    renderHistory();
+  }
+  function show(entry) {
+    render(entry.data);
+    $('fq-answers').replaceChildren(...entry.answers.map(renderAnswer));
+    currentEntry = entry.key;
+    renderHistory();
+  }
+  function renderHistory() {
+    const history = loadHistory();
+    $('history').hidden = !history.length;
+    $('history').replaceChildren(el('span', { class: 'small' }, '최근 본 결과'), ...history.map(h => {
+      const b = el('button', { type: 'button', class: 'ghost', 'aria-pressed': String(h.key === currentEntry) }, `${h.name} · ${h.at}`);
+      b.addEventListener('click', () => show(h));
+      return b;
+    }));
+  }
+
+  loadSamples().catch(e => $('status').textContent = '샘플 목록을 불러오지 못했습니다: ' + e.message)
+    .finally(() => { const [last] = loadHistory(); if (last) show(last); });
 </script>
 </body>
 </html>
