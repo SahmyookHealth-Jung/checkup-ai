@@ -7,6 +7,7 @@ import com.checkupai.report.extraction.ReportTextReader;
 import java.io.IOException;
 import java.util.List;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * 결과지 해설 API: 추출 → 판정 → 근거 검색 → 출처 붙은 해설 (ADR 0007).
@@ -31,6 +33,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api")
 @EnableConfigurationProperties({ExplanationProperties.class, DemoProperties.class})
 public class ExplanationController {
+
+    /** 올린 결과지의 글자 수 상한. 합성 결과지는 2천 자 안팎이다. 긴 문서로 한 번에 큰 비용이 나가지 않게 한다 */
+    static final int MAX_UPLOAD_CHARS = 20_000;
 
     private final ReportTextReader textReader;
     private final ReportExtractor extractor;
@@ -53,7 +58,11 @@ public class ExplanationController {
     @PostMapping(path = "/reports/explain", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ExplainResponse explain(@RequestPart("file") MultipartFile file) throws IOException {
         budget.check();
-        ExtractionResult extraction = extractor.extract(textReader.read(file.getBytes(), file.getOriginalFilename()));
+        String text = textReader.read(file.getBytes(), file.getOriginalFilename());
+        if (text.length() > MAX_UPLOAD_CHARS) {
+            throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE, "결과지 글자가 너무 많습니다 (최대 " + MAX_UPLOAD_CHARS + "자)");
+        }
+        ExtractionResult extraction = extractor.extract(text);
         // 후속 질문을 받으려고 추출 결과를 잠시 기억한다 (sampleId로 /demo/samples/{id}/followup)
         return new ExplainResponse(samples.remember(extraction), extraction, explanation.explain(extraction));
     }

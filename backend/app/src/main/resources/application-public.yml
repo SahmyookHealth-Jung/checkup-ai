@@ -1,0 +1,26 @@
+# 공개 데모 (Render + Neon). 켜는 법: SPRING_PROFILES_ACTIVE=public (Dockerfile이 켠다)
+# 허용한 API 밖은 PublicDemoConfig가 404로 막는다. 통계 화면은 공개 이미지에서 뺀다 (Dockerfile).
+server:
+  port: ${PORT:8080}            # Render가 PORT를 정해 준다
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 2MB        # 공개 데모는 작은 인스턴스에서 남이 올린 PDF를 읽는다 (샘플 PDF는 60KB 안팎)
+      max-request-size: 2MB
+  datasource:
+    url: ${JDBC_DATABASE_URL}   # 예: jdbc:postgresql://<호스트>/<DB>?sslmode=require (Neon은 pooler가 아닌 직접 연결 주소)
+
+checkupai:
+  followup:
+    vector-tiebreak: false      # 임베딩 모델(Ollama)이 없다. BM25 동점인 절은 청크 파일 순서로 둔다 (ADR 0011 보완)
+  eval:
+    endpoints-enabled: false
+  stats:
+    url: ${JDBC_DATABASE_URL}   # 통계 API는 닫혀 있지만 빈 생성에 값이 필요하다
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health         # metrics·info는 닫는다
