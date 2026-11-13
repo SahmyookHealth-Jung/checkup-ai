@@ -35,8 +35,10 @@ HIGHLIGHTS = [
      "set": "오류 심은 141문장, 보정 50문장", "status": "limit", "adr": "0009-의미-충실도-채점기-설계.md"},
     {"area": "후속 질문", "title": "문맥: 항목 범위 + 글자 2-gram BM25", "value": "개발 7 → 10/10", "detail": "정답 근거가 문맥에 다 실린 문항 (벡터 대비). 시험 13/18",
      "set": "질문 60개 (개발 20 / 시험 40)", "status": "good", "adr": "0011-후속-질문-경로-설계.md"},
-    {"area": "후속 질문", "title": "답하면 안 되는 질문에 답함", "value": "시험 2/22", "detail": "둘 다 진단 질문. 규칙 또는 LLM으로 바꾼 뒤 새 문항에서 진단 2/8에 아직 답함 (LLM 혼자면 6/8)",
-     "set": "시험 40문항 1회, 재확인 16문항 1회", "status": "bad", "adr": "0011-후속-질문-경로-설계.md"},
+    {"area": "후속 질문", "title": "답하면 안 되는 질문에 답함", "value": "시험 2/22", "detail": "둘 다 진단 질문 (followup-v3, 시험은 다시 재지 않음)",
+     "set": "시험 40문항 1회", "status": "bad", "adr": "0011-후속-질문-경로-설계.md"},
+    {"area": "후속 질문", "title": "진단 거절: 질문 분류 + 답 검사", "value": "새 문항 1/36", "detail": "진단 요청에 답한 건수. 같은 실행에서 예전 방식(규칙 또는 LLM)이면 22/36. 경계 질문을 진단 거절 0/24",
+     "set": "구현 전에 별도 세션이 쓴 30문항 × 2방식, 1회", "status": "limit", "adr": "0014-후속-질문-진단-거절-보강.md"},
     {"area": "후속 질문", "title": "정답 근거를 인용해 답함", "value": "시험 8~10/18", "detail": "통과 기준 80% 미달. 답 문장 충실도 22/36 뒷받침, 판정 구간 틀림·치료 지시 0",
      "set": "시험 40문항", "status": "bad", "adr": "0011-후속-질문-경로-설계.md"},
     {"area": "통계", "title": "관리자 통계 질문 (Text-to-SQL)", "value": "32/34 일치", "detail": "v2(구조 검사·서버가 센 인원으로 숨김) 기준. 시험 몫을 v1에서 본 뒤라 깨끗한 수치는 v1의 27/34. 막을 요청 실행 0, 공격 6문항에서 숨김 없이 나간 작은 값 0",
@@ -47,6 +49,7 @@ FOLLOWUP_RUNS = {
     "dev": "20261112-2058_followup-answer_dev-v3",
     "test": "20261112-2101_followup-answer_test-v3",
     "recheck": "20261112-2118_followup-answer_recheck-v3-rule",
+    "recheck2": "20261113-1318_followup-answer_recheck2-v4-intent",
     "judge": "20261112-2102_faithfulness_20261112-2101_followup-answer_test-v3_off_followup-test-v3",
 }
 
@@ -64,7 +67,7 @@ def record(run_id: str, rows: list[dict]) -> dict:
 
 def followup(rows: list[dict]) -> dict:
     out = {}
-    for name in ("dev", "test", "recheck"):
+    for name in ("dev", "test", "recheck", "recheck2"):
         rec = record(FOLLOWUP_RUNS[name], rows)
         out[name] = {"runId": rec["runId"], "commit": rec["git"]["commit"], "dirty": rec["git"]["dirty"],
                      "dataset": rec["dataset"], "modes": {
