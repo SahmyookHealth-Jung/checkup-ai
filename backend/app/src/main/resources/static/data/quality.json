@@ -95,7 +95,7 @@
    "area": "후속 질문",
    "title": "정답 근거를 인용해 답함",
    "value": "시험 8~10/18",
-   "detail": "통과 기준 80% 미달. 답 문장 충실도 22/36 뒷받침, 판정 구간 틀림·치료 지시 0",
+   "detail": "통과 기준 80% 미달. 새 문항 29개에서는 25/29(항목 고름)·20/29, 재확인·문맥 균형 보완은 효과 없음(ADR 0011 보완). 답 문장 충실도 22/36 뒷받침, 판정 구간 틀림·치료 지시 0",
    "set": "시험 40문항",
    "status": "bad",
    "adr": "0011-후속-질문-경로-설계.md"
@@ -1070,6 +1070,57 @@
     "treatmentPresent": 0,
     "selfConsistency.support": null,
     "costUsd": 2.7282
+   }
+  },
+  {
+   "runId": "20261113-1828_followup-answer_ground1-before",
+   "kind": "followup-answer",
+   "label": "ground1-before",
+   "createdAt": "2026-11-13T18:28:55",
+   "commit": "a80841d",
+   "dirty": false,
+   "dataset": "followup-ground-v1",
+   "headline": {
+    "selected:answeredButShouldNot": 1,
+    "selected:answerableGrounded": "25/29",
+    "inferred:answeredButShouldNot": 1,
+    "inferred:answerableGrounded": "20/29",
+    "selected:pass": false,
+    "inferred:pass": false
+   }
+  },
+  {
+   "runId": "20261113-1834_followup-answer_dev-v5-recheck",
+   "kind": "followup-answer",
+   "label": "dev-v5-recheck",
+   "createdAt": "2026-11-13T18:34:30",
+   "commit": "9053087",
+   "dirty": false,
+   "dataset": "followup-v1",
+   "headline": {
+    "selected:answeredButShouldNot": 0,
+    "selected:answerableGrounded": "18/20",
+    "inferred:answeredButShouldNot": 0,
+    "inferred:answerableGrounded": "20/20",
+    "selected:pass": true,
+    "inferred:pass": true
+   }
+  },
+  {
+   "runId": "20261113-1839_followup-answer_ground1-after",
+   "kind": "followup-answer",
+   "label": "ground1-after",
+   "createdAt": "2026-11-13T18:39:52",
+   "commit": "946bedc",
+   "dirty": false,
+   "dataset": "followup-ground-v1",
+   "headline": {
+    "selected:answeredButShouldNot": 1,
+    "selected:answerableGrounded": "23/29",
+    "inferred:answeredButShouldNot": 1,
+    "inferred:answerableGrounded": "22/29",
+    "selected:pass": false,
+    "inferred:pass": false
    }
   }
  ]
