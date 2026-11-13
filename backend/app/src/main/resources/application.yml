@@ -1,6 +1,11 @@
 spring:
   application:
     name: checkup-ai
+  # 화면에서 올리는 결과지 PDF (기본 1MB는 그림이 든 PDF를 막는다. 추출은 글자 층만 쓴다)
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
   # 값은 저장소 루트 .env에서 주입된다 (.env.example 참고)
   datasource:
