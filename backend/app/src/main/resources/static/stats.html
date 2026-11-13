@@ -79,7 +79,7 @@
         el('span', { class: 'small' }, r.reason ?? '')),
       r.sql ? el('div', { class: 'sql' }, r.sql) : '',
       t ? el('div', { class: 'scroll' }, el('table', {},
-        el('thead', {}, el('tr', {}, ...t.columns.map((c, i) => el('th', { class: i === nIndex ? 'num' : '' }, c === 'n' ? '사람 수' : c)))),
+        el('thead', {}, el('tr', {}, ...t.columns.map((c, i) => el('th', { class: i === nIndex || t.rows.some(row => typeof row[i] === 'number') ? 'num' : '' }, c === 'n' ? '사람 수' : c)))),
         el('tbody', {}, ...t.rows.map(row => el('tr', {}, ...row.map((v, i) => el('td',
           { class: (typeof v === 'number' || i === nIndex ? 'num' : '') + (v === null ? ' hidden-cell' : '') },
           v === null && (i === nIndex || nIndex >= 0 && row[nIndex] === null) ? '숨김' : fmt(v)))))))) : '',
