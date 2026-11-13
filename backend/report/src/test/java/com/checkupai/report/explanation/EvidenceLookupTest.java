@@ -1,15 +1,18 @@
 package com.checkupai.report.explanation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import com.checkupai.report.extraction.ItemCode;
 import com.checkupai.report.retrieval.GuidelineChunks;
 import com.checkupai.report.retrieval.RetrievedChunk;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -26,6 +29,12 @@ class EvidenceLookupTest {
             ItemCode.EGFR, ItemCode.CHEST_XRAY);
 
     private final EvidenceLookup lookup = new EvidenceLookup(CHUNKS);
+
+    /** 청크 파일은 라이선스 때문에 커밋하지 않는다(.gitignore). 파일이 없는 CI에서는 건너뛰고 로컬에서만 확인한다 */
+    @BeforeAll
+    static void requireChunkFile() {
+        assumeTrue(Files.exists(CHUNKS), "근거 청크 파일 없음: rag.build_chunks로 만든 뒤 다시 돌린다");
+    }
 
     @Test
     @DisplayName("조회표에 적은 절과 판정 구분 정의가 모두 근거 청크 파일에 있다")
