@@ -60,8 +60,8 @@ public class ExplanationController {
 
     /** 합성 샘플 결과지 목록 (화면의 선택 상자) */
     @GetMapping("/demo/samples")
-    public List<String> samples() throws IOException {
-        return samples.ids();
+    public List<DemoSamples.Sample> samples() throws IOException {
+        return samples.samples();
     }
 
     @PostMapping("/demo/samples/{id}/explain")

@@ -1,12 +1,15 @@
 package com.checkupai.report.explanation;
 
+import com.checkupai.report.extraction.CheckupReport;
 import com.checkupai.report.extraction.ExtractionResult;
 import com.checkupai.report.extraction.ReportExtractor;
+import com.checkupai.report.extraction.ReportItem;
 import com.checkupai.report.extraction.ReportTextReader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,6 +21,7 @@ import java.util.stream.Stream;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * 화면 데모의 합성 샘플 결과지 (ADR 0007 7절, ADR 0012 2절).
@@ -34,10 +38,15 @@ public class DemoSamples {
     private static final Pattern UPLOAD_ID = Pattern.compile("up-[0-9a-f]{24}");
     static final int MAX_UPLOADS = 50;
     private static final SecureRandom RANDOM = new SecureRandom();
+    /** 합성기 템플릿 이름 (eval/synth/templates.py의 TEMPLATES) */
+    private static final Map<String, String> TEMPLATE_NAMES = Map.of(
+            "std", "공단 표준 서식", "sum", "기관 요약표", "nar", "목록 + 의사 소견");
+    private static final JsonMapper JSON = JsonMapper.builder().build();
 
     private final DemoProperties demo;
     private final ReportTextReader textReader;
     private final ReportExtractor extractor;
+    private final ScreeningCriteria criteria;
     private final Map<String, ExtractionResult> extractions = new ConcurrentHashMap<>();
     private final Map<String, ExtractionResult> uploads = new LinkedHashMap<>() {
         @Override
@@ -46,10 +55,69 @@ public class DemoSamples {
         }
     };
 
-    public DemoSamples(DemoProperties demo, ReportTextReader textReader, ReportExtractor extractor) {
+    public DemoSamples(DemoProperties demo, ReportTextReader textReader, ReportExtractor extractor,
+                       ScreeningCriteria criteria) {
         this.demo = demo;
         this.textReader = textReader;
         this.extractor = extractor;
+        this.criteria = criteria;
+    }
+
+    /**
+     * 선택 상자 한 줄. label은 합성기가 결과지에 찍은 값(정답 파일)을 앱의 판정기준표로 판정해 만든다.
+     * LLM 추출 결과가 아니므로, 고른 뒤 화면의 판정(추출 실패·"확인 필요")과 다를 수 있다.
+     */
+    public record Sample(String id, String group, String label) {
+    }
+
+    /** 화면 선택 상자용: 양식별로 묶고, 질환의심·경계 항목 이름을 보여 준다 */
+    public List<Sample> samples() throws IOException {
+        List<Sample> out = new ArrayList<>();
+        for (String id : ids()) {
+            out.add(sample(id));
+        }
+        return out;
+    }
+
+    Sample sample(String id) throws IOException {
+        int dash = id.indexOf('-');
+        String group = TEMPLATE_NAMES.getOrDefault(id.substring(0, dash), id.substring(0, dash));
+        String number = Integer.parseInt(id.substring(dash + 1)) + "번";
+        Path expected = Path.of(demo.samplesDir(), id + ".expected.json");
+        if (!Files.exists(expected)) {
+            return new Sample(id, group, number);
+        }
+        CheckupReport report = JSON.readValue(Files.readString(expected), CheckupReport.class);
+        List<String> suspect = new ArrayList<>();
+        List<String> borderline = new ArrayList<>();
+        for (ReportItem item : report.items()) {
+            Judgment judgment = criteria.judge(item.code(), item.value(), item.unit(), report.sex()).judgment();
+            String name = item.code().koreanName().replaceAll("\\(.*\\)", "").strip();
+            if (judgment == Judgment.SUSPECT) {
+                suspect.add(name);
+            } else if (judgment == Judgment.NORMAL_B) {
+                borderline.add(name);
+            }
+        }
+        String sex = switch (report.sex()) {
+            case MALE -> "남";
+            case FEMALE -> "여";
+            case UNKNOWN -> "성별 미기재";
+        };
+        String findings = suspect.isEmpty() && borderline.isEmpty()
+                ? "질환의심·경계 없음"
+                : String.join(" · ", Stream.of(names("질환의심", suspect), names("경계", borderline))
+                        .filter(s -> !s.isEmpty()).toList());
+        return new Sample(id, group, number + " · " + sex + " · " + findings);
+    }
+
+    /** "경계 요단백, AST, ALT 외 2". 선택 상자 한 줄에 들어가게 셋까지만 이름을 쓴다 */
+    private static String names(String judgment, List<String> names) {
+        if (names.isEmpty()) {
+            return "";
+        }
+        String shown = String.join(", ", names.subList(0, Math.min(3, names.size())));
+        return judgment + " " + shown + (names.size() > 3 ? " 외 " + (names.size() - 3) : "");
     }
 
     public List<String> ids() throws IOException {

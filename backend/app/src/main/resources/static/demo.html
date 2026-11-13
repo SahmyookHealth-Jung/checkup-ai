@@ -31,6 +31,7 @@
   .d-ANSWER { color: var(--a); }
   .d-NO_EVIDENCE { color: var(--muted); }
   .d-REFUSE_DIAGNOSIS, .d-REFUSE_TREATMENT, .d-MALICIOUS { color: var(--s); }
+  #sample { max-width: 100%; }
 </style>
 </head>
 <body>
@@ -44,7 +45,7 @@
     <label class="upload">또는 가상 결과지 올리기 (글자가 있는 PDF·txt)<input id="file" type="file" accept=".pdf,.txt,application/pdf,text/plain"></label>
     <span class="status" id="status"></span>
   </div>
-  <p class="empty small" id="empty">샘플을 고르고 <b>해설 보기</b>를 누르세요. 처음 고른 샘플은 추출까지 10초 안팎 걸리고, 같은 샘플은 다시 추출하지 않습니다.</p>
+  <p class="empty small" id="empty">샘플 이름의 질환의심·경계는 결과지에 적힌 값을 판정기준표로 미리 판정한 것입니다. 샘플을 고르고 <b>해설 보기</b>를 누르세요. 처음 고른 샘플은 추출까지 10초 안팎 걸리고, 같은 샘플은 다시 추출하지 않습니다.</p>
 
   <section id="result" hidden>
     <p class="summary" id="summary"></p>
@@ -89,10 +90,14 @@
     return node;
   };
 
+  const sampleLabels = {};   // 결과 머리 줄에 id 대신 이름을 쓴다
   async function loadSamples() {
-    const ids = await fetch('/api/demo/samples').then(r => r.json());
-    $('sample').replaceChildren(...ids.map(id => el('option', { value: id }, id)));
-    if (!ids.length) $('status').textContent = '샘플 PDF가 없습니다 (eval/에서 생성기로 만드세요).';
+    const samples = await fetch('/api/demo/samples').then(r => r.json());
+    samples.forEach(s => sampleLabels[s.id] = `${s.group} ${s.label}`);
+    const groups = [...new Set(samples.map(s => s.group))];
+    $('sample').replaceChildren(...groups.map(g => el('optgroup', { label: g },
+      samples.filter(s => s.group === g).map(s => el('option', { value: s.id }, s.label)))));
+    if (!samples.length) $('status').textContent = '샘플 PDF가 없습니다 (eval/에서 생성기로 만드세요).';
   }
 
   async function run(file) {
@@ -150,7 +155,7 @@
     currentSample = data.sampleId;
     renderFollowupItems(x.judgments);
     const count = j => x.judgments.filter(v => v.judgment === j).length;
-    $('summary').replaceChildren(el('b', {}, data.sampleId.startsWith('up-') ? '올린 결과지' : data.sampleId), ' · ',
+    $('summary').replaceChildren(el('b', {}, data.sampleId.startsWith('up-') ? '올린 결과지' : (sampleLabels[data.sampleId] ?? data.sampleId)), ' · ',
       ...[['질환의심', 'SUSPECT'], ['정상B(경계)', 'NORMAL_B'], ['정상A', 'NORMAL_A'], ['기준 없음', 'NOT_JUDGED']]
         .flatMap(([label, j], i) => [i ? ' · ' : '', el('span', { class: `j j-${j}` }, label), ` ${count(j)}`]),
       ` · 해설 ${x.items.length}개`);
