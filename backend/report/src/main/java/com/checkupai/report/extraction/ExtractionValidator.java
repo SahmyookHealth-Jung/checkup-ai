@@ -74,6 +74,11 @@ public class ExtractionValidator {
     /** 숫자 사이의 범위·분수 기호와 그 양옆 공백 ("0 - 2", "120 / 80") */
     private static final Pattern NUMBER_CONNECTOR = Pattern.compile("(\\d)\\s*([-~/])\\s*(\\d)");
     private static final Pattern EMPTY_MARK = Pattern.compile("[-–—]+|없음|N/?A", Pattern.CASE_INSENSITIVE);
+    /**
+     * 빈 양식의 값 자리 표시("O.O", "[OO mg/dL]"의 "OO", "OOO / OO", "XX"). 숫자 자리에 글자 O·X를 쓴 것으로, 결과가 아니다.
+     * 2026-11-13 화면 업로드: 빈 양식의 당화혈색소 "[O.O %]"가 원문 대조를 통과해 값 "O.O"로 남았다.
+     */
+    private static final Pattern PLACEHOLDER = Pattern.compile("[\\[(]?[OoXx○0-9.,/~\\s-]*[OoXx○][OoXx○0-9.,/~\\s-]*[\\])]?");
 
     /**
      * 국가건강검진 판정 등급 (정상A, 정상B(경계), 질환의심, 유질환자). 판정 칸의 값이지 참고치가 될 수 없다.
@@ -120,6 +125,10 @@ public class ExtractionValidator {
         for (ReportItem item : ordered) {
             if (item.code() == null || item.value() == null || item.value().isBlank()) {
                 issues.add(new Issue(IssueType.EMPTY, item.code(), "code 또는 value 없음"));
+                continue;
+            }
+            if (PLACEHOLDER.matcher(item.value().strip()).matches()) {
+                issues.add(new Issue(IssueType.EMPTY, item.code(), "빈칸 표시: " + item.value()));
                 continue;
             }
             String key = item.code() + "|" + SourceText.squash(item.value());

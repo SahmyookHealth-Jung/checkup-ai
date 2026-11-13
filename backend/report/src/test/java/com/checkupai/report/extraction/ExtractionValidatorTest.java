@@ -175,6 +175,25 @@ class ExtractionValidatorTest {
     }
 
     @Test
+    @DisplayName("빈 양식의 값 자리 표시(O.O, OOO / OO)는 값으로 남기지 않는다")
+    void dropsFormPlaceholders() {
+        String source = """
+                당화혈색소 (HbA1c) [O.O %] 4.0 ~ 5.6 %
+                혈압 (수축기/이완기) [OOO / OO mmHg] 120 / 80 mmHg 미만
+                공복혈당 (FBS) [92] mg/dL 70 ~ 99
+                """;
+        CheckupReport report = new CheckupReport(null, CheckupReport.ExamType.COMPREHENSIVE, CheckupReport.Sex.FEMALE, 42, List.of(
+                item(ItemCode.OTHER, "당화혈색소 (HbA1c)", "O.O"),
+                item(ItemCode.SYSTOLIC_BP, "혈압 (수축기/이완기)", "OOO / OO"),
+                item(ItemCode.FASTING_GLUCOSE, "공복혈당 (FBS)", "92")));
+
+        ValidationResult result = validator.validate(report, source);
+
+        assertThat(result.report().items()).extracting(ReportItem::value).containsExactly("92");
+        assertThat(types(result)).containsExactly(IssueType.EMPTY, IssueType.EMPTY);
+    }
+
+    @Test
     @DisplayName("같은 코드에 다른 값이 오면 처음 값만 남긴다")
     void keepsFirstValueOnConflict() {
         ValidationResult result = validate(
