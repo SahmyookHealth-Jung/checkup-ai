@@ -45,7 +45,8 @@ import org.springframework.stereotype.Service;
 public class ExplanationService {
 
     static final String FEATURE = "report.explanation";
-    static final String PROMPT_VERSION = "explanation-v1";
+    /** v2 (2026-11-13): 생활습관 효과는 근거가 그 수치에 대해 말한 것만 (충실도 채점에서 부분 판정 53건의 주된 모양) */
+    static final String PROMPT_VERSION = "explanation-v2";
     private static final String USER_TEMPLATE = """
             아래 항목을 각각 설명해 주세요.
             {items}
@@ -64,7 +65,7 @@ public class ExplanationService {
         this.criteria = criteria;
         this.lookup = lookup;
         this.properties = properties;
-        this.systemPrompt = loadPrompt("prompts/report-explanation-v1.st");
+        this.systemPrompt = loadPrompt("prompts/report-" + PROMPT_VERSION + ".st");
     }
 
     /** 해설 대상 항목과 그 항목에 쓸 수 있는 근거 (근거 번호 → 근거 문단). templated면 코드 문구로 답한다 */
