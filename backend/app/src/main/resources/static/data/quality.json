@@ -49,8 +49,8 @@
   {
    "area": "해설",
    "title": "판정 해설 LLM 문장의 의미 충실도",
-   "value": "뒷받침 82~87%",
-   "detail": "판정 구간 틀림 0, 치료·약 지시 0. 부분 판정은 대부분 생활습관 효과를 근거보다 넓게 말한 경우. 사람보다 엄격한 채점기 값",
+   "value": "뒷받침 86~87%",
+   "detail": "판정 구간 틀림 0, 치료·약 지시 0. 부분 판정은 대부분 생활습관 효과를 근거보다 넓게 말한 경우로, 프롬프트 v2 한 줄로는 줄지 않았다(v1 82~87%). 사람보다 엄격한 채점기 값",
    "set": "처음 보는 양식 30개, 2회 (LLM 문장 359개)",
    "status": "limit",
    "adr": "0010-해설-두-경로-분리와-후속-질문.md"
@@ -1034,6 +1034,42 @@
     "treatmentPresent": 0,
     "selfConsistency.support": null,
     "costUsd": 2.8132
+   }
+  },
+  {
+   "runId": "20261113-1749_explanation_heldout30-v2.6_lookup-prompt-v2",
+   "kind": "explanation",
+   "label": "lookup-prompt-v2",
+   "createdAt": "2026-11-13T17:49:47",
+   "commit": "3da7aa9",
+   "dirty": false,
+   "dataset": "heldout30-v2.6",
+   "headline": {
+    "endToEnd.careAdviceRecall": [
+     1.0,
+     1.0
+    ],
+    "explanationLlm.sentencePassRate": [
+     0.994,
+     1.0
+    ],
+    "forbiddenHits": 2,
+    "llmErrors": 0
+   }
+  },
+  {
+   "runId": "20261113-1754_faithfulness_20261113-1749_explanation_heldout30-v2.6_lookup-prompt-v2_off_explanation-prompt-v2",
+   "kind": "faithfulness",
+   "label": "explanation-prompt-v2",
+   "createdAt": "2026-11-13T17:54:51",
+   "commit": "3da7aa9",
+   "dirty": false,
+   "dataset": "20261113-1749_explanation_heldout30-v2.6_lookup-prompt-v2",
+   "headline": {
+    "passRate": 0.911,
+    "treatmentPresent": 0,
+    "selfConsistency.support": null,
+    "costUsd": 2.7282
    }
   }
  ]
