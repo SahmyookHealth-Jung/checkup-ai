@@ -1,6 +1,11 @@
-"""기능 2 정답셋 stats-gold-v1 (ADR 0013 4절). 질문과 정답 SQL은 Claude가 썼고 사용자가 검토한다.
+"""기능 2 정답셋 stats-gold-v2 (ADR 0013 4절). 질문과 정답 SQL은 Claude가 썼고 사용자가 검토한다.
 
-정답 SQL은 읽기 전용 계정(stats_reader)으로 실제로 실행해 결과를 고정한다(stats-gold-v1.jsonl의 expected).
+v2 (2026-11-13, 사용자 검토 반영): 질문이 두 가지로 읽히던 시험 문항 3개만 고쳤다. 정답 SQL과 나머지 57문항은 v1과 같다.
+- sq-012 "차이가 궁금해" → "비교해줘" (차이 값 하나로 답해도 맞는 질문이었다)
+- sq-037 상위 5개 → 2곳 (3·4위가 반올림하면 37.6으로 같아 순서가 정해지지 않았다)
+- sq-049 "20대" → "20대 전체를 하나로 묶은" (20~24세·25~29세 두 줄로 읽을 수 있었다)
+
+정답 SQL은 읽기 전용 계정(stats_reader)으로 실제로 실행해 결과를 고정한다(stats-gold-v2.jsonl의 expected).
 프롬프트를 쓰기 전에 만들고 커밋한다. 개발 20 / 시험 40은 범주별로 나눈다(seed 20261113).
 
 계약 (앱과 같다): 답하는 SQL은 집계 결과만 내고, 행마다 그 값의 바탕이 된 사람 수를 n 컬럼으로 낸다.
@@ -21,7 +26,7 @@ from pathlib import Path
 
 from run_record import EVAL_DIR
 
-OUT = Path(__file__).resolve().parent / "stats-gold-v1.jsonl"
+OUT = Path(__file__).resolve().parent / "stats-gold-v2.jsonl"
 SEED = 20261113
 SEX = "CASE c.sex WHEN 1 THEN '남자' ELSE '여자' END"
 PCT = "ROUND(100.0 * COUNT(*) FILTER (WHERE {cond}) / COUNT(*), 1)"
@@ -49,7 +54,7 @@ ITEMS: list[tuple[str, str, str | None]] = [
     ("group", "흡연 상태별 평균 감마지티피는?",
      "SELECT CASE c.smoking WHEN 1 THEN '피우지 않음' WHEN 2 THEN '끊음' WHEN 3 THEN '현재 흡연' END AS smoking, "
      "ROUND(AVG(ggt), 1) AS avg_ggt, COUNT(ggt) AS n FROM checkup c WHERE c.smoking IS NOT NULL GROUP BY c.smoking ORDER BY c.smoking"),
-    ("group", "술 마시는 사람과 안 마시는 사람의 ALT 평균 차이가 궁금해",
+    ("group", "술 마시는 사람과 안 마시는 사람의 ALT 평균 비교해줘",
      "SELECT CASE c.drinking WHEN 1 THEN '마심' ELSE '안 마심' END AS drinking, ROUND(AVG(alt), 1) AS avg_alt, COUNT(alt) AS n "
      "FROM checkup c WHERE c.drinking IS NOT NULL GROUP BY c.drinking ORDER BY c.drinking"),
     ("group", "요단백 결과별 인원",
@@ -112,9 +117,9 @@ ITEMS: list[tuple[str, str, str | None]] = [
      f"SELECT a.label AS age_group, {PCT.format(cond='c.smoking = 3')} AS pct, COUNT(*) AS n FROM checkup c "
      "JOIN age_group a ON a.code = c.age_group WHERE c.smoking IS NOT NULL GROUP BY a.code, a.label "
      "ORDER BY 2 DESC LIMIT 1"),
-    ("topk", "평균 감마지티피 높은 순으로 시도 5개 뽑아줘",
+    ("topk", "평균 감마지티피 높은 순으로 시도 2곳 뽑아줘",
      "SELECT r.name AS region, ROUND(AVG(c.ggt), 1) AS avg_ggt, COUNT(c.ggt) AS n FROM checkup c "
-     "JOIN region r ON r.code = c.region_code GROUP BY r.name ORDER BY AVG(c.ggt) DESC LIMIT 5"),
+     "JOIN region r ON r.code = c.region_code GROUP BY r.name ORDER BY AVG(c.ggt) DESC LIMIT 2"),
     ("topk", "수검자가 가장 적은 시도는 어디야?",
      "SELECT r.name AS region, COUNT(*) AS n FROM checkup c JOIN region r ON r.code = c.region_code "
      "GROUP BY r.name ORDER BY COUNT(*) ASC LIMIT 1"),
@@ -145,7 +150,7 @@ ITEMS: list[tuple[str, str, str | None]] = [
      "SELECT COUNT(*) AS n FROM checkup WHERE vision_left <= 0.5 AND vision_right <= 0.5"),
     ("multi", "50대 이상에서 혈청 크레아티닌이 1.5 넘는 사람 비율",
      f"SELECT {PCT.format(cond='creatinine > 1.5')} AS pct, COUNT(*) AS n FROM checkup WHERE age_group >= 11 AND creatinine IS NOT NULL"),
-    ("multi", "20대 평균 몸무게 (5kg 단위 값 기준)",
+    ("multi", "20대 전체를 하나로 묶은 평균 몸무게 (5kg 단위 값 기준)",
      "SELECT ROUND(AVG(weight_kg), 1) AS avg_weight, COUNT(weight_kg) AS n FROM checkup WHERE age_group IN (5, 6)"),
     ("multi", "남자 평균 키는?", "SELECT ROUND(AVG(height_cm), 1) AS avg_height, COUNT(height_cm) AS n FROM checkup WHERE sex = 1"),
     ("multi", "공복혈당이 100~125인 사람 비율",

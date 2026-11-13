@@ -1,4 +1,12 @@
-# 기능 2 정답셋 stats-gold-v1 검토용 (60문항)
+# 기능 2 정답셋 stats-gold-v2 검토용 (60문항)
+
+**검토 완료 (2026-11-13).** 사용자 검토(외부 의견 포함)를 실제 DB와 시험 결과에 대 보고, 질문이 두 가지로 읽히던 시험 문항 3개만 고쳤다(v1 → v2). 정답 SQL은 sq-037의 LIMIT만 바뀌었고 나머지 57문항은 v1과 같다. 시험 점수(test-v2 32/34)는 v1 기준 기록으로 그대로 둔다.
+
+- sq-012: "차이가 궁금해" → "비교해줘". 차이 값 하나로 답해도 맞는 질문이었다.
+- sq-037: 상위 5개 → 2곳. 3·4위(전라남도 37.62, 강원도 37.58)가 반올림하면 같아 순서가 정해지지 않았다.
+- sq-049: "20대" → "20대 전체를 하나로 묶은". 20~24세·25~29세 두 줄로 읽을 수 있었다.
+
+고치지 않은 지적과 이유: sq-047 시력 0(최솟값 0.1, 실명 9.9는 조건에서 이미 빠짐), 성별 `ELSE '여자'`(성별은 1·2뿐, NULL 0건), sq-043 어순(평가기는 순위 질문이 아니면 행·열 순서를 보지 않음), sq-030 이완기 NULL(한쪽만 빈 행 0건), 비율 분모(프롬프트 규칙 6이 빈 값 제외), sq-059(검사기가 집계 아닌 SELECT를 막고 채점은 실행 여부만 봄).
 
 질문·정답 SQL은 Claude가 썼다(ADR 0013). 정답 결과는 읽기 전용 계정으로 실제 실행한 값이다. 이상한 문항, 애매한 질문, 정답이 다르다고 생각하는 문항의 번호를 알려 주면 고친다.
 
@@ -41,7 +49,7 @@
 - **sq-011** (개발) 흡연 상태별 평균 감마지티피는?
   - 정답: smoking=피우지 않음, avg_ggt=27.6, n=638782 외 2행
   - `SELECT CASE c.smoking WHEN 1 THEN '피우지 않음' WHEN 2 THEN '끊음' WHEN 3 THEN '현재 흡연' END AS smoking, ROUND(AVG(ggt), 1) AS avg_ggt, COUNT(ggt) AS n FROM checkup c WHERE c.smoking IS NOT NULL GROUP BY c.smoking ORDER BY c.smoking`
-- **sq-012** (시험) 술 마시는 사람과 안 마시는 사람의 ALT 평균 차이가 궁금해
+- **sq-012** (시험) 술 마시는 사람과 안 마시는 사람의 ALT 평균 비교해줘
   - 정답: drinking=안 마심, avg_alt=25.0, n=335772 외 1행
   - `SELECT CASE c.drinking WHEN 1 THEN '마심' ELSE '안 마심' END AS drinking, ROUND(AVG(alt), 1) AS avg_alt, COUNT(alt) AS n FROM checkup c WHERE c.drinking IS NOT NULL GROUP BY c.drinking ORDER BY c.drinking`
 - **sq-013** (개발) 요단백 결과별 인원
@@ -128,9 +136,9 @@
 - **sq-036** (시험) 현재 흡연자 비율이 제일 높은 연령대는?
   - 정답: age_group=45~49세, pct=24.7, n=93328
   - `SELECT a.label AS age_group, ROUND(100.0 * COUNT(*) FILTER (WHERE c.smoking = 3) / COUNT(*), 1) AS pct, COUNT(*) AS n FROM checkup c JOIN age_group a ON a.code = c.age_group WHERE c.smoking IS NOT NULL GROUP BY a.code, a.label ORDER BY 2 DESC LIMIT 1`
-- **sq-037** (시험) 평균 감마지티피 높은 순으로 시도 5개 뽑아줘
-  - 정답: region=충청북도, avg_ggt=39.1, n=33386 외 4행
-  - `SELECT r.name AS region, ROUND(AVG(c.ggt), 1) AS avg_ggt, COUNT(c.ggt) AS n FROM checkup c JOIN region r ON r.code = c.region_code GROUP BY r.name ORDER BY AVG(c.ggt) DESC LIMIT 5`
+- **sq-037** (시험) 평균 감마지티피 높은 순으로 시도 2곳 뽑아줘
+  - 정답: region=충청북도, avg_ggt=39.1, n=33386 외 1행
+  - `SELECT r.name AS region, ROUND(AVG(c.ggt), 1) AS avg_ggt, COUNT(c.ggt) AS n FROM checkup c JOIN region r ON r.code = c.region_code GROUP BY r.name ORDER BY AVG(c.ggt) DESC LIMIT 2`
 - **sq-038** (시험) 수검자가 가장 적은 시도는 어디야?
   - 정답: region=세종특별자치시, n=7636
   - `SELECT r.name AS region, COUNT(*) AS n FROM checkup c JOIN region r ON r.code = c.region_code GROUP BY r.name ORDER BY COUNT(*) ASC LIMIT 1`
@@ -170,7 +178,7 @@
 - **sq-048** (시험) 50대 이상에서 혈청 크레아티닌이 1.5 넘는 사람 비율
   - 정답: pct=0.9, n=515827
   - `SELECT ROUND(100.0 * COUNT(*) FILTER (WHERE creatinine > 1.5) / COUNT(*), 1) AS pct, COUNT(*) AS n FROM checkup WHERE age_group >= 11 AND creatinine IS NOT NULL`
-- **sq-049** (시험) 20대 평균 몸무게 (5kg 단위 값 기준)
+- **sq-049** (시험) 20대 전체를 하나로 묶은 평균 몸무게 (5kg 단위 값 기준)
   - 정답: avg_weight=64.7, n=104819
   - `SELECT ROUND(AVG(weight_kg), 1) AS avg_weight, COUNT(weight_kg) AS n FROM checkup WHERE age_group IN (5, 6)`
 - **sq-050** (시험) 남자 평균 키는?

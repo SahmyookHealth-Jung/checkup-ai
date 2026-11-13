@@ -1,6 +1,6 @@
 """기능 2 Text-to-SQL 평가 (ADR 0013 4절). 문항마다 Haiku 1~2회.
 
-정답셋 stats-gold-v1의 질문을 앱(POST /api/stats/ask)에 보내 결과를 정답 SQL의 결과와 맞춘다.
+정답셋(기본 stats-gold-v2, --gold로 고른다)의 질문을 앱(POST /api/stats/ask)에 보내 결과를 정답 SQL의 결과와 맞춘다.
 - 실행 결과 일치: 행 수가 같고, 정답의 행마다 앱 결과의 한 행이 정답 값을 모두 포함한다(앱이 이름 열 등을 더 내도 된다).
   숫자는 소수 첫째 자리로 맞춘다. 정답 SQL에 ORDER BY ... LIMIT이 있으면(순위 질문) 순서까지 맞아야 한다.
   작은 집단 숨김은 정답 결과에도 같은 규칙으로 걸고 비교한다.
@@ -26,7 +26,7 @@ from pathlib import Path
 import run_record
 from run_record import EVAL_DIR
 
-GOLD = Path(__file__).resolve().parent / "stats-gold-v1.jsonl"
+HERE = Path(__file__).resolve().parent
 MIN_GROUP = 10
 
 
@@ -138,11 +138,13 @@ def main() -> None:
     parser.add_argument("--split", default="dev")
     parser.add_argument("--runs", type=int, default=1)
     parser.add_argument("--label", default="dev")
+    parser.add_argument("--gold", default="stats-gold-v2", help="eval/stats/ 안의 정답셋 이름 (v1은 2026-11-13 이전 기록)")
     args = parser.parse_args()
     git = run_record.git_state()  # 시작할 때 잰다 (실행 중에 파일을 고쳐도 기록이 바뀌지 않게, 2026-11-12 dev-v2 교훈)
     if git["dirty"]:
         print("주의: 커밋하지 않은 변경이 있다. 기록에 dirty=true로 남는다 (비교 수치로 쓰지 않는다)")
-    gold = [json.loads(line) for line in GOLD.read_text(encoding="utf-8").splitlines() if line.strip()]
+    gold_path = HERE / f"{args.gold}.jsonl"
+    gold = [json.loads(line) for line in gold_path.read_text(encoding="utf-8").splitlines() if line.strip()]
     gold = [g for g in gold if g["split"] == args.split]
     rows = []
     for run in range(1, args.runs + 1):
@@ -171,7 +173,7 @@ def main() -> None:
     print(json.dumps(summary["all"], ensure_ascii=False, indent=1))
     run_id = run_record.new_run_id("stats-sql", args.label)
     out = run_record.save(run_id, "stats-sql", "stats", label=args.label,
-                          dataset={"name": GOLD.stem, "split": args.split, "questions": len(gold)},
+                          dataset={"name": gold_path.stem, "split": args.split, "questions": len(gold)},
                           config={"promptVersion": sorted({r["promptVersion"] for r in rows if r["promptVersion"]}),
                                   "runs": args.runs, "minGroupSize": MIN_GROUP},
                           summary=summary,
