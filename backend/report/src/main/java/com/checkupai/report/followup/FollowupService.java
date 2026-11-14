@@ -99,10 +99,11 @@ public class FollowupService {
      * @param answerBlocked 답 검사가 진단을 확인해 주는 답이라 막았는가
      */
     /**
+     * @param contextUnitIds LLM에 보낸 근거 단위 id (S1부터 순서대로). 평가가 정답 절이 문맥에 있었는지 본다
      * @param unsupportedQuotes 근거 구절이 없거나 짧거나 인용한 근거 문단에 없어 지운 문장 수
      */
     public record Metrics(String promptVersion, String itemSource, int contextChars, int contextUnits,
-                          int sentencesGenerated, int sentencesKept, int unsupportedQuotes, int invalidCitations,
+                          List<String> contextUnitIds, int sentencesGenerated, int sentencesKept, int unsupportedQuotes, int invalidCitations,
                           int uncitedSentences, int ungroundedNumberSentences, int forbiddenHits, long llmMs,
                           long totalMs, String llmError) {
     }
@@ -209,7 +210,7 @@ public class FollowupService {
                 })
                 .toList();
         var metrics = new Metrics(PROMPT_VERSION + "+" + INTENT_VERSION, context.itemSource().name(), context.totalChars(), byLabel.size(),
-                drafts.size(), decision == Decision.ANSWER ? outcome.kept().size() : 0, unsupportedQuotes,
+                byLabel.values().stream().map(ContextUnit::id).toList(), drafts.size(), decision == Decision.ANSWER ? outcome.kept().size() : 0, unsupportedQuotes,
                 outcome.invalidCitations(), outcome.uncited(), outcome.ungroundedNumbers(), outcome.forbiddenHits(),
                 llmMs, (System.nanoTime() - started) / 1_000_000, llmError);
         return new FollowupResult(question, decision, llmDecision == null ? null : llmDecision.name(),

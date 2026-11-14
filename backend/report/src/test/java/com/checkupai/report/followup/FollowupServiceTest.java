@@ -52,6 +52,7 @@ class FollowupServiceTest {
         assertThat(result.decision()).isEqualTo(Decision.ANSWER);
         assertThat(result.sentences()).singleElement().satisfies(s -> assertThat(s.citations()).containsExactly(1));
         assertThat(result.citations()).singleElement().satisfies(c -> assertThat(c.unitId()).isEqualTo("kdca-5457#개요-종류"));
+        assertThat(result.metrics().contextUnitIds()).hasSize(result.metrics().contextUnits()).contains("kdca-5457#개요-종류");
         assertThat(result.metrics().unsupportedQuotes()).isEqualTo(1);  // S9는 없는 근거라 구절도 대조할 수 없다
         assertThat(result.metrics().promptVersion()).isEqualTo("followup-v3+followup-intent-v1");
         assertThat(result.intentDiagnosis()).isFalse();
