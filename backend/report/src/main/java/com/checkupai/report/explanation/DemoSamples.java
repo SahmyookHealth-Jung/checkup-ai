@@ -91,7 +91,7 @@ public class DemoSamples {
         List<String> suspect = new ArrayList<>();
         List<String> borderline = new ArrayList<>();
         for (ReportItem item : report.items()) {
-            Judgment judgment = criteria.judge(item.code(), item.value(), item.unit(), report.sex()).judgment();
+            Judgment judgment = criteria.judge(item, report).judgment();
             String name = item.code().koreanName().replaceAll("\\(.*\\)", "").strip();
             if (judgment == Judgment.SUSPECT) {
                 suspect.add(name);

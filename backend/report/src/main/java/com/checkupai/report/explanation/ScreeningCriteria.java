@@ -3,6 +3,7 @@ package com.checkupai.report.explanation;
 import com.checkupai.report.extraction.CheckupReport;
 import com.checkupai.report.extraction.ItemCode;
 import com.checkupai.report.extraction.NumericValue;
+import com.checkupai.report.extraction.ReportItem;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -26,11 +27,18 @@ import tools.jackson.databind.json.JsonMapper;
  * 숫자로 읽지 못하거나, 아는 글자 표기가 아니면 {@link Judgment#NOT_JUDGED}와 이유를 돌려준다.
  * 해설 서비스는 이런 항목을 "확인 필요"로 알린다. 틀린 판정이나 조용한 누락보다 "모른다"가 안전하다.
  * 단위 환산은 하지 않는다.
+ *
+ * <p>예외로, eGFR 단위가 1.73m² 보정 표기 없이 mL/min으로 적힌 경우는 두 해석(보정값을 줄여 쓴 것, 보정하지 않은
+ * 절대값)을 모두 계산해 판정이 같을 때만 판정한다 (ADR 0007 보완, 2026-11-14). 성별을 모를 때와 같은 방식이다.
  */
 @Component
 public class ScreeningCriteria {
 
     static final String RESOURCE = "criteria/general-screening-2026-6.json";
+
+    /** eGFR 보정의 기준 체표면적 (m²). 판정기준표의 단위 mL/min/1.73m²의 그 값이다 */
+    private static final double STANDARD_BSA = 1.73;
+
     private final CriteriaFile file;
     private final String sourceLabel;
 
@@ -48,18 +56,89 @@ public class ScreeningCriteria {
         return judge(code, value, null, sex);
     }
 
+    /** 결과지의 한 항목을 판정한다. 성별과 체격(신장·체중)은 결과지에서 가져온다 */
+    public CriteriaJudgment judge(ReportItem item, CheckupReport report) {
+        return judge(item.code(), item.value(), item.unit(), report == null ? null : report.sex(),
+                report == null ? OptionalDouble.empty() : bodySurfaceArea(report.items()));
+    }
+
     /**
      * @param unit 결과지에 적힌 단위. 비어 있으면 대표 단위로 본다. 대표 단위와 다르면 판정하지 않는다
      */
     public CriteriaJudgment judge(ItemCode code, String value, String unit, CheckupReport.Sex sex) {
+        return judge(code, value, unit, sex, OptionalDouble.empty());
+    }
+
+    /**
+     * @param bodySurfaceArea 체표면적 (m²). eGFR 단위가 mL/min일 때만 쓴다. 없으면 그 경우를 판정하지 않는다
+     */
+    public CriteriaJudgment judge(ItemCode code, String value, String unit, CheckupReport.Sex sex,
+                                  OptionalDouble bodySurfaceArea) {
         ItemCriteria criteria = file.items().get(code.name());
         if (criteria == null || value == null || value.isBlank()) {
-            return new CriteriaJudgment(code, value, Judgment.NOT_JUDGED, null, null, null);
+            return new CriteriaJudgment(code, value, Judgment.NOT_JUDGED, null, null, null, null);
         }
-        Outcome outcome = criteria.textBands() != null
-                ? judgeText(criteria.textBands(), value.strip())
-                : judgeNumber(criteria, value.strip(), unit, code.canonicalUnit(), sex);
-        return new CriteriaJudgment(code, value, outcome.judgment(), criteria.row(), sourceLabel, outcome.note());
+        Outcome outcome;
+        if (criteria.textBands() != null) {
+            outcome = judgeText(criteria.textBands(), value.strip());
+        } else if (code == ItemCode.EGFR && unindexedEgfrUnit(unit)) {
+            outcome = judgeUnindexedEgfr(criteria, value.strip(), unit.strip(), sex, bodySurfaceArea);
+        } else {
+            outcome = judgeNumber(criteria, value.strip(), unit, code.canonicalUnit(), sex);
+        }
+        return new CriteriaJudgment(code, value, outcome.judgment(), criteria.row(), sourceLabel, outcome.note(),
+                outcome.unitNote());
+    }
+
+    /**
+     * 체표면적 (m²). 결과지의 신장(cm)과 체중(kg)으로 구한다. 둘 중 하나라도 없거나 단위가 다르면 비어 있다.
+     * 공식: Du Bois & Du Bois (Arch Intern Med 1916;17:863), BSA = 0.007184 × 체중^0.425 × 신장^0.725.
+     */
+    static OptionalDouble bodySurfaceArea(List<ReportItem> items) {
+        OptionalDouble height = measurement(items, ItemCode.HEIGHT);
+        OptionalDouble weight = measurement(items, ItemCode.WEIGHT);
+        if (height.isEmpty() || weight.isEmpty() || height.getAsDouble() <= 0 || weight.getAsDouble() <= 0) {
+            return OptionalDouble.empty();
+        }
+        return OptionalDouble.of(0.007184 * Math.pow(weight.getAsDouble(), 0.425) * Math.pow(height.getAsDouble(), 0.725));
+    }
+
+    private static OptionalDouble measurement(List<ReportItem> items, ItemCode code) {
+        return items == null ? OptionalDouble.empty() : items.stream()
+                .filter(item -> item.code() == code && item.value() != null
+                        && sameUnit(item.unit(), code.canonicalUnit()) && !NumericValue.hasInequality(item.value()))
+                .map(item -> NumericValue.parse(item.value()))
+                .filter(OptionalDouble::isPresent)
+                .findFirst().orElse(OptionalDouble.empty());
+    }
+
+    /** eGFR 단위가 1.73m² 보정 표기 없이 mL/min으로만 적혔는가 */
+    private static boolean unindexedEgfrUnit(String unit) {
+        return unit != null && normalizeUnit(unit).equals("ml/min");
+    }
+
+    /**
+     * eGFR이 mL/min으로 적혔을 때. 검사실 eGFR은 보통 1.73m² 보정값이고(KDIGO 2012 CKD 가이드라인의 검사실 보고 권고)
+     * mL/min은 그것을 줄여 쓴 것일 수 있다. 하지만 보정하지 않은 절대값(= 보정값 × 체표면적 ÷ 1.73, 약 용량 계산에 쓴다)도
+     * 같은 단위다. 어느 쪽인지 결과지로는 알 수 없으므로 두 해석을 모두 판정해, 같으면 그 판정을 쓰고 다르면 판정하지 않는다.
+     * 2026-11-14 Codex 리뷰: 줄여 쓴 것으로만 보면 체격이 큰 사람의 절대값이 기준 60 근처에서 정상A로 잘못 나온다.
+     */
+    private static Outcome judgeUnindexedEgfr(ItemCriteria criteria, String value, String unit, CheckupReport.Sex sex,
+                                              OptionalDouble bodySurfaceArea) {
+        Outcome asIndexed = judgeNumber(criteria, value, null, null, sex);
+        if (asIndexed.judgment() == Judgment.NOT_JUDGED) {
+            return asIndexed;
+        }
+        if (bodySurfaceArea.isEmpty()) {
+            return Outcome.unknown("단위에 1.73m² 보정 표기가 없음: " + unit + " (신장·체중이 없어 보정 여부의 영향을 확인하지 못함)");
+        }
+        double indexed = NumericValue.parse(value).getAsDouble() * STANDARD_BSA / bodySurfaceArea.getAsDouble();
+        Outcome asAbsolute = judgeBands(criteria.bands(), indexed);
+        if (asAbsolute.judgment() != asIndexed.judgment()) {
+            return Outcome.unknown("단위에 1.73m² 보정 표기가 없음: " + unit + " (보정값인지에 따라 판정이 달라짐)");
+        }
+        return new Outcome(asIndexed.judgment(), null, "결과지 단위가 " + unit + "입니다. 1.73m² 보정값이든 보정하지 않은 값이든 "
+                + "판정이 같아 판정했습니다. 신장·체중으로 계산한 체표면적을 썼습니다.");
     }
 
     /** 판정 기준의 출처 (문서명과 고시 번호) */
@@ -68,14 +147,14 @@ public class ScreeningCriteria {
     }
 
     /** 판정과, 판정하지 못했을 때의 이유 */
-    private record Outcome(Judgment judgment, String note) {
+    private record Outcome(Judgment judgment, String note, String unitNote) {
 
         static Outcome of(Judgment judgment) {
-            return new Outcome(judgment, null);
+            return new Outcome(judgment, null, null);
         }
 
         static Outcome unknown(String note) {
-            return new Outcome(Judgment.NOT_JUDGED, note);
+            return new Outcome(Judgment.NOT_JUDGED, note, null);
         }
     }
 

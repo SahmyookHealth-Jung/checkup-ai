@@ -16,9 +16,13 @@ public record ExplanationResult(List<ItemJudgment> judgments, List<ItemExplanati
                                 List<ReviewNotice> needsReview, List<Citation> citations, String disclaimer,
                                 Metrics metrics) {
 
-    /** @param centerJudgment 결과지에 적힌 판정 (국가 기준 판정과 따로 보여 준다) */
+    /**
+     * @param centerJudgment 결과지에 적힌 판정 (국가 기준 판정과 따로 보여 준다)
+     * @param unitNote 단위 표기가 모호한데도 판정할 수 있었을 때 화면에 밝히는 문구. 없으면 null
+     */
     public record ItemJudgment(ItemCode code, String name, String rawName, String value, String unit,
-                               Judgment judgment, String judgmentLabel, String criterion, String centerJudgment) {
+                               Judgment judgment, String judgmentLabel, String criterion, String centerJudgment,
+                               String unitNote) {
     }
 
     /**

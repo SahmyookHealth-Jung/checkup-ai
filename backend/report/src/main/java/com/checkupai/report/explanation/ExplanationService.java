@@ -77,7 +77,6 @@ public class ExplanationService {
         long started = System.nanoTime();
         CheckupReport report = extraction.report();
         List<ReportItem> reportItems = report == null || report.items() == null ? List.of() : report.items();
-        CheckupReport.Sex sex = report == null ? null : report.sex();
 
         // 1~2. 코드가 판정하고 해설 대상을 고른다
         List<ItemJudgment> judgments = new ArrayList<>();
@@ -87,7 +86,7 @@ public class ExplanationService {
             if (item.code() == null) {
                 continue;
             }
-            CriteriaJudgment judgment = criteria.judge(item.code(), item.value(), item.unit(), sex);
+            CriteriaJudgment judgment = criteria.judge(item, report);
             if (judgment.unjudgedTarget()) {
                 // 판정 대상인데 판정하지 못했다. 조용히 넘어가지 않고 확인 필요로 알린다 (ADR 0007 보완)
                 unjudged.add(new ReviewNotice(item.code(), item.rawName(), item.value(),
@@ -96,7 +95,7 @@ public class ExplanationService {
             }
             judgments.add(new ItemJudgment(item.code(), item.code().koreanName(), item.rawName(), item.value(),
                     item.unit(), judgment.judgment(), judgment.judgment().label(), judgment.criterion(),
-                    item.centerJudgment()));
+                    item.centerJudgment(), judgment.unitNote()));
             if (judgment.judgment() == Judgment.SUSPECT || judgment.judgment() == Judgment.NORMAL_B) {
                 // 코드 문구로 답할지는 근거를 조회한 뒤 정한다 (글 청크가 없으면 코드 문구)
                 targets.add(new Target(item, judgment, new LinkedHashMap<>(), false));

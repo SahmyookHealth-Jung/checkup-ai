@@ -284,7 +284,7 @@ public class FollowupService {
             if (item.code() == null || !wanted.contains(item.code())) {
                 continue;
             }
-            CriteriaJudgment judgment = criteria.judge(item.code(), item.value(), item.unit(), report.sex());
+            CriteriaJudgment judgment = criteria.judge(item, report);
             lines.add("- " + item.code().koreanName() + ": " + item.value() + (item.unit() == null ? "" : " " + item.unit())
                     + " | 판정: " + judgment.judgment().label()
                     + (judgment.criterion() == null ? "" : " | 기준: " + judgment.criterion()));

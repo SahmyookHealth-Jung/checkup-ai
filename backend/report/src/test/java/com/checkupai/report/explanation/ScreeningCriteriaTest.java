@@ -4,9 +4,13 @@ import static com.checkupai.report.extraction.CheckupReport.Sex.FEMALE;
 import static com.checkupai.report.extraction.CheckupReport.Sex.MALE;
 import static com.checkupai.report.extraction.CheckupReport.Sex.UNKNOWN;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 import com.checkupai.report.extraction.CheckupReport;
 import com.checkupai.report.extraction.ItemCode;
+import com.checkupai.report.extraction.ReportItem;
+import java.util.List;
+import java.util.OptionalDouble;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -129,6 +133,90 @@ class ScreeningCriteriaTest {
         CriteriaJudgment judgment = criteria.judge(code, value, null, MALE);
         assertThat(judgment.judgment()).isEqualTo(expected);
         assertThat(judgment.unjudgedTarget()).isEqualTo(expected == Judgment.NOT_JUDGED);
+    }
+
+    private static OptionalDouble bsa(double heightCm, double weightKg) {
+        return ScreeningCriteria.bodySurfaceArea(List.of(
+                new ReportItem(ItemCode.HEIGHT, "신장", String.valueOf(heightCm), "cm", null, null),
+                new ReportItem(ItemCode.WEIGHT, "체중", String.valueOf(weightKg), "kg", null, null)));
+    }
+
+    @Test
+    @DisplayName("체표면적은 결과지의 신장·체중으로 구한다 (Du Bois). 하나라도 없거나 단위가 다르면 구하지 않는다")
+    void bodySurfaceAreaFromHeightAndWeight() {
+        // 170cm, 63kg은 약 1.73m² (기준 체표면적 근처)
+        assertThat(bsa(170, 63).getAsDouble()).isCloseTo(1.73, within(0.02));
+        assertThat(bsa(185, 100).getAsDouble()).isCloseTo(2.24, within(0.03));
+
+        assertThat(ScreeningCriteria.bodySurfaceArea(List.of(
+                new ReportItem(ItemCode.HEIGHT, "신장", "170", "cm", null, null)))).isEmpty();
+        assertThat(ScreeningCriteria.bodySurfaceArea(List.of(
+                new ReportItem(ItemCode.HEIGHT, "신장", "1.7", "m", null, null),
+                new ReportItem(ItemCode.WEIGHT, "체중", "63", "kg", null, null)))).isEmpty();
+        assertThat(ScreeningCriteria.bodySurfaceArea(null)).isEmpty();
+    }
+
+    @Test
+    @DisplayName("eGFR이 mL/min이면 보정값·절대값 두 해석의 판정이 같을 때만 판정하고, 그 사실을 돌려준다")
+    void judgesUnindexedEgfrOnlyWhenBothReadingsAgree() {
+        // 94.5: 보정값이면 94.5, 절대값이면 172cm·68kg(약 1.80m²)에서 약 91. 둘 다 정상A
+        CriteriaJudgment normal = criteria.judge(ItemCode.EGFR, "94.5", "mL/min", MALE, bsa(172.1, 68.1));
+        assertThat(normal.judgment()).isEqualTo(Judgment.NORMAL_A);
+        assertThat(normal.unitNote()).contains("mL/min").contains("판정이 같아 판정");
+        assertThat(normal.note()).isNull();
+
+        // 40: 체격이 작아(150cm·45kg, 약 1.37m²) 절대값이라 해도 약 50. 둘 다 질환의심
+        CriteriaJudgment suspect = criteria.judge(ItemCode.EGFR, "40", "ml / min", MALE, bsa(150, 45));
+        assertThat(suspect.judgment()).isEqualTo(Judgment.SUSPECT);
+        assertThat(suspect.unitNote()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("eGFR mL/min: 두 해석의 판정이 다르면 판정하지 않는다 (체격이 큰 사람의 거짓 안심을 막는다)")
+    void doesNotJudgeUnindexedEgfrWhenReadingsDisagree() {
+        // 65: 보정값이면 정상A. 절대값이면 185cm·100kg(약 2.24m²)에서 약 50, 질환의심
+        CriteriaJudgment large = criteria.judge(ItemCode.EGFR, "65", "mL/min", MALE, bsa(185, 100));
+        assertThat(large.judgment()).isEqualTo(Judgment.NOT_JUDGED);
+        assertThat(large.note()).contains("1.73m² 보정 표기가 없음").contains("판정이 달라짐");
+        assertThat(large.unitNote()).isNull();
+        assertThat(large.unjudgedTarget()).isTrue();
+
+        // 55: 보정값이면 질환의심. 절대값이면 150cm·45kg에서 약 69, 정상A
+        assertThat(criteria.judge(ItemCode.EGFR, "55", "mL/min", MALE, bsa(150, 45)).judgment())
+                .isEqualTo(Judgment.NOT_JUDGED);
+    }
+
+    @Test
+    @DisplayName("eGFR mL/min: 신장·체중이 없으면 판정하지 않는다. 대표 단위에는 영향이 없고 다른 항목의 mL/min은 모르는 단위다")
+    void unindexedEgfrNeedsBodySizeAndStaysNarrow() {
+        CriteriaJudgment noBody = criteria.judge(ItemCode.EGFR, "94.5", "mL/min", MALE);
+        assertThat(noBody.judgment()).isEqualTo(Judgment.NOT_JUDGED);
+        assertThat(noBody.note()).contains("신장·체중이 없어");
+
+        CriteriaJudgment canonical = criteria.judge(ItemCode.EGFR, "65", "mL/min/1.73m²", MALE, bsa(185, 100));
+        assertThat(canonical.judgment()).isEqualTo(Judgment.NORMAL_A);
+        assertThat(canonical.unitNote()).isNull();
+
+        assertThat(criteria.judge(ItemCode.SERUM_CREATININE, "0.9", "mL/min", MALE, bsa(170, 63)).judgment())
+                .isEqualTo(Judgment.NOT_JUDGED);
+        assertThat(criteria.judge(ItemCode.EGFR, "1.5", "mL/s", MALE, bsa(170, 63)).judgment())
+                .isEqualTo(Judgment.NOT_JUDGED);
+
+        // 부등호 값은 체격이 있어도 판정하지 않는다
+        CriteriaJudgment inequality = criteria.judge(ItemCode.EGFR, ">90", "mL/min", MALE, bsa(170, 63));
+        assertThat(inequality.judgment()).isEqualTo(Judgment.NOT_JUDGED);
+        assertThat(inequality.note()).startsWith("실제 수치가 아닌 값");
+    }
+
+    @Test
+    @DisplayName("결과지 항목으로 판정하면 성별과 체격을 결과지에서 가져온다")
+    void judgesFromReport() {
+        ReportItem egfr = new ReportItem(ItemCode.EGFR, "신사구체여과율", "94.5", "mL/min", null, null);
+        CheckupReport report = new CheckupReport(null, null, MALE, null, List.of(
+                new ReportItem(ItemCode.HEIGHT, "신장", "172.1", "cm", null, null),
+                new ReportItem(ItemCode.WEIGHT, "체중", "68.1", "kg", null, null), egfr));
+        assertThat(criteria.judge(egfr, report).judgment()).isEqualTo(Judgment.NORMAL_A);
+        assertThat(criteria.judge(egfr, null).judgment()).isEqualTo(Judgment.NOT_JUDGED);
     }
 
     @Test

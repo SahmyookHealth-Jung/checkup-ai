@@ -49,6 +49,8 @@
   .upload:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
   .upload:has(input:disabled) { color: var(--muted); cursor: not-allowed; text-decoration: none; }
   .consent { display: block; margin-top: 8px; cursor: pointer; }
+  #assumed ul { margin: 4px 0 0; padding-left: 18px; }
+  #assumed li b { display: inline; }
   .noevidence { color: var(--muted); }
   .metrics { color: var(--muted); font-size: 12px; margin-top: 16px; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; }
@@ -99,6 +101,7 @@
       <p class="unjudged-lede">아래 값은 판정 결과가 아닙니다. 값이나 표기를 확인하지 못해 판정에서 뺐고, 위험한 값일 수도 있습니다.</p>
       <div id="review"></div>
     </section>
+    <div id="assumed" class="care review" hidden><b>단위 표기를 확인하고 판정한 항목 *</b><ul id="assumed-list"></ul></div>
     <details id="all-results"><summary id="all-summary">전체 검사 결과 보기</summary>
       <div class="scroll"><table>
         <thead><tr><th>항목</th><th>결과지 항목명</th><th>결과</th><th>결과지 판정</th><th>국가 기준 판정</th></tr></thead>
@@ -195,7 +198,12 @@
       // OTHER의 내부 이름("위 목록에 없는 검사")은 화면에 보이지 않는다
       // 묻기는 이름 칸에 둔다: 좁은 화면에서 표가 옆으로 밀려도 보이게
       el('td', {}, j.code === 'OTHER' ? '기타 검사' : j.name, FLAGGED.includes(j.judgment) && j.code ? [' ', askButton(j.code, j.name)] : ''), el('td', {}, j.rawName ?? ''), el('td', {}, `${j.value}${j.unit ? ' ' + j.unit : ''}`),
-      el('td', {}, j.centerJudgment ?? '-'), el('td', { class: `j j-${j.judgment}` }, j.judgmentLabel))));
+      el('td', {}, j.centerJudgment ?? '-'), el('td', { class: `j j-${j.judgment}` }, j.judgmentLabel, j.unitNote ? ' *' : ''))));
+    // 단위 표기가 모호한데 판정한 항목은 접힌 표 밖에서 밝힌다 (정상A여도 보이게, ADR 0007 보완)
+    const assumed = x.judgments.filter(j => j.unitNote);
+    $('assumed').hidden = !assumed.length;
+    $('assumed-list').replaceChildren(...assumed.map(j => el('li', {},
+      el('b', {}, j.name), ` ${j.value} ${j.unit ?? ''} → ${j.judgmentLabel}. ${j.unitNote}`)));
     $('items').replaceChildren(...(x.items.length ? x.items.map(item => el('div', { class: 'card flag' },
       el('h3', {}, item.name),
       el('div', { class: 'flag-val' }, el('span', { class: 'v' }, item.value), item.unit ? ` ${item.unit} ` : ' ',

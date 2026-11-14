@@ -149,7 +149,7 @@ public class FollowupContextBuilder {
             if (item.code() == null || item.code() == ItemCode.OTHER || out.containsKey(item.code())) {
                 continue;
             }
-            out.put(item.code(), criteria.judge(item.code(), item.value(), item.unit(), report.sex()).judgment());
+            out.put(item.code(), criteria.judge(item, report).judgment());
         }
         return out;
     }
